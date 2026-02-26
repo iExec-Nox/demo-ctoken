@@ -186,25 +186,9 @@ await noxSDK.revokeView({ auditorAddress });
 
 ---
 
-## Shared Components
+## Components
 
-### `<TxStatus />`
-
-Displays transaction lifecycle: `idle | pending | success | error` with spinner and colored badges.
-
-### `<ArbiscanLink />`
-
-```tsx
-<ArbiscanLink txHash={hash} />
-// Renders: "View on Arbiscan ↗" opening in new tab
-// Base URL: https://sepolia.arbiscan.io/tx/{hash}
-```
-
-Must be present on **every** transaction confirmation screen.
-
-### `<DeveloperModeProvider />`
-
-Wraps the app. When Developer Mode is active, injects a floating log panel and annotates SDK calls.
+Component conventions, design system, inventory and shared component specs are in [`components/CLAUDE.md`](./components/CLAUDE.md).
 
 ---
 
