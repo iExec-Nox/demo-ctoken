@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Mulish, Anybody, Inter } from "next/font/google";
 import { Topbar } from "@/components/topbar";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,10 +55,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
       >
-        <Topbar />
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <Topbar />
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
