@@ -1,11 +1,11 @@
 ---
-name: planifieur
+name: archive
 description: Archive un plan validé en ADR + changelog pour documenter les décisions et l'historique du projet
 argument-hint: "[description courte du plan validé]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# Planifieur — Archivage des plans validés
+# Archive — Archivage des plans validés
 
 Ce skill documente chaque plan validé sous deux formes :
 - **ADR** (Architecture Decision Record) dans `docs/decisions/`
