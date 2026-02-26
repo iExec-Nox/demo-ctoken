@@ -1,5 +1,7 @@
 # CLAUDE.md – Nox Confidential Token Demo
 
+Always present a plan before implementing. Never jump into code changes without first outlining the approach and getting user approval.
+
 ## Project Overview
 
 Build a web3 frontend demo showcasing the **Nox confidential computing protocol** on Arbitrum Sepolia testnet. Users can mint, transfer, and audit private tokens (cTokens) using a polished, developer-friendly UI. The app must match the onboarding quality of Zama and Inco while differentiating through ACL management and embedded developer tooling.
