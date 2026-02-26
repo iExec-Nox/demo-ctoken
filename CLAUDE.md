@@ -272,6 +272,19 @@ npm run lint      # ESLint
 
 ---
 
+## Git Workflow
+
+**Always use the `/commit` skill** for all commits. Never commit manually without it.
+
+This skill enforces:
+- **Atomic commits** — one commit per logical change, staged selectively by file
+- **Conventional Commits** — `<type>(<scope>): <description>` format
+- **Auto push + PR** when on a feature branch
+
+See [`/.claude/skills/commit/SKILL.md`](./.claude/skills/commit/SKILL.md) for full details.
+
+---
+
 ## Priority Matrix (Must Have vs Nice to Have)
 
 | Feature                  | Priority            |
