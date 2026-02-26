@@ -2,6 +2,7 @@
 
 ## Conventions
 
+- **File naming**: kebab-case for all component files (e.g. `hero-section.tsx`, `feature-card.tsx`). No camelCase or snake_case.
 - **Named exports** only (no default exports): `export function MyComponent() {}`
 - **Flat structure**: all components live directly in `/components`, no nesting
 - **Single responsibility**: each component does one thing. Extract sub-components when a section contains repeated patterns (e.g. `FeatureCard` extracted from `FeaturesSection`)
