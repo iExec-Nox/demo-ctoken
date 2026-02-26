@@ -77,12 +77,24 @@ size-8 rounded-xl bg-[#748eff] (header) / size-7 (footer)
 
 ---
 
+## Accessibility
+
+- **Interactive elements** : utiliser `<button>` pour les actions (copier, logout, etc.) et `<a>` pour la navigation. Toujours ajouter `cursor-pointer` sur les boutons pour un feedback visuel cohérent.
+- **Images** : attribut `alt` obligatoire sur tout `<img>` et `<Image>`. Utiliser `alt=""` uniquement pour les images purement décoratives.
+- **Contraste** : respecter un ratio minimum de 4.5:1 entre le texte et le fond. Les couleurs du design system (`#748eff` sur `#1d1d24`, `#f1f5f9` sur `#1d1d24`) sont conformes.
+- **Focus visible** : ne jamais supprimer l'outline de focus natif (`outline-none` interdit sauf si un style de focus custom est fourni).
+- **Sémantique HTML** : utiliser les balises appropriées (`<header>`, `<main>`, `<nav>`, `<footer>`, `<button>` pour les actions primaires, `<a>` pour les liens/menus).
+- **ARIA labels** : ajouter `aria-label` sur les éléments interactifs dont le contenu visuel n'est pas suffisant (ex: bouton icône seul).
+- **Keyboard navigation** : tous les éléments interactifs doivent être accessibles au clavier (Tab, Enter, Escape pour fermer les modales/dropdowns).
+
+---
+
 ## Current Inventory
 
 | Component | File | Description |
 |-----------|------|-------------|
 | `Topbar` | `topbar.tsx` | Testnet indicator + "Get Test Tokens" link → `/faucet` |
-| `Header` | `header.tsx` | Logo + "Connect Wallet" button (not connected state) |
+| `Header` | `header.tsx` | Logo + Connect Wallet (Reown) / Wallet dropdown (connected) avec Copy Address, Account details, Logout |
 | `HeroSection` | `hero-section.tsx` | Landing title, subtitle, 2 CTAs (Try It Now / Talk to us) |
 | `FeatureCard` | `feature-card.tsx` | Reusable card: icon + title + description |
 | `FeaturesSection` | `features-section.tsx` | 3 feature cards driven by `FEATURES` data array |
