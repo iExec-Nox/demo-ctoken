@@ -19,6 +19,7 @@ createAppKit({
     url: "https://nox.iex.ec",
     icons: ["/nox-icon.png"],
   },
+  allowUnsupportedChain: true,
   themeMode: "dark",
   themeVariables: {
     "--w3m-accent": "#748eff",
