@@ -2,8 +2,7 @@
 name: commit
 description: Commit, push and create PR following atomic commits and conventional commits standards
 argument-hint: "[optional commit hint]"
-disable-model-invocation: true
-allowed-tools: Bash(git *), Bash(gh pr *)
+allowed-tools: Bash(gh pr *), Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git add*), Bash(git commit*), Bash(git push*)
 ---
 
 # Commit — Commit atomique + Push + PR
@@ -33,11 +32,11 @@ Analyse les fichiers modifiés et regroupe-les par **responsabilité logique**. 
 
 ### Exemples de découpage
 
-| Changements | Commits |
-|---|---|
-| Nouveau composant + page qui l'utilise | 1. `feat(components): add TransferForm component` 2. `feat(transfer): wire TransferForm into transfer page` |
-| Bugfix + refactor découvert en chemin | 1. `fix(dashboard): correct cToken balance calculation` 2. `refactor(dashboard): extract BalanceCard component` |
-| Nouvelle lib + hook + composant | 1. `feat(sdk): add confidentialTransfer wrapper` 2. `feat(hooks): add useTransfer hook` 3. `feat(transfer): implement transfer flow UI` |
+| Changements                            | Commits                                                                                                                                 |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Nouveau composant + page qui l'utilise | 1. `feat(components): add TransferForm component` 2. `feat(transfer): wire TransferForm into transfer page`                             |
+| Bugfix + refactor découvert en chemin  | 1. `fix(dashboard): correct cToken balance calculation` 2. `refactor(dashboard): extract BalanceCard component`                         |
+| Nouvelle lib + hook + composant        | 1. `feat(sdk): add confidentialTransfer wrapper` 2. `feat(hooks): add useTransfer hook` 3. `feat(transfer): implement transfer flow UI` |
 
 ---
 
@@ -53,18 +52,18 @@ Analyse les fichiers modifiés et regroupe-les par **responsabilité logique**. 
 
 ### Types autorisés
 
-| Type | Usage |
-|---|---|
-| `feat` | Nouvelle fonctionnalité |
-| `fix` | Correction de bug |
-| `refactor` | Restructuration sans changement de comportement |
-| `style` | Formatage, espaces, points-virgules (pas de changement de logique) |
-| `docs` | Documentation uniquement |
-| `test` | Ajout ou correction de tests |
-| `chore` | Tâches de maintenance (deps, config, scripts) |
-| `perf` | Amélioration de performance |
-| `ci` | Changements CI/CD |
-| `build` | Changements du système de build |
+| Type       | Usage                                                              |
+| ---------- | ------------------------------------------------------------------ |
+| `feat`     | Nouvelle fonctionnalité                                            |
+| `fix`      | Correction de bug                                                  |
+| `refactor` | Restructuration sans changement de comportement                    |
+| `style`    | Formatage, espaces, points-virgules (pas de changement de logique) |
+| `docs`     | Documentation uniquement                                           |
+| `test`     | Ajout ou correction de tests                                       |
+| `chore`    | Tâches de maintenance (deps, config, scripts)                      |
+| `perf`     | Amélioration de performance                                        |
+| `ci`       | Changements CI/CD                                                  |
+| `build`    | Changements du système de build                                    |
 
 ### Règles du message
 
