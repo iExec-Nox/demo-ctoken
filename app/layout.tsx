@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono, Mulish, Anybody, Inter } from "next/font/google";
 import { Topbar } from "@/components/topbar";
 import { Header } from "@/components/header";
@@ -39,11 +40,14 @@ export const metadata: Metadata = {
   description: "Manage your confidential assets privately",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersObj = await headers();
+  const cookies = headersObj.get("cookie");
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -55,7 +59,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
       >
-        <Providers>
+        <Providers cookies={cookies}>
           <Topbar />
           <Header />
           {children}

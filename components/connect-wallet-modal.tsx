@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 
 interface ConnectWalletModalProps {
   isOpen: boolean;
@@ -77,8 +76,8 @@ function SocialButton({ src, alt, bg }: SocialButtonProps) {
 
 export function ConnectWalletModal({ isOpen, onClose }: ConnectWalletModalProps) {
   const router = useRouter();
-  const { openConnectModal } = useConnectModal();
-  const { isConnected } = useAccount();
+  const { open } = useAppKit();
+  const { isConnected } = useAppKitAccount();
 
   useEffect(() => {
     if (isConnected) {
@@ -102,7 +101,12 @@ export function ConnectWalletModal({ isOpen, onClose }: ConnectWalletModalProps)
 
   function handleWalletConnect() {
     onClose();
-    openConnectModal?.();
+    open();
+  }
+
+  function handleNetworkSelect() {
+    onClose();
+    open({ view: "Networks" });
   }
 
   return (
@@ -180,7 +184,7 @@ export function ConnectWalletModal({ isOpen, onClose }: ConnectWalletModalProps)
           <WalletRow
             label="More Wallets"
             src="/wallet-passkey.png"
-            onClick={handleWalletConnect}
+            onClick={handleNetworkSelect}
           />
         </div>
 

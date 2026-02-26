@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useDisconnect } from "wagmi";
 import { ConnectWalletModal } from "@/components/connect-wallet-modal";
 
 function formatAddress(address: string) {
@@ -12,7 +13,7 @@ function formatAddress(address: string) {
 
 export function Header() {
   const [modalOpen, setModalOpen] = useState(false);
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useAppKitAccount();
   const { disconnect } = useDisconnect();
 
   return (
