@@ -19,6 +19,8 @@ interface WalletDropdownProps {
 
 function WalletDropdown({ address, triggerRef, onClose, onLogout }: WalletDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -28,19 +30,19 @@ function WalletDropdown({ address, triggerRef, onClose, onLogout }: WalletDropdo
         !dropdownRef.current.contains(target) &&
         !triggerRef.current?.contains(target)
       ) {
-        onClose();
+        onCloseRef.current();
       }
     }
     function handleEscape(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     }
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("keydown", handleEscape, { passive: true });
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [onClose]);
+  }, [triggerRef]);
 
   function handleCopyAddress() {
     navigator.clipboard.writeText(address);
