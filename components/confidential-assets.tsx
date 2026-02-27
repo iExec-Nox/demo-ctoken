@@ -1,6 +1,8 @@
+import { Card } from "@/components/ui/card";
+
 export function ConfidentialAssets() {
   return (
-    <div className="flex flex-col rounded-3xl border border-surface-border bg-asset-card-bg">
+    <Card className="gap-0 rounded-3xl border-surface-border bg-asset-card-bg py-0">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
@@ -29,6 +31,6 @@ export function ConfidentialAssets() {
           will be encrypted on-chain and hidden from block explorers.
         </p>
       </div>
-    </div>
+    </Card>
   );
 }

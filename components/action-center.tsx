@@ -1,3 +1,4 @@
+import { Card, CardContent } from "@/components/ui/card";
 import { ActionButton } from "./action-button";
 
 const ACTIONS = [
@@ -33,7 +34,7 @@ interface ActionCenterProps {
 
 export function ActionCenter({ hasBalance }: ActionCenterProps) {
   return (
-    <div className="flex w-[290px] shrink-0 flex-col gap-7 rounded-3xl border border-surface-border bg-surface p-[25px] backdrop-blur-sm">
+    <Card className="w-[290px] shrink-0 gap-7 rounded-3xl border-surface-border bg-surface p-[25px] backdrop-blur-sm">
       {/* Warning banner */}
       {!hasBalance && (
         <div className="flex items-center gap-2 rounded-xl border border-info-banner-border bg-info-banner-bg p-[13px]">
@@ -50,7 +51,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       </p>
 
       {/* Action buttons */}
-      <div className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-3 p-0">
         {ACTIONS.map((action) => (
           <ActionButton
             key={action.label}
@@ -61,7 +62,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
             href={action.href}
           />
         ))}
-      </div>
+      </CardContent>
 
       {/* Privacy Status */}
       <div className="flex flex-col gap-2 rounded-2xl border border-surface-border bg-surface p-[17px]">
@@ -79,6 +80,6 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
             : "No confidential assets detected. Shielded transactions require an initial balance."}
         </p>
       </div>
-    </div>
+    </Card>
   );
 }

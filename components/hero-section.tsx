@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   return (
@@ -12,19 +13,22 @@ export function HeroSection() {
         and experience private on-chain transfers in action.
       </p>
       <div className="flex w-full items-start justify-center gap-5">
-        <Link
-          href="/dashboard"
-          className="flex items-center gap-2 rounded-xl bg-primary px-5 py-4 text-center font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover"
+        <Button
+          asChild
+          className="h-auto rounded-xl bg-primary px-5 py-4 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
         >
-          <span className="material-icons text-xl leading-7">account_balance_wallet</span>
-          Try It Now
-        </Link>
-        <Link
-          href="#"
-          className="flex h-[60px] items-center justify-center rounded-xl border border-ghost-btn-border bg-ghost-btn-bg px-5 py-4 font-mulish text-lg font-bold text-ghost-btn-text backdrop-blur-sm transition-colors hover:opacity-80"
+          <Link href="/dashboard">
+            <span className="material-icons text-xl leading-7">account_balance_wallet</span>
+            Try It Now
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant="ghost"
+          className="h-[60px] rounded-xl border border-ghost-btn-border bg-ghost-btn-bg px-5 py-4 font-mulish text-lg font-bold text-ghost-btn-text backdrop-blur-sm hover:bg-ghost-btn-bg hover:opacity-80"
         >
-          Talk to us
-        </Link>
+          <Link href="#">Talk to us</Link>
+        </Button>
       </div>
     </section>
   );

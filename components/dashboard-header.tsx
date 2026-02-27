@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { WalletButton } from "@/components/wallet-button";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
 
 const NAV_ITEMS = [
@@ -18,21 +20,16 @@ function DevModeToggle() {
   const [enabled, setEnabled] = useState(true);
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5">
       <span className="font-inter text-sm font-medium text-text-body">
         Developer Mode
       </span>
-      <button
-        onClick={() => setEnabled((prev) => !prev)}
-        role="switch"
-        aria-checked={enabled}
+      <Switch
+        size="sm"
+        checked={enabled}
+        onCheckedChange={setEnabled}
         aria-label={enabled ? "Disable developer mode" : "Enable developer mode"}
-        className={`relative h-[14px] w-[32px] cursor-pointer rounded-full transition-colors duration-200 ${enabled ? "bg-primary" : "bg-surface-border"}`}
-      >
-        <div
-          className={`absolute top-px size-[12px] rounded-full bg-primary-foreground transition-[left] duration-200 ${enabled ? "left-[18px]" : "left-px"}`}
-        />
-      </button>
+      />
     </div>
   );
 }
@@ -70,12 +67,12 @@ export function DashboardHeader() {
         <ThemeToggle />
         <DevModeToggle />
 
-        <Link
-          href="#"
-          className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover"
+        <Button
+          asChild
+          className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
         >
-          Contact us
-        </Link>
+          <Link href="#">Contact us</Link>
+        </Button>
 
         <WalletButton />
       </div>

@@ -1,6 +1,7 @@
 import type { TokenBalance } from "@/hooks/use-token-balances";
 import type { TokenPrices } from "@/hooks/use-token-prices";
 import { toFloat, formatUsd } from "@/lib/format";
+import { Card } from "@/components/ui/card";
 import { TokenRow } from "./token-row";
 
 interface PublicAssetsProps {
@@ -12,7 +13,7 @@ export function PublicAssets({ balances, prices }: PublicAssetsProps) {
   const tokensWithBalance = balances.filter((b) => b.balance > 0n);
 
   return (
-    <div className="flex flex-col rounded-[25px] border border-surface-border bg-asset-card-bg">
+    <Card className="gap-0 rounded-[25px] border-surface-border bg-asset-card-bg py-0">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
@@ -53,6 +54,6 @@ export function PublicAssets({ balances, prices }: PublicAssetsProps) {
           </p>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
