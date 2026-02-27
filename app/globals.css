@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 @import "tailwindcss";
 
 :root {
@@ -24,3 +25,4 @@ body {
 html {
   background: #1d1d24;
 }
+

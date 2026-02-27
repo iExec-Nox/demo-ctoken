@@ -50,12 +50,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet"
-        />
-      </head>
+      <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
       >
