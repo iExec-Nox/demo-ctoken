@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { WalletButton } from "@/components/wallet-button";
+import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
@@ -24,11 +24,13 @@ function DevModeToggle() {
       </span>
       <button
         onClick={() => setEnabled((prev) => !prev)}
+        role="switch"
+        aria-checked={enabled}
         aria-label={enabled ? "Disable developer mode" : "Enable developer mode"}
         className={`relative h-[14px] w-[32px] cursor-pointer rounded-full transition-colors duration-200 ${enabled ? "bg-primary" : "bg-surface-border"}`}
       >
         <div
-          className={`absolute top-px size-[12px] rounded-full bg-white transition-[left] duration-200 ${enabled ? "left-[18px]" : "left-px"}`}
+          className={`absolute top-px size-[12px] rounded-full bg-primary-foreground transition-[left] duration-200 ${enabled ? "left-[18px]" : "left-px"}`}
         />
       </button>
     </div>
@@ -37,16 +39,7 @@ function DevModeToggle() {
 
 export function DashboardHeader() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { isConnected } = useAppKitAccount();
-  const wasConnected = useRef(true);
-
-  useEffect(() => {
-    if (!isConnected && wasConnected.current) {
-      router.push("/");
-    }
-    wasConnected.current = isConnected;
-  }, [isConnected, router]);
+  useWalletRedirect({ onDisconnect: "/" });
 
   return (
     <header className="flex w-full items-center justify-between bg-background px-10 py-[9px]">
@@ -79,7 +72,7 @@ export function DashboardHeader() {
 
         <Link
           href="#"
-          className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-white shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover"
+          className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover"
         >
           Contact us
         </Link>
