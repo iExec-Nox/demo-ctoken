@@ -41,7 +41,7 @@ function WalletDropdown({ address, onClose, onLogout }: WalletDropdownProps) {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 top-full mt-px flex w-full flex-col gap-3 rounded-[7px] bg-[#2b2b2f] p-[10px]"
+      className="absolute right-0 top-full mt-px flex w-full origin-top-right animate-[dropdown-in_150ms_ease-out] flex-col gap-3 rounded-[7px] bg-[#2b2b2f] p-[10px]"
     >
       <button
         onClick={handleCopyAddress}
