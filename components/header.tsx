@@ -41,26 +41,26 @@ function WalletDropdown({ address, onClose, onLogout }: WalletDropdownProps) {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 top-full mt-px flex flex-col gap-3 rounded-[7px] bg-[#2b2b2f] p-[10px]"
+      className="absolute right-0 top-full mt-px flex w-full flex-col gap-3 rounded-[7px] bg-[#2b2b2f] p-[10px]"
     >
       <button
         onClick={handleCopyAddress}
         className="flex cursor-pointer items-center gap-2 whitespace-nowrap font-[family-name:var(--font-mulish)] text-xs font-semibold leading-5 text-[#748eff]"
       >
-        <span className="material-icons text-sm">content_copy</span>
+        <span className="material-icons text-[14px]!">content_copy</span>
         Copy Address
       </button>
       <button
         className="flex cursor-pointer items-center gap-2 whitespace-nowrap font-[family-name:var(--font-mulish)] text-xs font-semibold leading-5 text-white"
       >
-        <span className="material-icons text-sm">person_outline</span>
+        <span className="material-icons text-[14px]!">person_outline</span>
         Account details
       </button>
       <button
         onClick={onLogout}
         className="flex cursor-pointer items-center gap-2 whitespace-nowrap font-[family-name:var(--font-mulish)] text-xs font-semibold leading-5 text-white"
       >
-        <span className="material-icons text-sm">logout</span>
+        <span className="material-icons text-[14px]!">logout</span>
         Logout
       </button>
     </div>
