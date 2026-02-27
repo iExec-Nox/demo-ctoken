@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard | Nox",
+  description: "Your confidential token portfolio",
+};
+
 export default function DashboardPage() {
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-20 py-16">

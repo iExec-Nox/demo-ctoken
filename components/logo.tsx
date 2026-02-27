@@ -20,7 +20,7 @@ export function Logo({
       <div
         className={`relative ${sizeClass} overflow-hidden rounded-xl bg-[#748eff]`}
       >
-        <Image src="/nox-icon.png" alt="Nox logo" fill className="object-cover" />
+        <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover" />
       </div>
       <span
         className={`${fontClass} text-xl font-bold tracking-tight ${textColor}`}
