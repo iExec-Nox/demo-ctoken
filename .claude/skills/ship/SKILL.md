@@ -1,13 +1,13 @@
 ---
-name: task
-description: Orchestre le workflow complet d'une tâche — branche → plan → build → review → commit & PR
+name: ship
+description: Orchestre le workflow complet d'une tâche — worktree → plan → build → review → commit & PR
 argument-hint: [description de la tâche]
-allowed-tools: Skill, Read, Write, Edit, Glob, Grep, Bash(git *), Bash(gh *), Bash(npm *), Bash(npx *), Bash(curl *), Task, EnterPlanMode, ExitPlanMode, AskUserQuestion, mcp__figma-desktop__get_design_context, mcp__figma-desktop__get_screenshot, mcp__ide__getDiagnostics
+allowed-tools: Skill, Read, Write, Edit, Glob, Grep, Bash(git *), Bash(gh *), Bash(npm *), Bash(npx *), Bash(curl *), Task, EnterPlanMode, ExitPlanMode, EnterWorktree, AskUserQuestion, mcp__figma-desktop__get_design_context, mcp__figma-desktop__get_screenshot, mcp__ide__getDiagnostics
 ---
 
 # Skill : task
 
-Orchestre le workflow complet d'une tâche, de la création de branche à la PR.
+Orchestre le workflow complet d'une tâche, du worktree isolé à la PR.
 
 ## Entrée
 
@@ -19,11 +19,18 @@ Le workflow se déroule en **6 phases séquentielles**. Chaque phase est un chec
 
 ---
 
-### Phase 1 : Branche 🌿
+### Phase 1 : Worktree 🌿
 
-Invoquer le skill `/branch` avec `$ARGUMENTS`.
+Créer un worktree isolé via l'outil `EnterWorktree`.
 
-Résultat attendu : on est sur une nouvelle branche dédiée à la tâche.
+**Nommage du worktree :** dériver un slug depuis `$ARGUMENTS` (kebab-case anglais, max 4-5 mots).
+Exemples :
+- "implémenter la page faucet" → `add-faucet-page`
+- "fix du bug de connexion wallet" → `fix-wallet-connection`
+
+Appeler `EnterWorktree` avec ce nom.
+
+Résultat attendu : on travaille dans un worktree isolé avec sa propre branche.
 
 ---
 
@@ -78,7 +85,7 @@ Résultat attendu : commits atomiques, push, PR créée.
 ```
 🎯 Tâche terminée !
 
-   🌿 Branche : <nom-de-la-branche>
+   🌿 Worktree : <nom-du-worktree> (branche: <nom-de-la-branche>)
    📐 Plan : validé (<n> étapes)
    📋 ADR : docs/decisions/<fichier>.md
    🔨 Build : <n> fichiers créés, <n> modifiés
