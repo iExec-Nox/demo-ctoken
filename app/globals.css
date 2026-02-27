@@ -83,6 +83,13 @@
   --card-icon-bg: #748eff;
   --toggle-track: #b8bdd0;
   --toggle-thumb: #dde2ee;
+  --asset-card-bg: #edf0f8;
+  --asset-card-border: #c0c6d8;
+  --asset-icon-bg: #e2e6f0;
+  --asset-text-secondary: #6b7280;
+  --asset-text-tertiary: #9ca3af;
+  --info-banner-bg: rgba(116, 142, 255, 0.15);
+  --info-banner-border: rgba(71, 37, 244, 0.2);
 
   /* shadcn tokens (mapped to Nox theme) */
   --primary-foreground: #ffffff;
@@ -147,6 +154,13 @@
   --card-icon-bg: #748eff;
   --toggle-track: #2a2a35;
   --toggle-thumb: #1a1a24;
+  --asset-card-bg: #1d1d24;
+  --asset-card-border: rgba(255, 255, 255, 0.08);
+  --asset-icon-bg: rgba(255, 255, 255, 0.08);
+  --asset-text-secondary: #94a3b8;
+  --asset-text-tertiary: #64748b;
+  --info-banner-bg: rgba(116, 142, 255, 0.27);
+  --info-banner-border: rgba(71, 37, 244, 0.2);
 
   /* shadcn tokens (mapped to Nox dark theme) */
   --primary-foreground: #ffffff;
@@ -212,6 +226,13 @@
   --color-card-icon-bg: var(--card-icon-bg);
   --color-toggle-track: var(--toggle-track);
   --color-toggle-thumb: var(--toggle-thumb);
+  --color-asset-card-bg: var(--asset-card-bg);
+  --color-asset-card-border: var(--asset-card-border);
+  --color-asset-icon-bg: var(--asset-icon-bg);
+  --color-asset-text-secondary: var(--asset-text-secondary);
+  --color-asset-text-tertiary: var(--asset-text-tertiary);
+  --color-info-banner-bg: var(--info-banner-bg);
+  --color-info-banner-border: var(--info-banner-border);
 
   /* shadcn tokens */
   --color-primary-foreground: var(--primary-foreground);

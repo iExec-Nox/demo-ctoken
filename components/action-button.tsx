@@ -9,7 +9,7 @@ interface ActionButtonProps {
 }
 
 const sharedClasses =
-  "flex w-full items-center gap-4 rounded-2xl border border-white/5 bg-slate-800/50 p-4";
+  "flex w-full items-center gap-4 rounded-2xl border border-surface-border bg-surface p-4";
 
 export function ActionButton({
   icon,
@@ -20,16 +20,16 @@ export function ActionButton({
 }: ActionButtonProps) {
   const content = (
     <>
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-700/50">
-        <span className="material-icons text-[24px]! text-slate-400">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-asset-icon-bg">
+        <span className="material-icons text-[24px]! text-text-muted">
           {icon}
         </span>
       </div>
       <div className="text-left">
-        <p className="font-mulish text-base font-bold leading-6 text-slate-400">
+        <p className="font-mulish text-base font-bold leading-6 text-text-body">
           {label}
         </p>
-        <p className="font-mulish text-[10px] leading-[15px] text-slate-400">
+        <p className="font-mulish text-[10px] leading-[15px] text-text-muted">
           {description}
         </p>
       </div>
@@ -52,7 +52,7 @@ export function ActionButton({
   return (
     <Link
       href={href}
-      className={`${sharedClasses} cursor-pointer hover:border-white/10 hover:bg-slate-800/70`}
+      className={`${sharedClasses} cursor-pointer hover:border-primary-alpha-border hover:bg-surface`}
     >
       {content}
     </Link>
