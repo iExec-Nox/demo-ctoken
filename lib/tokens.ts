@@ -1,5 +1,3 @@
-import tokensData from "./tokens.json";
-
 export interface TokenConfig {
   symbol: string;
   name: string;
@@ -10,7 +8,32 @@ export interface TokenConfig {
   coingeckoId?: string;
 }
 
-export const tokens: TokenConfig[] = tokensData;
+export const tokens: TokenConfig[] = [
+  {
+    symbol: "ETH",
+    name: "Ethereum",
+    decimals: 18,
+    isNative: true,
+    icon: "/icon-eth.svg",
+    coingeckoId: "ethereum",
+  },
+  {
+    symbol: "USDC",
+    name: "USD Coin",
+    decimals: 6,
+    address: "0xf3C3351D6Bd0098EEb33ca8f830FAf2a141Ea2E1",
+    icon: "/icon-usdc.svg",
+    coingeckoId: "usd-coin",
+  },
+  {
+    symbol: "RLC",
+    name: "iExec RLC",
+    decimals: 9,
+    address: "0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963",
+    icon: "/icon-rlc.svg",
+    coingeckoId: "iexec-rlc",
+  },
+];
 
 export const erc20Tokens = tokens.filter(
   (t): t is TokenConfig & { address: string } => !t.isNative && !!t.address
