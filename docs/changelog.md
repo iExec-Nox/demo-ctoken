@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-02-27 — Forcer le réseau Arbitrum Sepolia
+
+Restriction de la config AppKit à Arbitrum Sepolia uniquement (`allowUnsupportedChain: false`, retrait d'`arbitrum` mainnet). Le mécanisme per-dApp natif de MetaMask et AppKit `defaultNetwork` assurent la connexion sur le bon réseau sans code custom.
+
+→ ADR : [ADR-0004](./decisions/0004-enforce-arbitrum-sepolia-network.md)
+
 ### 2026-02-26 — Connexion wallet via RainbowKit
 
 Implémentation de la connexion wallet avec modale custom fidèle au design Figma, support Arbitrum + Arbitrum Sepolia, blur backdrop, et redirection post-connexion vers le dashboard.

@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { FaucetModalProvider } from "@/components/faucet-modal-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
-import { arbitrum, arbitrumSepolia } from "@reown/appkit/networks";
+import { arbitrumSepolia } from "@reown/appkit/networks";
 import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
 import { wagmiAdapter, projectId } from "@/lib/wagmi";
 
@@ -18,7 +18,7 @@ function initAppKit() {
   createAppKit({
     adapters: [wagmiAdapter],
     projectId,
-    networks: [arbitrumSepolia, arbitrum],
+    networks: [arbitrumSepolia],
     defaultNetwork: arbitrumSepolia,
     metadata: {
       name: "Confidential Token | Nox",
@@ -26,7 +26,7 @@ function initAppKit() {
       url: "https://nox.iex.ec",
       icons: ["/nox-icon.png"],
     },
-    allowUnsupportedChain: true,
+    allowUnsupportedChain: false,
     themeMode: "dark",
     themeVariables: {
       "--w3m-accent": "#748eff",
