@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { WalletButton } from "@/components/wallet-button";
+import { DevModeToggle } from "@/components/dev-mode-toggle";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
 import { useFaucetModal } from "@/components/faucet-modal-provider";
 
@@ -15,24 +14,6 @@ const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Activity", href: "/explorer" },
 ] as const;
-
-function DevModeToggle() {
-  const [enabled, setEnabled] = useState(true);
-
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="font-inter text-sm font-medium text-text-body">
-        Developer Mode
-      </span>
-      <Switch
-        size="sm"
-        checked={enabled}
-        onCheckedChange={setEnabled}
-        aria-label={enabled ? "Disable developer mode" : "Enable developer mode"}
-      />
-    </div>
-  );
-}
 
 export function DashboardHeader() {
   const pathname = usePathname();
