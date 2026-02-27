@@ -17,7 +17,7 @@
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| Background | `#1d1d24` | Global page background (hardcoded on `html`/`body`) |
+| Background | `#1d1d24` | Global page background (hardcoded on `html`) |
 | Primary | `#748eff` | Buttons, icon backgrounds, accents |
 | Primary hover | `#6378e6` | Button hover state |
 | Text white | `text-white` | Titles, button labels |
@@ -34,15 +34,15 @@
 | `--font-mulish` | Mulish | 400, 500, 700 | UI text (topbar, subtitles, buttons, nav links) |
 | `--font-inter` | Inter | 400, 500, 700 | Card content (titles, descriptions, footer) |
 
-Usage pattern: `font-[family-name:var(--font-mulish)]`
+Usage pattern (Tailwind v4 canonical syntax): `font-mulish`, `font-anybody`, `font-inter`
 
-Material Icons loaded via `<link>` in `<head>` for icon glyphs (e.g. `account_balance_wallet`).
+Material Icons loaded via `@import` in `globals.css`. **Important:** Material Icons CSS sets `font-size: 24px` by default on `.material-icons`. Tailwind classes like `text-sm` will be overridden. Always use the `!` suffix to force the size (e.g. `text-[14px]!`, `text-lg!`).
 
 ### Component Patterns
 
 **Card (glass style):**
 ```
-rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm px-10 py-8
+rounded-2xl border border-white/8 bg-white/3 backdrop-blur-sm px-10 py-8
 ```
 
 **Primary button:**
@@ -52,7 +52,7 @@ rounded-xl bg-[#748eff] shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-[#
 
 **Ghost button:**
 ```
-rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.08]
+rounded-xl border border-white/8 bg-white/3 backdrop-blur-sm hover:bg-white/8
 ```
 
 **Icon container (large — features):**
@@ -60,9 +60,9 @@ rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm hover:bg-
 size-12 rounded-xl bg-[#748eff]
 ```
 
-**Icon container (small — header/footer logo):**
+**Dropdown (popup menu):**
 ```
-size-8 rounded-xl bg-[#748eff] (header) / size-7 (footer)
+absolute right-0 top-full origin-top-right animate-[dropdown-in_150ms_ease-out] rounded-[7px] bg-[#2b2b2f] p-[10px]
 ```
 
 ### Spacing
@@ -86,6 +86,7 @@ size-8 rounded-xl bg-[#748eff] (header) / size-7 (footer)
 - **Sémantique HTML** : utiliser les balises appropriées (`<header>`, `<main>`, `<nav>`, `<footer>`, `<button>` pour les actions primaires, `<a>` pour les liens/menus).
 - **ARIA labels** : ajouter `aria-label` sur les éléments interactifs dont le contenu visuel n'est pas suffisant (ex: bouton icône seul).
 - **Keyboard navigation** : tous les éléments interactifs doivent être accessibles au clavier (Tab, Enter, Escape pour fermer les modales/dropdowns).
+- **Dropdown pattern** : pour tout menu popup, implémenter : (1) fermeture au clic extérieur via `mousedown` listener avec exclusion du bouton trigger (`triggerRef`), (2) fermeture via touche Escape, (3) animation d'ouverture avec `origin-top-right`. Voir `WalletDropdown` dans `header.tsx` comme référence.
 
 ---
 
@@ -95,6 +96,7 @@ size-8 rounded-xl bg-[#748eff] (header) / size-7 (footer)
 |-----------|------|-------------|
 | `Topbar` | `topbar.tsx` | Testnet indicator + "Get Test Tokens" link → `/faucet` |
 | `Header` | `header.tsx` | Logo + Connect Wallet (Reown) / Wallet dropdown (connected) avec Copy Address, Account details, Logout |
+| `Logo` | `logo.tsx` | Reusable logo (icon + text) with configurable `iconSize`, `font` and `textColor` — used by Header and Footer |
 | `HeroSection` | `hero-section.tsx` | Landing title, subtitle, 2 CTAs (Try It Now / Talk to us) |
 | `FeatureCard` | `feature-card.tsx` | Reusable card: icon + title + description |
 | `FeaturesSection` | `features-section.tsx` | 3 feature cards driven by `FEATURES` data array |
