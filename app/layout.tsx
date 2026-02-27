@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { Geist, Geist_Mono, Mulish, Anybody, Inter } from "next/font/google";
+import { Mulish, Anybody, Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const mulish = Mulish({
   variable: "--font-mulish",
@@ -56,7 +46,7 @@ export default async function RootLayout({
         precedence="default"
       />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
+        className={`${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
       >
         <Providers cookies={cookieString}>
           {children}
