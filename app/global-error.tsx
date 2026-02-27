@@ -9,17 +9,17 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#1d1d24] text-[#ededed] antialiased">
+      <body className="bg-background text-foreground antialiased">
         <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-text-heading">
             Something went wrong
           </h1>
-          <p className="max-w-md text-base text-slate-400">
+          <p className="max-w-md text-base text-text-muted">
             {error.message || "A critical error occurred."}
           </p>
           <button
             onClick={reset}
-            className="rounded-xl bg-[#748eff] px-5 py-4 font-bold text-white transition-colors hover:bg-[#6378e6]"
+            className="rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground transition-colors hover:bg-primary-hover"
           >
             Try again
           </button>
