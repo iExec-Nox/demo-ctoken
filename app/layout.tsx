@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono, Mulish, Anybody, Inter } from "next/font/google";
 import { Topbar } from "@/components/topbar";
 import { Header } from "@/components/header";
@@ -45,16 +45,23 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersObj = await headers();
-  const cookies = headersObj.get("cookie");
+  const cookieStore = await cookies();
+  const cookieString = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        precedence="default"
+      />
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
       >
-        <Providers cookies={cookies}>
+        <Providers cookies={cookieString}>
           <Topbar />
           <Header />
           {children}
