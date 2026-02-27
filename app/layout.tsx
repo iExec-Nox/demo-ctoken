@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono, Mulish, Anybody, Inter } from "next/font/google";
-import { Topbar } from "@/components/topbar";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -62,10 +59,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
       >
         <Providers cookies={cookieString}>
-          <Topbar />
-          <Header />
           {children}
-          <Footer />
         </Providers>
       </body>
     </html>
