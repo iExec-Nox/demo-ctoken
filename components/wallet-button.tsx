@@ -1,7 +1,8 @@
 "use client";
 
-import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useDisconnect } from "wagmi";
+import { useConnectWallet } from "@/hooks/use-connect-wallet";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +16,7 @@ function formatAddress(address: string) {
 }
 
 export function WalletButton() {
-  const { open } = useAppKit();
+  const { connect } = useConnectWallet();
   const { address, isConnected } = useAppKitAccount();
   const { disconnect } = useDisconnect();
 
@@ -66,7 +67,7 @@ export function WalletButton() {
 
   return (
     <Button
-      onClick={() => open()}
+      onClick={connect}
       className="rounded-lg border border-primary-alpha-border bg-primary px-6 py-2 font-mulish text-sm font-bold text-primary-foreground hover:bg-primary-hover"
     >
       Connect Wallet

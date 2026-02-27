@@ -1,7 +1,12 @@
-import Link from "next/link";
+"use client";
+
+import { useConnectWallet } from "@/hooks/use-connect-wallet";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function HeroSection() {
+  const { connect } = useConnectWallet();
+
   return (
     <section className="flex w-full flex-col items-start gap-10 px-40 py-16">
       <h1 className="w-full text-center font-anybody text-7xl font-bold leading-[72px] tracking-[-3.6px] text-text-heading">
@@ -14,13 +19,11 @@ export function HeroSection() {
       </p>
       <div className="flex w-full items-start justify-center gap-5">
         <Button
-          asChild
+          onClick={connect}
           className="h-auto rounded-xl bg-primary px-5 py-4 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
         >
-          <Link href="/dashboard">
-            <span className="material-icons text-xl leading-7">account_balance_wallet</span>
-            Try It Now
-          </Link>
+          <span className="material-icons text-xl leading-7">account_balance_wallet</span>
+          Try It Now
         </Button>
         <Button
           asChild
