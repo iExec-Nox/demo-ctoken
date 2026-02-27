@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { Logo } from "@/components/logo";
 import { WalletButton } from "@/components/wallet-button";
 
@@ -55,6 +56,16 @@ function DevModeToggle() {
 
 export function DashboardHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isConnected } = useAppKitAccount();
+  const wasConnected = useRef(true);
+
+  useEffect(() => {
+    if (!isConnected && wasConnected.current) {
+      router.push("/");
+    }
+    wasConnected.current = isConnected;
+  }, [isConnected, router]);
 
   return (
     <header className="flex w-full items-center justify-between bg-[#1d1d24] px-10 py-[9px]">
