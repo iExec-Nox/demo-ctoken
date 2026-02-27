@@ -1,4 +1,5 @@
 import { DashboardHeader } from "@/components/dashboard-header";
+import { Footer } from "@/components/footer";
 
 export default function AppLayout({
   children,
@@ -6,9 +7,10 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <DashboardHeader />
-      {children}
-    </>
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </div>
   );
 }

@@ -46,7 +46,7 @@ export default async function RootLayout({
         precedence="default"
       />
       <body
-        className={`${mulish.variable} ${anybody.variable} ${inter.variable} antialiased`}
+        className={`${mulish.variable} ${anybody.variable} ${inter.variable} flex min-h-screen flex-col antialiased`}
       >
         <Providers cookies={cookieString}>
           {children}
