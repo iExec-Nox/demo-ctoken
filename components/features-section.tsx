@@ -25,10 +25,10 @@ export function FeaturesSection() {
   return (
     <section className="flex w-full flex-col items-center gap-10 py-16">
       <div className="flex flex-col items-center gap-5">
-        <h2 className="font-[family-name:var(--font-anybody)] text-[32px] font-bold leading-[1.2] text-white">
+        <h2 className="font-anybody text-[32px] font-bold leading-[1.2] text-white">
           The Next Evolution of DeFi Is Confidential
         </h2>
-        <p className="font-[family-name:var(--font-mulish)] text-lg leading-[1.6] text-slate-400">
+        <p className="font-mulish text-lg leading-[1.6] text-slate-400">
           Built for scalable, compliant and composable finance.
         </p>
       </div>
