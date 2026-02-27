@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PortfolioHeader } from "@/components/portfolio-header";
+import { DashboardContent } from "@/components/dashboard-content";
 
 export const metadata: Metadata = {
   title: "Dashboard | Nox",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   return (
     <main className="min-h-[60vh]">
-      <PortfolioHeader />
+      <DashboardContent />
     </main>
   );
 }
