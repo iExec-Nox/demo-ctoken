@@ -1,30 +1,11 @@
 import type { TokenBalance } from "@/hooks/use-token-balances";
 import type { TokenPrices } from "@/hooks/use-token-prices";
+import { toFloat, formatUsd } from "@/lib/format";
 import { TokenRow } from "./token-row";
 
 interface PublicAssetsProps {
   balances: TokenBalance[];
   prices: TokenPrices;
-}
-
-function formatUsd(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
-function getUsdValue(
-  balance: TokenBalance,
-  prices: TokenPrices
-): { usdValue: string; usdNum: number } | null {
-  const price = prices[balance.symbol];
-  if (!price) return null;
-  const num = Number(balance.balance) / 10 ** balance.decimals;
-  const usdNum = num * price;
-  return { usdValue: formatUsd(usdNum), usdNum };
 }
 
 export function PublicAssets({ balances, prices }: PublicAssetsProps) {
@@ -50,7 +31,10 @@ export function PublicAssets({ balances, prices }: PublicAssetsProps) {
       {/* Token rows */}
       {tokensWithBalance.length > 0 ? (
         tokensWithBalance.map((token) => {
-          const usd = getUsdValue(token, prices);
+          const price = prices[token.symbol];
+          const usdValue = price
+            ? formatUsd(toFloat(token.balance, token.decimals) * price)
+            : undefined;
           return (
             <TokenRow
               key={token.symbol}
@@ -58,7 +42,7 @@ export function PublicAssets({ balances, prices }: PublicAssetsProps) {
               symbol={token.symbol}
               icon={token.icon}
               formatted={token.formatted}
-              usdValue={usd?.usdValue}
+              usdValue={usdValue}
             />
           );
         })
@@ -72,5 +56,3 @@ export function PublicAssets({ balances, prices }: PublicAssetsProps) {
     </div>
   );
 }
-
-export { formatUsd, getUsdValue };

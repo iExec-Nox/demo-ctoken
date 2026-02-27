@@ -1,5 +1,3 @@
-"use client";
-
 import { ActionButton } from "./action-button";
 
 const ACTIONS = [

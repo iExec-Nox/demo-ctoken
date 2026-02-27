@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface ActionButtonProps {
   icon: string;
   label: string;
@@ -6,6 +8,9 @@ interface ActionButtonProps {
   href: string;
 }
 
+const sharedClasses =
+  "flex w-full items-center gap-4 rounded-2xl border border-white/5 bg-slate-800/50 p-4";
+
 export function ActionButton({
   icon,
   label,
@@ -13,17 +18,8 @@ export function ActionButton({
   disabled = false,
   href,
 }: ActionButtonProps) {
-  const Tag = disabled ? "div" : "a";
-
-  return (
-    <Tag
-      {...(!disabled && { href })}
-      className={`flex w-full items-center gap-4 rounded-2xl border border-white/5 bg-slate-800/50 p-4 ${
-        disabled
-          ? "cursor-not-allowed opacity-30"
-          : "cursor-pointer hover:border-white/10 hover:bg-slate-800/70"
-      }`}
-    >
+  const content = (
+    <>
       <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-700/50">
         <span className="material-icons text-[24px]! text-slate-400">
           {icon}
@@ -37,6 +33,28 @@ export function ActionButton({
           {description}
         </p>
       </div>
-    </Tag>
+    </>
+  );
+
+  if (disabled) {
+    return (
+      <div
+        className={`${sharedClasses} cursor-not-allowed opacity-30`}
+        role="link"
+        aria-disabled="true"
+        aria-label={`${label} — ${description}`}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className={`${sharedClasses} cursor-pointer hover:border-white/10 hover:bg-slate-800/70`}
+    >
+      {content}
+    </Link>
   );
 }
