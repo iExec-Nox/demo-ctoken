@@ -14,12 +14,13 @@ Build a web3 frontend demo showcasing the **Nox confidential computing protocol*
 
 ## Tech Stack
 
-- **Framework:** Next.js 14+ (App Router)
-- **Styling:** Tailwind CSS + shadcn/ui
-- **Web3:** wagmi v2 + viem + RainbowKit (wallet connection)
-- **State:** Zustand or React Context
+- **Framework:** Next.js 16 (App Router, Turbopack)
+- **Styling:** Tailwind CSS v4 + shadcn/ui (New York style)
+- **Web3:** wagmi v2 + viem + Reown AppKit (wallet connection — see ADR-0001)
+- **State:** React Context (FaucetModalProvider, ThemeProvider)
 - **Nox SDK:** Import SDK functions for `encrypt`, `decrypt`, `wrap`, `confidentialTransfer`, `shareView`
 - **Chain:** Arbitrum Sepolia (chainId: 421614)
+- **Prices:** CoinGecko API via Next.js API route (`app/api/prices/route.ts`, revalidate 60s)
 
 ---
 
@@ -37,49 +38,46 @@ Build a web3 frontend demo showcasing the **Nox confidential computing protocol*
 
 ## Pages & Features
 
-### 1. Landing / Connect Wallet (`/`)
+### 1. Landing / Connect Wallet (`/`) — DONE
 
-**Priority:** Must Have
+**Priority:** Must Have — **Status: Implemented**
 
 - Tagline: _"Manage your confidential assets privately"_
-- `ConnectWallet` button supporting MetaMask, Rabby, Coinbase Wallet, WalletConnect
-- Network selector defaulting to Arbitrum Sepolia
-- CTA button: "Get Testnet Tokens" → navigates to `/faucet`
+- Reown AppKit modal supporting MetaMask, Rabby, Coinbase Wallet, WalletConnect
+- Network defaults to Arbitrum Sepolia
+- CTA button: "Try It Now" opens wallet modal, "Talk to us" external link
 - After connection → redirect to `/dashboard`
 
-**Component hints:**
-
-```tsx
-<HeroSection tagline="Manage your confidential assets privately" />
-<ConnectWalletButton />
-<NetworkSelector defaultChain="arbitrum-sepolia" />
-```
+**Route group:** `app/(landing)/` with dedicated layout (Header + Footer, no Topbar)
 
 ---
 
-### 2. Faucet (`/faucet`)
+### 2. Faucet (modal, no dedicated page) — DONE
 
-**Priority:** Must Have (core differentiator vs competitors using external faucets)
+**Priority:** Must Have — **Status: Implemented (see ADR-0003)**
 
-- Request testnet USDC and/or ETH from a built-in faucet
-- Show claim limits (e.g., max 100 USDC per address per day)
-- Show transaction status (pending → success/failure)
-- Update balances after claim
-- Display Arbiscan link for faucet tx
+- **Architecture:** Global modal via `FaucetModalProvider` (React Context) + shadcn Dialog — no `/faucet` route
+- 3 token cards (ETH, RLC, USDC) with "Mint" buttons linking to external faucets
+- Entry points: EmptyPortfolio CTA, Topbar "Get Test Tokens", Dashboard nav menu "Faucet"
+- Modal tokens: `--modal-bg`, `--modal-border` in globals.css
 
-**State flow:** `idle → requesting → pending → success | error`
+> Note: future iteration may add an on-chain faucet contract with tx status tracking
 
 ---
 
-### 3. Dashboard (`/dashboard`)
+### 3. Dashboard (`/dashboard`) — DONE
 
-**Priority:** Must Have
+**Priority:** Must Have — **Status: Implemented**
 
-- Display portfolio: confidential tokens (cUSDC, cETH) + public tokens (USDC)
-- Show balances in token units + approximate USD value
-- Quick action buttons: **Wrap**, **Unwrap**, **Transfer**, **Delegate View**
-- Recent activity summary (last 5 transactions)
-- Each token card links to wrap/transfer actions
+- Portfolio header with total value (USD) via CoinGecko prices
+- Public assets section (ETH, USDC, RLC) with real balances via wagmi
+- Confidential assets section (cUSDC placeholder — empty state)
+- Action Center: Wrap, Unwrap, Transfer, Selective Disclosure buttons (disabled when no balance, TODO: wire modals)
+- Privacy Status card
+- Empty portfolio state with faucet CTA
+- Skeleton loader (`loading.tsx`)
+
+**Route group:** `app/(app)/` with Topbar + DashboardHeader layout
 
 ---
 
@@ -230,8 +228,8 @@ export async function decryptValue(handle: string, privateKey: string) { ... }
 
 | Flow             | Steps                                                                                     |
 | ---------------- | ----------------------------------------------------------------------------------------- |
-| First Connection | Landing → Connect Wallet → Network Selection → Dashboard                                  |
-| Faucet           | Faucet page → Request tokens → Confirm → Balance updates                                  |
+| First Connection | Landing → Connect Wallet (Reown AppKit) → Dashboard                                      |
+| Faucet           | Dashboard → Faucet modal → Click external faucet link → Balance updates on return         |
 | Wrap             | Dashboard → Wrap → Select USDC → Input amount → Confirm → cUSDC balance updates           |
 | Transfer         | Dashboard/Transfer tab → Select cToken + amount → Recipient address → Confirm → Tx status |
 | Delegate View    | Delegate tab → Add auditor address + scope → Confirm → Record shown                       |
@@ -252,12 +250,11 @@ export async function decryptValue(handle: string, privateKey: string) { ... }
 ## Environment Variables
 
 ```env
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=<reown_project_id>
 NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC=https://sepolia-rollup.arbitrum.io/rpc
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FAUCET_ADDRESS=0x...
-NEXT_PUBLIC_WRAPPER_ADDRESS=0x...
-NEXT_PUBLIC_USDC_ADDRESS=0x...
 ```
+
+> Contract-related env vars (`FAUCET_ADDRESS`, `WRAPPER_ADDRESS`, etc.) will be added when smart contracts are deployed.
 
 ---
 
@@ -298,7 +295,7 @@ See [`/.claude/skills/commit/SKILL.md`](./.claude/skills/commit/SKILL.md) for fu
 | Activity Explorer        | Must Have           |
 | Developer Mode           | Must Have           |
 | Arbiscan Links           | Must Have           |
-| Light/Dark Theme         | Up 2 Design         |
+| Light/Dark Theme         | Done                |
 | Responsive mode          | Must Have           |
 | Settings page            | Must Have for EthCC |
 
@@ -306,9 +303,11 @@ See [`/.claude/skills/commit/SKILL.md`](./.claude/skills/commit/SKILL.md) for fu
 
 ## Notes for Claude Code
 
-- Start by scaffolding the Next.js project with wagmi + RainbowKit + Tailwind
-- Use mock data initially for balances and tx history; replace with real contract calls once addresses are available
-- The Nox SDK may not be published yet — create a `lib/nox-sdk-mock.ts` with typed stubs for all functions so the UI can be built and tested independently
+- Project is scaffolded with Next.js 16 + wagmi + Reown AppKit + Tailwind v4 + shadcn/ui
+- Real balances are fetched via wagmi hooks (ETH native, USDC, RLC on Arbitrum Sepolia)
+- Prices fetched via CoinGecko API route (`app/api/prices/route.ts`)
+- The Nox SDK is not yet available — create `lib/nox-sdk.ts` abstraction when contract addresses/ABIs are provided
 - Keep all smart contract interactions behind the `lib/nox-sdk.ts` abstraction layer for easy swap-out
-- Prioritize the Wrap and Transfer flows first, then Delegate View, then Developer Mode
+- **Next priorities:** Wrap/Transfer modals (Action Center buttons), then Delegate View, then Activity Explorer, then Developer Mode
 - EthCC is a hard deadline — ensure Settings (theme toggle) and all Must Have features are complete before that date
+- Design system is documented in `components/CLAUDE.md` — always use semantic tokens, never hardcode colors
