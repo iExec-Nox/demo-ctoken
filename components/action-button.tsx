@@ -1,35 +1,46 @@
-import Link from "next/link";
-
 interface ActionButtonProps {
   icon: string;
   label: string;
   description: string;
   disabled?: boolean;
-  href: string;
+  onClick?: () => void;
 }
-
-const sharedClasses =
-  "flex w-full items-center gap-4 rounded-2xl border border-surface-border bg-surface p-4";
 
 export function ActionButton({
   icon,
   label,
   description,
   disabled = false,
-  href,
+  onClick,
 }: ActionButtonProps) {
   const content = (
     <>
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-asset-icon-bg">
-        <span className="material-icons text-[24px]! text-text-muted">
+      <div
+        className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
+          disabled ? "bg-[rgba(51,65,85,0.5)]" : "bg-primary"
+        }`}
+      >
+        <span
+          className={`material-icons text-[24px]! ${
+            disabled ? "text-text-muted" : "text-white"
+          }`}
+        >
           {icon}
         </span>
       </div>
       <div className="text-left">
-        <p className="font-mulish text-base font-bold leading-6 text-text-body">
+        <p
+          className={`font-mulish text-base font-bold leading-6 ${
+            disabled ? "text-text-muted" : "text-text-heading"
+          }`}
+        >
           {label}
         </p>
-        <p className="font-mulish text-[10px] leading-[15px] text-text-muted">
+        <p
+          className={`font-mulish text-[10px] leading-[15px] ${
+            disabled ? "text-text-muted" : "text-text-heading"
+          }`}
+        >
           {description}
         </p>
       </div>
@@ -39,8 +50,8 @@ export function ActionButton({
   if (disabled) {
     return (
       <div
-        className={`${sharedClasses} cursor-not-allowed opacity-30`}
-        role="link"
+        className="flex w-full items-center gap-4 rounded-2xl border border-surface-border bg-surface p-4 cursor-not-allowed opacity-30"
+        role="button"
         aria-disabled="true"
         aria-label={`${label} — ${description}`}
       >
@@ -50,11 +61,13 @@ export function ActionButton({
   }
 
   return (
-    <Link
-      href={href}
-      className={`${sharedClasses} cursor-pointer hover:border-primary-alpha-border hover:bg-surface`}
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-4 rounded-2xl border border-action-btn-active-border bg-action-btn-active-bg p-4 cursor-pointer transition-opacity hover:opacity-80"
+      aria-label={`${label} — ${description}`}
     >
       {content}
-    </Link>
+    </button>
   );
 }

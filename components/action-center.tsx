@@ -6,25 +6,21 @@ const ACTIONS = [
     icon: "layers",
     label: "Wrap",
     description: "Public to Private",
-    href: "/wrap",
   },
   {
     icon: "layers_clear",
     label: "Unwrap",
     description: "Private to Public",
-    href: "/wrap",
   },
   {
     icon: "send",
     label: "Transfer",
     description: "Private Transfer",
-    href: "/transfer",
   },
   {
     icon: "key",
     label: "Selective Disclosure",
     description: "Delegate View",
-    href: "/delegate",
   },
 ] as const;
 
@@ -59,7 +55,9 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
             label={action.label}
             description={action.description}
             disabled={!hasBalance}
-            href={action.href}
+            onClick={() => {
+              // TODO: open modal for each action
+            }}
           />
         ))}
       </CardContent>
@@ -74,9 +72,9 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
             Privacy Status
           </p>
         </div>
-        <p className="font-mulish text-xs leading-[19.5px] text-asset-text-tertiary">
+        <p className={`text-xs leading-[19.5px] ${hasBalance ? "font-inter text-asset-text-secondary" : "font-mulish text-asset-text-tertiary"}`}>
           {hasBalance
-            ? "Tokens detected. You can now wrap assets into confidential tokens."
+            ? "Your confidential assets are shielded using TEE. Metadata is obfuscated on the public ledger."
             : "No confidential assets detected. Shielded transactions require an initial balance."}
         </p>
       </div>

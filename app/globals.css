@@ -90,6 +90,8 @@
   --asset-text-tertiary: #9ca3af;
   --info-banner-bg: rgba(116, 142, 255, 0.15);
   --info-banner-border: rgba(71, 37, 244, 0.2);
+  --action-btn-active-bg: rgba(116, 142, 255, 0.25);
+  --action-btn-active-border: rgba(116, 142, 255, 0.15);
 
   /* shadcn tokens (mapped to Nox theme) */
   --primary-foreground: #ffffff;
@@ -161,6 +163,8 @@
   --asset-text-tertiary: #64748b;
   --info-banner-bg: rgba(116, 142, 255, 0.27);
   --info-banner-border: rgba(71, 37, 244, 0.2);
+  --action-btn-active-bg: rgba(116, 142, 255, 0.4);
+  --action-btn-active-border: rgba(255, 255, 255, 0.05);
 
   /* shadcn tokens (mapped to Nox dark theme) */
   --primary-foreground: #ffffff;
@@ -233,6 +237,8 @@
   --color-asset-text-tertiary: var(--asset-text-tertiary);
   --color-info-banner-bg: var(--info-banner-bg);
   --color-info-banner-border: var(--info-banner-border);
+  --color-action-btn-active-bg: var(--action-btn-active-bg);
+  --color-action-btn-active-border: var(--action-btn-active-border);
 
   /* shadcn tokens */
   --color-primary-foreground: var(--primary-foreground);
