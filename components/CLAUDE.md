@@ -8,6 +8,7 @@
 - **Single responsibility**: each component does one thing. Extract sub-components when a section contains repeated patterns (e.g. `FeatureCard` extracted from `FeaturesSection`)
 - **Props interface**: define a dedicated `interface` for components with 2+ props
 - **No inline data**: extract data arrays as `const` at module level (e.g. `FEATURES` array in `features-section.tsx`)
+- **Light/Dark mode obligatoire** : tout composant créé ou modifié **doit** être compatible light et dark mode. Utiliser exclusivement les tokens sémantiques du design system (voir section Color Tokens ci-dessous). Un composant avec des couleurs hardcodées (`text-white`, `text-slate-*`, `bg-[#...]`) sera considéré comme non conforme et devra être corrigé avant merge.
 
 ---
 
@@ -23,7 +24,7 @@ The app supports light and dark themes via `next-themes` (class strategy with `.
 - `ThemeProvider` from `next-themes` wraps the app in `providers.tsx` (attribute: `class`, default: `dark`, system: enabled)
 - `ThemeToggle` component in `header.tsx` provides sun/moon toggle
 
-**Rule:** Never use hardcoded color values (e.g. `bg-[#1d1d24]`, `text-white`, `text-slate-400`). Always use semantic Tailwind tokens: `bg-background`, `text-text-heading`, `text-text-body`, etc.
+**Règle absolue :** Ne jamais utiliser de couleurs hardcodées (ex: `bg-[#1d1d24]`, `text-white`, `text-slate-400`). Toujours utiliser les tokens sémantiques Tailwind : `bg-background`, `text-text-heading`, `text-text-body`, etc. Avant chaque commit, vérifier visuellement le rendu en light ET dark mode.
 
 ### Color Tokens
 
