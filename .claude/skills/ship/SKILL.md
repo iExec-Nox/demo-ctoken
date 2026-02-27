@@ -30,7 +30,13 @@ Exemples :
 
 Appeler `EnterWorktree` avec ce nom.
 
-Résultat attendu : on travaille dans un worktree isolé avec sa propre branche.
+**Lien symbolique .env :** Après création du worktree, créer un symlink du `.env.local` de la racine du projet vers le worktree :
+```bash
+ln -s <racine-projet>/.env.local <worktree>/.env.local
+```
+Cela garantit que les variables d'environnement sont disponibles dans le worktree.
+
+Résultat attendu : on travaille dans un worktree isolé avec sa propre branche et un `.env.local` fonctionnel.
 
 ---
 
