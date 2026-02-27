@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useAccount } from "wagmi";
 import { useTokenBalances } from "@/hooks/use-token-balances";
 import { useTokenPrices } from "@/hooks/use-token-prices";
 import { toFloat, formatUsd } from "@/lib/format";
@@ -12,6 +13,7 @@ import { PortfolioHeader } from "./portfolio-header";
 import { DashboardSkeleton } from "./dashboard-skeleton";
 
 export function DashboardContent() {
+  const { address } = useAccount();
   const { balances, hasAnyBalance, isLoading } = useTokenBalances();
   const { prices } = useTokenPrices();
 
@@ -36,7 +38,7 @@ export function DashboardContent() {
       <div className="flex items-start gap-[22px] px-10">
         {hasAnyBalance ? (
           <div className="flex flex-1 flex-col gap-10">
-            <PublicAssets balances={balances} prices={prices} />
+            <PublicAssets balances={balances} prices={prices} address={address} />
             <ConfidentialAssets />
           </div>
         ) : (

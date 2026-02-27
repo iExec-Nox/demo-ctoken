@@ -7,9 +7,10 @@ import { TokenRow } from "./token-row";
 interface PublicAssetsProps {
   balances: TokenBalance[];
   prices: TokenPrices;
+  address?: string;
 }
 
-export function PublicAssets({ balances, prices }: PublicAssetsProps) {
+export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
   const tokensWithBalance = balances.filter((b) => b.balance > 0n);
 
   return (
@@ -24,9 +25,21 @@ export function PublicAssets({ balances, prices }: PublicAssetsProps) {
             Public Assets
           </p>
         </div>
-        <p className="font-mulish text-xs text-text-muted">
-          Visible to explorers
-        </p>
+        {address ? (
+          <a
+            href={`https://sepolia.arbiscan.io/address/${address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-mulish text-xs text-text-muted transition-colors hover:text-primary"
+          >
+            Visible to explorers
+            <span className="material-icons text-[12px]!">open_in_new</span>
+          </a>
+        ) : (
+          <p className="font-mulish text-xs text-text-muted">
+            Visible to explorers
+          </p>
+        )}
       </div>
 
       {/* Token rows */}
