@@ -17,12 +17,12 @@ export function ActionButton({
     <>
       <div
         className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
-          disabled ? "bg-[rgba(51,65,85,0.5)]" : "bg-primary"
+          disabled ? "bg-asset-icon-bg" : "bg-primary"
         }`}
       >
         <span
           className={`material-icons text-[24px]! ${
-            disabled ? "text-text-muted" : "text-white"
+            disabled ? "text-text-muted" : "text-primary-foreground"
           }`}
         >
           {icon}
