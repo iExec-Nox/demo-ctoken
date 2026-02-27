@@ -52,6 +52,12 @@ The app supports light and dark themes via `next-themes` (class strategy with `.
 | `text-footer-text` | `#64748b` | `#64748b` | Footer nav links |
 | `text-footer-muted` | `#9ca3af` | `#475569` | Footer copyright text |
 | `bg-card-icon-bg` | `#748eff` | `#748eff` | Feature card icon bg |
+| `bg-tx-success-bg` | `rgba(34,197,94,0.15)` | `rgba(34,197,94,0.2)` | TxStatus success background |
+| `text-tx-success-text` | `#16a34a` | `#4ade80` | TxStatus success text |
+| `bg-tx-error-bg` | `rgba(239,68,68,0.15)` | `rgba(239,68,68,0.2)` | TxStatus error background |
+| `text-tx-error-text` | `#dc2626` | `#f87171` | TxStatus error text |
+| `bg-tx-pending-bg` | `rgba(234,179,8,0.15)` | `rgba(234,179,8,0.2)` | TxStatus pending background |
+| `text-tx-pending-text` | `#ca8a04` | `#facc15` | TxStatus pending text |
 
 ### Fonts (CSS variables from `next/font/google`)
 
@@ -129,24 +135,12 @@ absolute right-0 top-full origin-top-right animate-[dropdown-in_150ms_ease-out] 
 | `FeatureCard` | `feature-card.tsx` | Reusable card: icon + title + description |
 | `FeaturesSection` | `features-section.tsx` | 3 feature cards driven by `FEATURES` data array |
 | `Footer` | `footer.tsx` | Logo + nav links (Documentation, Github, Terms) + copyright |
+| `TxStatus` | `tx-status.tsx` | Transaction lifecycle badge: idle, pending (animated), success, error |
+| `ArbiscanLink` | `arbiscan-link.tsx` | Link to `sepolia.arbiscan.io/tx/{hash}`, opens in new tab |
 
 ---
 
 ## Shared Components (to implement)
-
-### `<TxStatus />`
-
-Displays transaction lifecycle: `idle | pending | success | error` with spinner and colored badges.
-
-### `<ArbiscanLink />`
-
-```tsx
-<ArbiscanLink txHash={hash} />
-// Renders: "View on Arbiscan ↗" opening in new tab
-// Base URL: https://sepolia.arbiscan.io/tx/{hash}
-```
-
-Must be present on **every** transaction confirmation screen.
 
 ### `<DeveloperModeProvider />`
 

@@ -94,6 +94,12 @@
   --action-btn-active-border: rgba(116, 142, 255, 0.15);
   --modal-bg: #ffffff;
   --modal-border: rgba(0, 0, 0, 0.1);
+  --tx-success-bg: rgba(34, 197, 94, 0.15);
+  --tx-success-text: #16a34a;
+  --tx-error-bg: rgba(239, 68, 68, 0.15);
+  --tx-error-text: #dc2626;
+  --tx-pending-bg: rgba(234, 179, 8, 0.15);
+  --tx-pending-text: #ca8a04;
 
   /* shadcn tokens (mapped to Nox theme) */
   --primary-foreground: #ffffff;
@@ -169,6 +175,12 @@
   --action-btn-active-border: rgba(255, 255, 255, 0.05);
   --modal-bg: #24242b;
   --modal-border: rgba(255, 255, 255, 0.1);
+  --tx-success-bg: rgba(34, 197, 94, 0.2);
+  --tx-success-text: #4ade80;
+  --tx-error-bg: rgba(239, 68, 68, 0.2);
+  --tx-error-text: #f87171;
+  --tx-pending-bg: rgba(234, 179, 8, 0.2);
+  --tx-pending-text: #facc15;
 
   /* shadcn tokens (mapped to Nox dark theme) */
   --primary-foreground: #ffffff;
@@ -245,6 +257,12 @@
   --color-action-btn-active-border: var(--action-btn-active-border);
   --color-modal-bg: var(--modal-bg);
   --color-modal-border: var(--modal-border);
+  --color-tx-success-bg: var(--tx-success-bg);
+  --color-tx-success-text: var(--tx-success-text);
+  --color-tx-error-bg: var(--tx-error-bg);
+  --color-tx-error-text: var(--tx-error-text);
+  --color-tx-pending-bg: var(--tx-pending-bg);
+  --color-tx-pending-text: var(--tx-pending-text);
 
   /* shadcn tokens */
   --color-primary-foreground: var(--primary-foreground);
