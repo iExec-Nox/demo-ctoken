@@ -52,7 +52,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
         precedence="default"
       />
       <body
