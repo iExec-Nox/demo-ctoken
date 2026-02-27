@@ -1,8 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import { useBalance, useReadContracts, useAccount, useChainId } from "wagmi";
 import { erc20Abi } from "viem";
-import tokens from "@/lib/tokens.json";
+import { erc20Tokens, nativeToken } from "@/lib/tokens";
+import { formatBalance } from "@/lib/format";
 
 export interface TokenBalance {
   symbol: string;
@@ -13,8 +15,7 @@ export interface TokenBalance {
   formatted: string;
 }
 
-const erc20Tokens = tokens.filter((t) => !t.isNative && t.address);
-const nativeToken = tokens.find((t) => t.isNative);
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
 export function useTokenBalances() {
   const { address, isConnected, status } = useAccount();
@@ -38,52 +39,51 @@ export function useTokenBalances() {
     contracts: erc20Tokens.map((token) => ({
       address: token.address as `0x${string}`,
       abi: erc20Abi,
-      functionName: "balanceOf",
-      args: [address!],
+      functionName: "balanceOf" as const,
+      args: [address ?? ZERO_ADDRESS],
       chainId,
     })),
     query: { enabled: isReady },
   });
 
-  const balances: TokenBalance[] = [];
+  const balances = useMemo(() => {
+    const result: TokenBalance[] = [];
 
-  if (nativeToken) {
-    const raw = nativeBalance?.value ?? 0n;
-    balances.push({
-      symbol: nativeToken.symbol,
-      name: nativeToken.name,
-      decimals: nativeToken.decimals,
-      icon: nativeToken.icon,
-      balance: raw,
-      formatted: formatBalance(raw, nativeToken.decimals),
+    if (nativeToken) {
+      const raw = nativeBalance?.value ?? 0n;
+      result.push({
+        symbol: nativeToken.symbol,
+        name: nativeToken.name,
+        decimals: nativeToken.decimals,
+        icon: nativeToken.icon,
+        balance: raw,
+        formatted: formatBalance(raw, nativeToken.decimals),
+      });
+    }
+
+    erc20Tokens.forEach((token, i) => {
+      const entry = erc20Results?.[i];
+      const raw =
+        entry?.status === "success" ? (entry.result as bigint) : 0n;
+      result.push({
+        symbol: token.symbol,
+        name: token.name,
+        decimals: token.decimals,
+        icon: token.icon,
+        balance: raw,
+        formatted: formatBalance(raw, token.decimals),
+      });
     });
-  }
 
-  erc20Tokens.forEach((token, i) => {
-    const result = erc20Results?.[i];
-    const raw = result?.status === "success" ? (result.result as bigint) : 0n;
-    balances.push({
-      symbol: token.symbol,
-      name: token.name,
-      decimals: token.decimals,
-      icon: token.icon,
-      balance: raw,
-      formatted: formatBalance(raw, token.decimals),
-    });
-  });
+    return result;
+  }, [nativeBalance, erc20Results]);
 
-  const hasAnyBalance = balances.some((b) => b.balance > 0n);
+  const hasAnyBalance = useMemo(
+    () => balances.some((b) => b.balance > 0n),
+    [balances]
+  );
+
   const isLoading = isReconnecting || isNativeLoading || isErc20Loading;
 
   return { balances, hasAnyBalance, isLoading };
-}
-
-function formatBalance(value: bigint, decimals: number): string {
-  if (value === 0n) return "0";
-  const divisor = 10n ** BigInt(decimals);
-  const whole = value / divisor;
-  const remainder = value % divisor;
-  const fractional = remainder.toString().padStart(decimals, "0").slice(0, 4);
-  const trimmed = fractional.replace(/0+$/, "");
-  return trimmed ? `${whole}.${trimmed}` : whole.toString();
 }
