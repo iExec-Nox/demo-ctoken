@@ -1,8 +1,12 @@
-import Link from "next/link";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useFaucetModal } from "@/components/faucet-modal-provider";
 
 export function EmptyPortfolio() {
+  const { setOpen } = useFaucetModal();
+
   return (
     <Card className="flex flex-1 flex-col items-center justify-center rounded-[32px] border-surface-border bg-surface px-10 py-24 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-[29px]">
@@ -22,15 +26,13 @@ export function EmptyPortfolio() {
         </p>
 
         <Button
-          asChild
-          className="h-auto rounded-xl bg-primary px-5 py-3 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
+          onClick={() => setOpen(true)}
+          className="h-auto cursor-pointer rounded-xl bg-primary px-5 py-3 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
         >
-          <Link href="/faucet">
-            <span className="material-icons text-[20px]!">
-              account_balance_wallet
-            </span>
-            Go to Faucets
-          </Link>
+          <span className="material-icons text-[20px]!">
+            account_balance_wallet
+          </span>
+          Go to Faucets
         </Button>
       </div>
     </Card>

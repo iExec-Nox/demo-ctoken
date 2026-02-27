@@ -92,6 +92,8 @@
   --info-banner-border: rgba(71, 37, 244, 0.2);
   --action-btn-active-bg: rgba(116, 142, 255, 0.25);
   --action-btn-active-border: rgba(116, 142, 255, 0.15);
+  --modal-bg: #ffffff;
+  --modal-border: rgba(0, 0, 0, 0.1);
 
   /* shadcn tokens (mapped to Nox theme) */
   --primary-foreground: #ffffff;
@@ -165,6 +167,8 @@
   --info-banner-border: rgba(71, 37, 244, 0.2);
   --action-btn-active-bg: rgba(116, 142, 255, 0.4);
   --action-btn-active-border: rgba(255, 255, 255, 0.05);
+  --modal-bg: #24242b;
+  --modal-border: rgba(255, 255, 255, 0.1);
 
   /* shadcn tokens (mapped to Nox dark theme) */
   --primary-foreground: #ffffff;
@@ -239,6 +243,8 @@
   --color-info-banner-border: var(--info-banner-border);
   --color-action-btn-active-bg: var(--action-btn-active-bg);
   --color-action-btn-active-border: var(--action-btn-active-border);
+  --color-modal-bg: var(--modal-bg);
+  --color-modal-border: var(--modal-border);
 
   /* shadcn tokens */
   --color-primary-foreground: var(--primary-foreground);

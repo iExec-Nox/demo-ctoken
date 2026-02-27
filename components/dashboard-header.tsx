@@ -9,12 +9,12 @@ import { WalletButton } from "@/components/wallet-button";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
+import { useFaucetModal } from "@/components/faucet-modal-provider";
 
-const NAV_ITEMS = [
+const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Activity", href: "/explorer" },
-  { label: "Settings", href: "/settings" },
-];
+] as const;
 
 function DevModeToggle() {
   const [enabled, setEnabled] = useState(true);
@@ -36,6 +36,7 @@ function DevModeToggle() {
 
 export function DashboardHeader() {
   const pathname = usePathname();
+  const { setOpen } = useFaucetModal();
   useWalletRedirect({ onDisconnect: "/" });
 
   return (
@@ -44,7 +45,7 @@ export function DashboardHeader() {
         <Logo font="inter" />
 
         <nav className="flex items-center gap-6">
-          {NAV_ITEMS.map((item) => {
+          {NAV_LINKS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -60,6 +61,14 @@ export function DashboardHeader() {
               </Link>
             );
           })}
+
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="cursor-pointer rounded-md px-3 py-1.5 font-inter text-sm font-medium text-text-body transition-colors hover:text-text-heading"
+          >
+            Faucet
+          </button>
         </nav>
       </div>
 

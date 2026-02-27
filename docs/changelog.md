@@ -9,3 +9,9 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 Implémentation de la connexion wallet avec modale custom fidèle au design Figma, support Arbitrum + Arbitrum Sepolia, blur backdrop, et redirection post-connexion vers le dashboard.
 
 → ADR : [ADR-0001](./decisions/0001-wallet-connect-rainbowkit.md)
+
+### 2026-02-27 — Modale Faucet
+
+Ajout d'une modale Faucet (shadcn Dialog) avec 3 cartes token (ETH, RLC, USDC), accessible depuis le nav menu, l'empty portfolio et la topbar via un Context React.
+
+→ ADR : [ADR-0003](./decisions/0003-faucet-modal.md)
