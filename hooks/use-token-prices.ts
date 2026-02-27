@@ -24,9 +24,6 @@ export function useTokenPrices() {
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError")
           return;
-        if (process.env.NODE_ENV === "development") {
-          console.warn("Failed to fetch token prices:", error);
-        }
       } finally {
         setIsLoading(false);
       }
