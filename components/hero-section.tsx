@@ -14,7 +14,7 @@ export function HeroSection() {
       <div className="flex w-full items-start justify-center gap-5">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 rounded-xl bg-primary px-5 py-4 text-center font-mulish text-lg font-bold text-white shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover"
+          className="flex items-center gap-2 rounded-xl bg-primary px-5 py-4 text-center font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover"
         >
           <span className="material-icons text-xl leading-7">account_balance_wallet</span>
           Try It Now
