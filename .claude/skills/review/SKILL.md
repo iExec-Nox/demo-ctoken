@@ -28,11 +28,13 @@ Exécuter en parallèle :
 ```bash
 npm run build
 npm run lint
+npx tsc --noEmit
 ```
 
 Collecter les résultats :
 - **Build** : ✅ OK ou ❌ liste des erreurs
 - **Lint** : ✅ OK ou ❌ liste des warnings/erreurs
+- **Types** : ✅ OK ou ❌ liste des erreurs TypeScript
 
 ### 3. Review des conventions
 
@@ -72,6 +74,7 @@ Présenter le rapport à l'utilisateur :
 ## Checks automatiques
 - Build : ✅ | ❌
 - Lint : ✅ | ❌
+- Types (tsc) : ✅ | ❌
 
 ## Conventions
 - Nommage : ✅ | ⚠️ <détails>
