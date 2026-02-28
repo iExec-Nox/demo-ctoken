@@ -83,7 +83,7 @@ export function useTokenBalances() {
     [balances]
   );
 
-  const isLoading = isReconnecting || isNativeLoading || isErc20Loading;
+  const isLoading = !isReady || isReconnecting || isNativeLoading || isErc20Loading;
 
   return { balances, hasAnyBalance, isLoading };
 }

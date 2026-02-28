@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { FaucetModalProvider } from "@/components/faucet-modal-provider";
+import { WrapModalProvider } from "@/components/wrap-modal-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
 import { arbitrumSepolia } from "@reown/appkit/networks";
@@ -57,7 +58,9 @@ export function Providers({ children, cookies }: ProvidersProps) {
         initialState={initialState}
       >
         <QueryClientProvider client={queryClient}>
-          <FaucetModalProvider>{children}</FaucetModalProvider>
+          <FaucetModalProvider>
+            <WrapModalProvider>{children}</WrapModalProvider>
+          </FaucetModalProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </ThemeProvider>

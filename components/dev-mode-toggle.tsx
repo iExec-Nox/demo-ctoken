@@ -1,34 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
+import { useDevMode } from "@/hooks/use-dev-mode";
 
-const STORAGE_KEY = "nox-dev-mode";
+interface DevModeToggleProps {
+  label?: string;
+}
 
-export function DevModeToggle() {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
-      setEnabled(stored === "true");
-    }
-  }, []);
-
-  function handleChange(checked: boolean) {
-    setEnabled(checked);
-    localStorage.setItem(STORAGE_KEY, String(checked));
-  }
+export function DevModeToggle({ label = "Developer Mode" }: DevModeToggleProps) {
+  const { enabled, toggle } = useDevMode();
 
   return (
     <div className="flex items-center gap-1.5">
       <span className="font-inter text-sm font-medium text-text-body">
-        Developer Mode
+        {label}
       </span>
       <Switch
         size="sm"
         checked={enabled}
-        onCheckedChange={handleChange}
+        onCheckedChange={toggle}
         aria-label={enabled ? "Disable developer mode" : "Enable developer mode"}
       />
     </div>

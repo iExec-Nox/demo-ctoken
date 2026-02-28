@@ -6,3 +6,4 @@
 | 0002 | [Header Portfolio Overview pour le Dashboard](./0002-portfolio-header-dashboard.md) | 2026-02-27 | Accepté |
 | 0003 | [Modale Faucet avec Context React](./0003-faucet-modal.md) | 2026-02-27 | Accepté |
 | 0004 | [Forcer le réseau Arbitrum Sepolia après connexion wallet](./0004-enforce-arbitrum-sepolia-network.md) | 2026-02-27 | Accepté |
+| 0005 | [Modale Wrap / Unwrap avec Context React](./0005-wrap-unwrap-modal.md) | 2026-02-28 | Accepté |

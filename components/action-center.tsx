@@ -1,34 +1,43 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { ActionButton } from "./action-button";
-
-const ACTIONS = [
-  {
-    icon: "layers",
-    label: "Wrap",
-    description: "Public to Private",
-  },
-  {
-    icon: "layers_clear",
-    label: "Unwrap",
-    description: "Private to Public",
-  },
-  {
-    icon: "send",
-    label: "Transfer",
-    description: "Private Transfer",
-  },
-  {
-    icon: "key",
-    label: "Selective Disclosure",
-    description: "Delegate View",
-  },
-] as const;
+import { useWrapModal } from "./wrap-modal-provider";
 
 interface ActionCenterProps {
   hasBalance: boolean;
 }
 
 export function ActionCenter({ hasBalance }: ActionCenterProps) {
+  const { openWrap, openUnwrap } = useWrapModal();
+
+  const ACTIONS = [
+    {
+      icon: "layers",
+      label: "Wrap",
+      description: "Public to Private",
+      onClick: openWrap,
+    },
+    {
+      icon: "layers_clear",
+      label: "Unwrap",
+      description: "Private to Public",
+      onClick: openUnwrap,
+    },
+    {
+      icon: "send",
+      label: "Transfer",
+      description: "Private Transfer",
+      onClick: () => {},
+    },
+    {
+      icon: "key",
+      label: "Selective Disclosure",
+      description: "Delegate View",
+      onClick: () => {},
+    },
+  ] as const;
+
   return (
     <Card className="w-[290px] shrink-0 gap-7 rounded-3xl border-surface-border bg-surface p-[25px] backdrop-blur-sm">
       {/* Warning banner */}
@@ -55,9 +64,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
             label={action.label}
             description={action.description}
             disabled={!hasBalance}
-            onClick={() => {
-              // TODO: open modal for each action
-            }}
+            onClick={action.onClick}
           />
         ))}
       </CardContent>

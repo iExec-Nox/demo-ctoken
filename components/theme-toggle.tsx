@@ -37,7 +37,7 @@ export function ThemeToggle() {
         checked={!isDark}
         onCheckedChange={(checked) => setTheme(checked ? "light" : "dark")}
         className="!h-7 !w-[52px] cursor-pointer border-surface-border bg-toggle-track shadow-none data-[state=checked]:border-surface-border data-[state=checked]:bg-toggle-track dark:data-[state=unchecked]:bg-toggle-track"
-        thumbClassName="!size-[22px] bg-white! shadow-md"
+        thumbClassName="!size-[22px] bg-toggle-thumb shadow-md"
         thumbChildren={
           <span className="material-icons-outlined !text-[13px] leading-none text-text-muted">
             {isDark ? "light_mode" : "dark_mode"}
