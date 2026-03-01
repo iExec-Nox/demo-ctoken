@@ -40,7 +40,7 @@ export function ThemeToggle() {
         thumbClassName="!size-[22px] bg-toggle-thumb shadow-md"
         thumbChildren={
           <span className="material-icons-outlined !text-[13px] leading-none text-text-muted">
-            {isDark ? "light_mode" : "dark_mode"}
+            {isDark ? "dark_mode" : "light_mode"}
           </span>
         }
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
