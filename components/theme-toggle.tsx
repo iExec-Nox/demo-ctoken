@@ -20,7 +20,7 @@ export function ThemeToggle() {
           aria-hidden="true"
         >
           <div className="ml-[2px] flex size-[22px] items-center justify-center rounded-full bg-toggle-thumb shadow-md">
-            <span className="material-icons-outlined !text-[13px] leading-none text-text-muted">
+            <span aria-hidden="true" className="material-icons-outlined text-[13px]! leading-none text-text-muted">
               light_mode
             </span>
           </div>
@@ -36,10 +36,10 @@ export function ThemeToggle() {
       <Switch
         checked={!isDark}
         onCheckedChange={(checked) => setTheme(checked ? "light" : "dark")}
-        className="!h-7 !w-[52px] cursor-pointer border-surface-border bg-toggle-track shadow-none data-[state=checked]:border-surface-border data-[state=checked]:bg-toggle-track dark:data-[state=unchecked]:bg-toggle-track"
-        thumbClassName="!size-[22px] bg-toggle-thumb shadow-md"
+        className="h-7! w-[52px]! cursor-pointer border-surface-border bg-toggle-track shadow-none data-[state=checked]:border-surface-border data-[state=checked]:bg-toggle-track dark:data-[state=unchecked]:bg-toggle-track"
+        thumbClassName="size-[22px]! bg-toggle-thumb shadow-md"
         thumbChildren={
-          <span className="material-icons-outlined !text-[13px] leading-none text-text-muted">
+          <span aria-hidden="true" className="material-icons-outlined text-[13px]! leading-none text-text-muted">
             {isDark ? "dark_mode" : "light_mode"}
           </span>
         }
