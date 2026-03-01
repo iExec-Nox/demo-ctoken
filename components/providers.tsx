@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 import { ThemeProvider } from "@/components/theme-provider";
 import { FaucetModalProvider } from "@/components/faucet-modal-provider";
 import { WrapModalProvider } from "@/components/wrap-modal-provider";
 import { TransferModalProvider } from "@/components/transfer-modal-provider";
 import { SelectiveDisclosureModalProvider } from "@/components/selective-disclosure-modal-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createAppKit } from "@reown/appkit/react";
+import { createAppKit, useAppKitTheme } from "@reown/appkit/react";
 import { arbitrumSepolia } from "@reown/appkit/networks";
 import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
 import { wagmiAdapter, projectId } from "@/lib/wagmi";
@@ -38,6 +39,37 @@ function initAppKit() {
   });
 }
 
+function AppKitThemeSync() {
+  const { resolvedTheme } = useTheme();
+  const appKitTheme = useAppKitTheme();
+  const prevThemeRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!resolvedTheme || resolvedTheme === prevThemeRef.current) return;
+    prevThemeRef.current = resolvedTheme;
+
+    const mode = resolvedTheme as "light" | "dark";
+    appKitTheme.setThemeMode(mode);
+    appKitTheme.setThemeVariables(
+      mode === "light"
+        ? {
+            "--w3m-accent": "#748eff",
+            "--w3m-border-radius-master": "2px",
+            "--w3m-color-mix": "#e3ecff",
+            "--w3m-color-mix-strength": 25,
+          }
+        : {
+            "--w3m-accent": "#748eff",
+            "--w3m-border-radius-master": "2px",
+            "--w3m-color-mix": "#0f1119",
+            "--w3m-color-mix-strength": 10,
+          }
+    );
+  }, [resolvedTheme, appKitTheme]);
+
+  return null;
+}
+
 interface ProvidersProps {
   children: React.ReactNode;
   cookies: string | null;
@@ -60,6 +92,7 @@ export function Providers({ children, cookies }: ProvidersProps) {
         initialState={initialState}
       >
         <QueryClientProvider client={queryClient}>
+          <AppKitThemeSync />
           <FaucetModalProvider>
             <WrapModalProvider>
               <TransferModalProvider>
