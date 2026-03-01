@@ -6,7 +6,7 @@ export function Topbar() {
   const { setOpen } = useFaucetModal();
 
   return (
-    <div className="flex w-full items-center justify-center gap-2 border-b border-topbar-border bg-background px-5 py-3 text-sm font-medium backdrop-blur-sm">
+    <div className="flex w-full items-center justify-center gap-2 border-b border-topbar-border bg-background px-5 py-3 text-[11px] font-medium backdrop-blur-sm md:text-xs lg:text-sm">
       <span className="text-text-muted">Running on Arbitrum Sepolia Testnet</span>
       <button
         type="button"

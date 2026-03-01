@@ -10,18 +10,18 @@ export function Logo({
   iconSize = "md",
   font = "mulish",
 }: LogoProps) {
-  const sizeClass = iconSize === "sm" ? "size-7" : "size-8";
+  const sizeClass = iconSize === "sm" ? "size-[22px] md:size-7" : "size-[26px] md:size-8";
   const fontClass = font === "inter" ? "font-inter" : "font-mulish";
 
   return (
-    <Link href="/" className="flex items-center gap-3">
+    <Link href="/" className="flex items-center gap-3 md:gap-[18px]">
       <div
-        className={`relative ${sizeClass} overflow-hidden rounded-xl bg-primary`}
+        className={`relative ${sizeClass} overflow-hidden rounded-[10px] bg-primary md:rounded-xl`}
       >
         <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover" />
       </div>
       <span
-        className={`${fontClass} text-xl font-bold tracking-tight text-logo-text`}
+        className={`${fontClass} text-sm font-bold tracking-tight text-logo-text md:text-xl`}
       >
         Confidential Token
       </span>

@@ -9,17 +9,17 @@ interface FeatureCardProps {
 
 export function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <Card className="flex-1 gap-4 rounded-2xl border-surface-border bg-surface px-10 py-8 backdrop-blur-sm">
+    <Card className="flex-1 gap-2 rounded-2xl border-surface-border bg-surface px-5 py-4 backdrop-blur-sm md:gap-3 md:px-10 md:py-5 lg:gap-4 lg:py-8">
       <CardHeader className="p-0">
-        <div className="flex size-12 items-center justify-center rounded-xl bg-card-icon-bg">
-          <Image src={icon} alt="" width={28} height={28} />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-card-icon-bg md:size-[42px] lg:size-12">
+          <Image src={icon} alt="" width={28} height={28} className="size-[26px] md:size-[30px] lg:size-7" />
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4 p-0">
-        <h3 className="font-inter text-xl font-bold leading-7 text-text-heading">
+      <CardContent className="flex flex-col gap-2 p-0 md:gap-3 lg:gap-4">
+        <h3 className="font-inter text-base font-bold leading-7 text-text-heading">
           {title}
         </h3>
-        <p className="font-inter text-sm leading-[22px] text-text-body">
+        <p className="font-inter text-xs leading-[22px] text-text-body">
           {description}
         </p>
       </CardContent>
