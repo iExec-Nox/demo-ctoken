@@ -1,15 +1,54 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { HeroSection } from "@/components/hero-section";
 import { FeaturesSection } from "@/components/features-section";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: "Nox Protocol",
+      url: "https://nox.iex.ec",
+      logo: "https://nox.iex.ec/nox-icon.png",
+      description:
+        "Confidential token protocol enabling encrypted ERC-20 transfers and selective disclosure on Arbitrum.",
+      sameAs: ["https://github.com/iExecBlockchainComputing"],
+    },
+    {
+      "@type": "WebApplication",
+      name: "Nox Confidential Token",
+      url: "https://nox.iex.ec",
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      description:
+        "Wrap any ERC-20 into encrypted confidential tokens, transfer privately, and manage viewing permissions on-chain.",
+    },
+  ],
+};
+
 export const metadata: Metadata = {
-  title: "Home | Nox Confidential Token",
-  description: "Try confidential DeFi now — encrypt token balances and experience private on-chain transfers.",
+  title: "Private Finance in Action — Confidential DeFi on Arbitrum",
+  description:
+    "Wrap any ERC-20 into encrypted confidential tokens, transfer privately, and grant selective disclosure — all on-chain on Arbitrum Sepolia. Try Nox now.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function Home() {
   return (
     <>
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HeroSection />
       <FeaturesSection />
     </>

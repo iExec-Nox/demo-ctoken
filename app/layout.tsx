@@ -23,8 +23,41 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Confidential Token | Nox",
-  description: "Manage your confidential assets privately",
+  metadataBase: new URL("https://nox.iex.ec"),
+  title: {
+    default: "Nox — Confidential Token Protocol",
+    template: "%s | Nox",
+  },
+  description:
+    "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers, selective disclosure, and ACL management on Arbitrum.",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://nox.iex.ec",
+    siteName: "Nox Confidential Token",
+    title: "Nox — Confidential Token Protocol",
+    description:
+      "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers, selective disclosure, and ACL management on Arbitrum.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Nox Confidential Token Protocol",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nox — Confidential Token Protocol",
+    description:
+      "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers and selective disclosure on Arbitrum.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function RootLayout({
