@@ -8,3 +8,4 @@
 | 0004 | [Forcer le réseau Arbitrum Sepolia après connexion wallet](./0004-enforce-arbitrum-sepolia-network.md) | 2026-02-27 | Accepté |
 | 0005 | [Modale Wrap / Unwrap avec Context React](./0005-wrap-unwrap-modal.md) | 2026-02-28 | Accepté |
 | 0006 | [Modale Selective Disclosure avec Context React](./0006-selective-disclosure-modal.md) | 2026-03-01 | Accepté |
+| 0007 | [Page Activity Explorer](./0007-activity-explorer-page.md) | 2026-03-01 | Accepté |

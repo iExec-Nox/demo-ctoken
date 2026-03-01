@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-01 — Page Activity Explorer
+
+Implémentation de la page `/explorer` avec table d'historique des transactions (Wrap, Transfer, Unwrap, Delegation), filtre dropdown par type d'action, pagination, liens Arbiscan, et données mock en attente du SDK. Suit le pattern Page → Content du dashboard avec tokens sémantiques light/dark.
+
+→ ADR : [ADR-0007](./decisions/0007-activity-explorer-page.md)
+
 ### 2026-03-01 — Modale Selective Disclosure
 
 Implémentation de la modale Selective Disclosure (délégation de vue ACL) avec formulaire d'ajout de viewer (adresse, scope Full Portfolio/Specific Token, sélection de tokens), code viewer dev mode, sections Current/Past Viewers statiques, et security note. Pattern Provider/Hook cohérent avec les modales existantes.
