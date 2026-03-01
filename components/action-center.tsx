@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ActionButton } from "./action-button";
 import { useWrapModal } from "./wrap-modal-provider";
+import { useTransferModal } from "./transfer-modal-provider";
 
 interface ActionCenterProps {
   hasBalance: boolean;
@@ -10,6 +11,7 @@ interface ActionCenterProps {
 
 export function ActionCenter({ hasBalance }: ActionCenterProps) {
   const { openWrap, openUnwrap } = useWrapModal();
+  const { openTransfer } = useTransferModal();
 
   const ACTIONS = [
     {
@@ -28,7 +30,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       icon: "send",
       label: "Transfer",
       description: "Private Transfer",
-      onClick: () => {},
+      onClick: openTransfer,
     },
     {
       icon: "key",
