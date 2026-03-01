@@ -32,7 +32,7 @@ export function HeroSection() {
           variant="ghost"
           className="h-auto rounded-xl border border-ghost-btn-border bg-ghost-btn-bg px-2.5 py-2 font-mulish text-base font-bold text-ghost-btn-text backdrop-blur-sm hover:bg-ghost-btn-bg hover:opacity-80 md:px-[18px] md:py-3"
         >
-          <Link href="#">Talk To Us</Link>
+          <Link href="https://docs.nox.iex.ec/contact" target="_blank" rel="noopener noreferrer">Talk To Us</Link>
         </Button>
       </div>
     </section>
