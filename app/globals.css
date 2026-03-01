@@ -100,6 +100,7 @@
   --tx-error-text: #dc2626;
   --tx-pending-bg: rgba(234, 179, 8, 0.15);
   --tx-pending-text: #ca8a04;
+  --code-text: #5b7fbf;
 
   /* shadcn tokens (mapped to Nox theme) */
   --primary-foreground: #ffffff;
@@ -181,6 +182,7 @@
   --tx-error-text: #f87171;
   --tx-pending-bg: rgba(234, 179, 8, 0.2);
   --tx-pending-text: #facc15;
+  --code-text: #94c1ff;
 
   /* shadcn tokens (mapped to Nox dark theme) */
   --primary-foreground: #ffffff;
@@ -263,6 +265,7 @@
   --color-tx-error-text: var(--tx-error-text);
   --color-tx-pending-bg: var(--tx-pending-bg);
   --color-tx-pending-text: var(--tx-pending-text);
+  --color-code-text: var(--code-text);
 
   /* shadcn tokens */
   --color-primary-foreground: var(--primary-foreground);
