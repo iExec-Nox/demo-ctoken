@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-01 — Modale Selective Disclosure
+
+Implémentation de la modale Selective Disclosure (délégation de vue ACL) avec formulaire d'ajout de viewer (adresse, scope Full Portfolio/Specific Token, sélection de tokens), code viewer dev mode, sections Current/Past Viewers statiques, et security note. Pattern Provider/Hook cohérent avec les modales existantes.
+
+→ ADR : [ADR-0006](./decisions/0006-selective-disclosure-modal.md)
+
 ### 2026-02-27 — Forcer le réseau Arbitrum Sepolia
 
 Restriction de la config AppKit à Arbitrum Sepolia uniquement (`allowUnsupportedChain: false`, retrait d'`arbitrum` mainnet). Le mécanisme per-dApp natif de MetaMask et AppKit `defaultNetwork` assurent la connexion sur le bon réseau sans code custom.

@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { FaucetModalProvider } from "@/components/faucet-modal-provider";
 import { WrapModalProvider } from "@/components/wrap-modal-provider";
 import { TransferModalProvider } from "@/components/transfer-modal-provider";
+import { SelectiveDisclosureModalProvider } from "@/components/selective-disclosure-modal-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
 import { arbitrumSepolia } from "@reown/appkit/networks";
@@ -61,7 +62,11 @@ export function Providers({ children, cookies }: ProvidersProps) {
         <QueryClientProvider client={queryClient}>
           <FaucetModalProvider>
             <WrapModalProvider>
-              <TransferModalProvider>{children}</TransferModalProvider>
+              <TransferModalProvider>
+                <SelectiveDisclosureModalProvider>
+                  {children}
+                </SelectiveDisclosureModalProvider>
+              </TransferModalProvider>
             </WrapModalProvider>
           </FaucetModalProvider>
         </QueryClientProvider>
