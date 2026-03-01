@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function ExplorerPage() {
   return (
-    <main className="min-h-[60vh]">
+    <div className="min-h-[60vh]">
       <ExplorerContent />
-    </main>
+    </div>
   );
 }
