@@ -11,7 +11,7 @@ export function EmptyPortfolio() {
     <Card className="flex flex-1 flex-col items-center justify-center rounded-[32px] border-surface-border bg-surface px-10 py-24 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-[29px]">
         <div className="flex size-20 items-center justify-center rounded-full border border-surface-border bg-asset-icon-bg">
-          <span className="material-icons text-[36px]! text-text-muted">
+          <span aria-hidden="true" className="material-icons text-[36px]! text-text-muted">
             account_balance_wallet
           </span>
         </div>
@@ -29,7 +29,7 @@ export function EmptyPortfolio() {
           onClick={() => setOpen(true)}
           className="h-auto cursor-pointer rounded-xl bg-primary px-5 py-3 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
         >
-          <span className="material-icons text-[20px]!">
+          <span aria-hidden="true" className="material-icons text-[20px]!">
             account_balance_wallet
           </span>
           Go to Faucets

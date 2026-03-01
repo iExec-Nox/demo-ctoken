@@ -24,7 +24,7 @@ export function HeroSection() {
           onClick={connect}
           className="h-auto rounded-xl bg-primary px-2.5 py-2 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover md:px-[18px] md:py-3 md:text-base"
         >
-          <span className="material-icons text-base! leading-7 md:text-xl!">account_balance_wallet</span>
+          <span aria-hidden="true" className="material-icons text-base! leading-7 md:text-xl!">account_balance_wallet</span>
           Try It Now
         </Button>
         <Button

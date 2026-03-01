@@ -47,7 +47,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       {/* Warning banner */}
       {!hasBalance && (
         <div className="flex items-center gap-2 rounded-xl border border-info-banner-border bg-info-banner-bg p-[13px]">
-          <span className="material-icons text-[14px]! text-text-heading">info</span>
+          <span aria-hidden="true" className="material-icons text-[14px]! text-text-heading">info</span>
           <p className="font-mulish text-[13px] font-bold leading-[16.5px] tracking-[-0.275px] text-text-heading">
             Fund your wallet to unlock these actions
           </p>
@@ -76,7 +76,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       {/* Privacy Status */}
       <div className="flex flex-col gap-2 rounded-2xl border border-surface-border bg-surface p-[17px]">
         <div className="flex items-center gap-1.5">
-          <span className="material-icons text-[14px]! text-text-muted">
+          <span aria-hidden="true" className="material-icons text-[14px]! text-text-muted">
             verified_user
           </span>
           <p className="font-mulish text-xs font-bold tracking-[0.3px] text-text-muted">

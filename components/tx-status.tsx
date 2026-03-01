@@ -48,9 +48,10 @@ export function TxStatus({ status, message, className }: TxStatusProps) {
       )}
     >
       <span
+        aria-hidden="true"
         className={cn(
           "material-icons text-[16px]!",
-          status === "pending" && "animate-spin",
+          status === "pending" && "animate-spin motion-reduce:animate-none",
         )}
       >
         {icon}

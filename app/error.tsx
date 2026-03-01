@@ -16,6 +16,7 @@ export default function Error({
         {error.message || "An unexpected error occurred."}
       </p>
       <button
+        type="button"
         onClick={reset}
         className="rounded-xl bg-primary px-5 py-4 font-mulish font-bold text-primary-foreground transition-colors hover:bg-primary-hover"
       >

@@ -6,7 +6,7 @@ export function ConfidentialAssets() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="material-icons text-[18px]! text-text-heading">
+          <span aria-hidden="true" className="material-icons text-[18px]! text-text-heading">
             visibility_off
           </span>
           <p className="font-mulish text-sm font-bold uppercase tracking-[1.4px] text-asset-text-secondary">
@@ -20,7 +20,7 @@ export function ConfidentialAssets() {
 
       {/* Empty state */}
       <div className="flex flex-col items-center gap-3 border-t border-surface-border px-6 py-10">
-        <span className="material-icons text-[32px]! text-asset-text-tertiary">
+        <span aria-hidden="true" className="material-icons text-[32px]! text-asset-text-tertiary">
           enhanced_encryption
         </span>
         <p className="font-mulish text-sm text-text-muted">

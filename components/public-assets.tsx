@@ -18,7 +18,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="material-icons text-[18px]! text-primary">
+          <span aria-hidden="true" className="material-icons text-[18px]! text-primary">
             public
           </span>
           <p className="font-mulish text-sm font-bold uppercase tracking-[1.4px] text-asset-text-secondary">
@@ -33,7 +33,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
             className="inline-flex items-center gap-1 font-mulish text-xs text-text-muted transition-colors hover:text-primary"
           >
             Visible to explorers
-            <span className="material-icons text-[12px]!">open_in_new</span>
+            <span aria-hidden="true" className="material-icons text-[12px]!">open_in_new</span>
           </a>
         ) : (
           <p className="font-mulish text-xs text-text-muted">

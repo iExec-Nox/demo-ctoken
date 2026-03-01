@@ -18,6 +18,7 @@ export default function GlobalError({
             {error.message || "A critical error occurred."}
           </p>
           <button
+            type="button"
             onClick={reset}
             className="rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground transition-colors hover:bg-primary-hover"
           >

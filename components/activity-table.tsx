@@ -1,5 +1,3 @@
-"use client";
-
 import type { ActivityEntry } from "@/lib/activity";
 import { ACTIVITY_TYPE_CONFIG } from "@/lib/activity";
 
@@ -13,11 +11,13 @@ export function ActivityTable({ entries }: ActivityTableProps) {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-surface-border bg-surface backdrop-blur-sm">
       <table className="w-full">
+        <caption className="sr-only">Transaction history</caption>
         <thead>
           <tr className="border-b border-surface-border">
             {COLUMNS.map((col) => (
               <th
                 key={col}
+                scope="col"
                 className={`px-6 py-4 font-inter text-xs font-bold uppercase tracking-wider text-text-muted ${
                   col === "Amount" || col === "Details"
                     ? "text-right"
@@ -52,6 +52,7 @@ function ActivityTableRow({ entry }: { entry: ActivityEntry }) {
             className={`flex size-9 items-center justify-center rounded-lg ${config.iconBg}`}
           >
             <span
+              aria-hidden="true"
               className={`material-icons text-[18px]! ${config.iconColor}`}
             >
               {config.icon}
@@ -85,7 +86,7 @@ function ActivityTableRow({ entry }: { entry: ActivityEntry }) {
           className="inline-flex items-center gap-1 font-inter text-xs font-bold text-primary transition-colors hover:text-primary-hover"
         >
           Arbiscan
-          <span className="material-icons text-[14px]!">north_east</span>
+          <span aria-hidden="true" className="material-icons text-[14px]!">north_east</span>
         </a>
       </td>
     </tr>

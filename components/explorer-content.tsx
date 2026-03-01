@@ -67,6 +67,7 @@ export function ExplorerContent() {
               onChange={(e) =>
                 handleFilterChange(e.target.value as FilterValue)
               }
+              aria-label="Filter by action type"
               className="cursor-pointer appearance-none rounded-lg border border-surface-border bg-surface py-2 pl-4 pr-10 font-inter text-sm font-medium text-text-heading backdrop-blur-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
             >
               {FILTER_OPTIONS.map((opt) => (
@@ -75,7 +76,7 @@ export function ExplorerContent() {
                 </option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 material-icons text-[20px]! text-text-muted">
+            <span aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 material-icons text-[20px]! text-text-muted">
               expand_more
             </span>
           </div>
@@ -99,7 +100,7 @@ export function ExplorerContent() {
             aria-label="Previous page"
             className="cursor-pointer p-1 text-text-muted transition-colors hover:text-text-heading disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <span className="material-icons text-[24px]!">chevron_left</span>
+            <span aria-hidden="true" className="material-icons text-[24px]!">chevron_left</span>
           </button>
 
           <span className="flex min-w-[30px] items-center justify-center rounded border border-surface-border bg-surface px-3 py-1 font-inter text-xs font-medium text-text-heading backdrop-blur-sm">
@@ -113,7 +114,7 @@ export function ExplorerContent() {
             aria-label="Next page"
             className="cursor-pointer p-1 text-text-muted transition-colors hover:text-text-heading disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <span className="material-icons text-[24px]!">chevron_right</span>
+            <span aria-hidden="true" className="material-icons text-[24px]!">chevron_right</span>
           </button>
         </div>
       </div>

@@ -84,7 +84,7 @@ export function FaucetModal() {
 
         {/* Limits warning */}
         <div className="flex items-center justify-center gap-2 text-text-muted">
-          <span className="material-icons text-[14px]!">info</span>
+          <span aria-hidden="true" className="material-icons text-[14px]!">info</span>
           <p className="font-mulish text-xs font-medium">
             Limits: 0.1 ETH / 100 USDC per 24 hours
           </p>
