@@ -38,16 +38,16 @@ const CURRENT_VIEWERS: MockViewer[] = [
   {
     address: "0x3fA...E901",
     icon: "account_balance",
-    iconColor: "text-[#818cf8]",
-    iconBg: "bg-[rgba(99,102,241,0.2)]",
+    iconColor: "text-primary",
+    iconBg: "bg-primary-alpha-18",
     scope: "full",
     date: "12/02/2026 10:30 CET",
   },
   {
     address: "0x882...19a4",
     icon: "person",
-    iconColor: "text-[#a78bfa]",
-    iconBg: "bg-[rgba(139,92,246,0.2)]",
+    iconColor: "text-primary",
+    iconBg: "bg-primary-alpha-18",
     scope: "token",
     tokenLabel: "USDC Only",
     date: "12/02/2026 10:30 CET",
@@ -56,7 +56,7 @@ const CURRENT_VIEWERS: MockViewer[] = [
     address: "0x91d...77b2",
     icon: "verified_user",
     iconColor: "text-text-body",
-    iconBg: "bg-[rgba(100,116,139,0.2)]",
+    iconBg: "bg-surface",
     scope: "full",
     date: "12/02/2026 10:30 CET",
   },
@@ -66,8 +66,8 @@ const PAST_VIEWERS: MockViewer[] = [
   {
     address: "0x3fA...E901",
     icon: "account_balance",
-    iconColor: "text-[#818cf8]",
-    iconBg: "bg-[rgba(99,102,241,0.2)]",
+    iconColor: "text-primary",
+    iconBg: "bg-primary-alpha-18",
     scope: "full",
     date: "12/02/2026 10:30 CET",
   },
@@ -81,6 +81,7 @@ function ViewerCard({ viewer }: { viewer: MockViewer }) {
           className={`flex size-10 shrink-0 items-center justify-center rounded-full ${viewer.iconBg}`}
         >
           <span
+            aria-hidden="true"
             className={`material-icons text-[20px]! ${viewer.iconColor}`}
           >
             {viewer.icon}
@@ -91,11 +92,11 @@ function ViewerCard({ viewer }: { viewer: MockViewer }) {
             {viewer.address}
           </span>
           {viewer.scope === "full" ? (
-            <span className="inline-flex w-fit items-center rounded-full border border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.1)] px-2 py-0.5 font-mulish text-[10px] font-bold text-[#10b981]">
+            <span className="inline-flex w-fit items-center rounded-full border border-tx-success-text/20 bg-tx-success-bg px-2 py-0.5 font-mulish text-[10px] font-bold text-tx-success-text">
               Full Portfolio
             </span>
           ) : (
-            <span className="inline-flex w-fit items-center rounded-full border border-primary bg-primary px-2 py-0.5 font-mulish text-[10px] font-bold text-[#d3caff]">
+            <span className="inline-flex w-fit items-center rounded-full border border-primary bg-primary px-2 py-0.5 font-mulish text-[10px] font-bold text-primary-foreground">
               {viewer.tokenLabel}
             </span>
           )}
@@ -202,16 +203,16 @@ export function SelectiveDisclosureModal() {
           <div className="flex flex-col items-center gap-[26px]">
             {/* Viewer Address */}
             <div className="flex w-full flex-col gap-[11px]">
-              <label className="font-mulish text-sm font-bold text-text-body">
+              <label htmlFor="viewer-address" className="font-mulish text-sm font-bold text-text-body">
                 Viewer Address
               </label>
               <input
+                id="viewer-address"
                 type="text"
                 placeholder="0x..."
                 value={viewerAddress}
                 onChange={(e) => setViewerAddress(e.target.value)}
-                className="h-[50px] w-full rounded-xl border border-surface-border bg-[rgba(255,255,255,0.05)] px-4 font-mulish text-base text-text-heading outline-none transition-colors placeholder:text-text-heading/60 focus-visible:ring-2 focus-visible:ring-primary/50"
-                aria-label="Viewer address"
+                className="h-[50px] w-full rounded-xl border border-surface-border bg-surface px-4 font-mulish text-base text-text-heading outline-none transition-colors placeholder:text-text-heading/60 focus-visible:ring-2 focus-visible:ring-primary/50"
               />
             </div>
 
@@ -221,14 +222,16 @@ export function SelectiveDisclosureModal() {
                 Scope of Access
               </span>
 
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-2 gap-5" role="radiogroup" aria-label="Scope of access">
                 {/* Full Portfolio */}
                 <button
                   type="button"
+                  role="radio"
+                  aria-checked={scope === "full"}
                   onClick={() => handleScopeChange("full")}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors ${
                     scope === "full"
-                      ? "border-primary bg-[rgba(116,142,255,0.27)]"
+                      ? "border-primary bg-primary-alpha-18"
                       : "border-surface-border bg-surface"
                   }`}
                 >
@@ -256,10 +259,12 @@ export function SelectiveDisclosureModal() {
                 {/* Specific Token */}
                 <button
                   type="button"
+                  role="radio"
+                  aria-checked={scope === "specific"}
                   onClick={() => handleScopeChange("specific")}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors ${
                     scope === "specific"
-                      ? "border-primary bg-[rgba(116,142,255,0.27)]"
+                      ? "border-primary bg-primary-alpha-18"
                       : "border-surface-border bg-surface"
                   }`}
                 >
@@ -298,9 +303,11 @@ export function SelectiveDisclosureModal() {
                     <button
                       key={token.symbol}
                       type="button"
+                      role="checkbox"
+                      aria-checked={isChecked}
                       onClick={() => toggleToken(token.symbol)}
                       disabled={scope === "full"}
-                      className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-surface-border bg-[rgba(255,255,255,0.05)] px-[17px] py-2 transition-colors hover:bg-[rgba(255,255,255,0.08)] disabled:cursor-default disabled:opacity-70"
+                      className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-surface-border bg-surface px-[17px] py-2 transition-colors hover:opacity-80 disabled:cursor-default disabled:opacity-70"
                     >
                       <div className="flex items-center gap-2.5">
                         <div
@@ -311,7 +318,7 @@ export function SelectiveDisclosureModal() {
                           }`}
                         >
                           {isChecked && (
-                            <span className="material-icons text-[12px]! text-primary-foreground">
+                            <span aria-hidden="true" className="material-icons text-[12px]! text-primary-foreground">
                               check
                             </span>
                           )}
@@ -334,7 +341,7 @@ export function SelectiveDisclosureModal() {
             {/* How it works */}
             <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface p-3 backdrop-blur-lg">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                <span className="material-icons text-[24px]! text-primary-foreground">
+                <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
                   info
                 </span>
               </div>
@@ -372,7 +379,7 @@ export function SelectiveDisclosureModal() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                  <span className="material-icons text-[24px]! text-primary-foreground">
+                  <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
                     code
                   </span>
                 </div>
@@ -386,12 +393,12 @@ export function SelectiveDisclosureModal() {
                 className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
                 aria-label="Copy code"
               >
-                <span className="material-icons text-[18px]! text-text-muted transition-colors">
+                <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
                   {copied ? "check" : "content_copy"}
                 </span>
               </button>
             </div>
-            <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-[#94c1ff]">
+            <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
               {ALLOW_CODE}
             </pre>
           </div>
@@ -404,7 +411,8 @@ export function SelectiveDisclosureModal() {
           </span>
           <button
             type="button"
-            className="cursor-pointer font-mulish text-sm font-medium text-primary transition-opacity hover:opacity-70"
+            aria-disabled="true"
+            className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
           >
             Refresh List
           </button>
@@ -423,7 +431,8 @@ export function SelectiveDisclosureModal() {
           </span>
           <button
             type="button"
-            className="cursor-pointer font-mulish text-sm font-medium text-primary transition-opacity hover:opacity-70"
+            aria-disabled="true"
+            className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
           >
             See all
           </button>
@@ -437,7 +446,7 @@ export function SelectiveDisclosureModal() {
 
         {/* Security Note */}
         <div className="flex w-full items-center gap-3 rounded-xl bg-modal-bg p-2.5 backdrop-blur-sm">
-          <span className="material-icons text-[24px]! text-[#f59e0b]">
+          <span aria-hidden="true" className="material-icons text-[24px]! text-tx-pending-text">
             info
           </span>
           <div className="flex items-center gap-2.5 py-0.5 text-xs">

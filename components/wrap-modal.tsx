@@ -12,7 +12,7 @@ import { useWrapModal } from "./wrap-modal-provider";
 import { useTokenBalances } from "@/hooks/use-token-balances";
 import { useDevMode } from "@/hooks/use-dev-mode";
 import { DevModeToggle } from "./dev-mode-toggle";
-import { erc20Tokens } from "@/lib/tokens";
+import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
 
 const WRAP_CODE = `function wrap(address to, uint256 amount) public virtual override returns (euint256) {
     // take ownership of the underlying tokens
@@ -44,8 +44,8 @@ export function WrapModal() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Filter to wrappable tokens (ERC-20 only)
-  const wrappableTokens = erc20Tokens.map((t) => {
+  // Map wrappable tokens with balances
+  const wrappableTokens = wrappableTokenConfigs.map((t) => {
     const bal = balances.find((b) => b.symbol === t.symbol);
     return {
       symbol: t.symbol,
@@ -235,7 +235,7 @@ export function WrapModal() {
                     <span className="font-mulish text-sm font-bold text-text-heading">
                       {isWrap ? selectedToken?.symbol : cTokenSymbol}
                     </span>
-                    <span className="material-icons text-[14px]! text-text-body">
+                    <span aria-hidden="true" className="material-icons text-[14px]! text-text-body">
                       expand_more
                     </span>
                   </button>
@@ -244,7 +244,9 @@ export function WrapModal() {
                   {dropdownOpen && (
                     <div
                       ref={dropdownRef}
-                      className="absolute left-0 top-full z-50 mt-1 min-w-[160px] origin-top-left animate-[dropdown-in_150ms_ease-out] rounded-xl border border-surface-border bg-modal-bg p-2 shadow-lg"
+                      role="listbox"
+                      aria-label="Select token"
+                      className="absolute left-0 top-full z-50 mt-1 min-w-[160px] origin-top-left animate-[dropdown-in_150ms_ease-out] motion-reduce:animate-none rounded-xl border border-surface-border bg-modal-bg p-2 shadow-lg"
                     >
                       {wrappableTokens.map((token) => (
                         <button
@@ -285,8 +287,15 @@ export function WrapModal() {
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
+                  aria-invalid={isOverBalance}
+                  aria-describedby={isOverBalance ? "wrap-balance-error" : undefined}
                 />
               </div>
+              {isOverBalance && (
+                <p id="wrap-balance-error" className="pl-1 font-mulish text-xs text-tx-error-text">
+                  Insufficient balance
+                </p>
+              )}
 
               {/* Network + MAX */}
               <div className="flex items-center justify-between text-xs">
@@ -321,7 +330,7 @@ export function WrapModal() {
               disabled={!isValidAmount}
               className="mx-auto flex w-[215px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <span className="material-icons text-[20px]! text-primary-foreground">
+              <span aria-hidden="true" className="material-icons text-[20px]! text-primary-foreground">
                 account_balance_wallet
               </span>
               <span className="font-mulish text-lg font-bold text-primary-foreground">
@@ -331,14 +340,14 @@ export function WrapModal() {
           </div>
 
           {/* Progress tracker */}
-          <div className="flex w-full items-start">
+          <div className="flex w-full items-start" role="status" aria-live="polite">
             {/* Step 1: Approve — done */}
             <div className="flex-1">
               <div className="h-1 w-full rounded-full bg-tx-success-text/30">
                 <div className="h-1 w-full rounded-full bg-tx-success-text" />
               </div>
               <div className="mt-2 flex items-center justify-center gap-1">
-                <span className="material-icons text-[16px]! text-tx-success-text">
+                <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
                   check_circle
                 </span>
                 <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-tx-success-text">
@@ -353,7 +362,7 @@ export function WrapModal() {
                 <div className="h-1 w-1/3 rounded-full bg-primary" />
               </div>
               <div className="mt-2 flex items-center justify-center gap-1">
-                <span className="material-icons text-[16px]! text-primary">
+                <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
                   sync
                 </span>
                 <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
@@ -366,7 +375,7 @@ export function WrapModal() {
             <div className="flex-1">
               <div className="h-1 w-full rounded-full bg-surface-border" />
               <div className="mt-2 flex items-center justify-center gap-1">
-                <span className="material-icons text-[16px]! text-text-muted">
+                <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
                   verified
                 </span>
                 <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-text-muted">
@@ -379,7 +388,7 @@ export function WrapModal() {
           {/* How it works */}
           <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface p-6 backdrop-blur-sm">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-              <span className="material-icons text-[24px]! text-primary-foreground">
+              <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
                 info
               </span>
             </div>
@@ -399,7 +408,7 @@ export function WrapModal() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                    <span className="material-icons text-[24px]! text-primary-foreground">
+                    <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
                       code
                     </span>
                   </div>
@@ -413,12 +422,12 @@ export function WrapModal() {
                   className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
                   aria-label="Copy code"
                 >
-                  <span className="material-icons text-[18px]! text-text-muted transition-colors">
+                  <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
                     {copied ? "check" : "content_copy"}
                   </span>
                 </button>
               </div>
-              <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-[#94c1ff]">
+              <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
                 {isWrap ? WRAP_CODE : UNWRAP_CODE}
               </pre>
             </div>

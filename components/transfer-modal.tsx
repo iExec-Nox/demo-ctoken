@@ -168,14 +168,14 @@ export function TransferModal() {
               </span>
 
               {/* Input area */}
-              <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-[rgba(255,255,255,0.05)] px-4 py-[17px]">
+              <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-surface px-4 py-[17px]">
                 {/* Token selector */}
                 <div className="relative">
                   <button
                     ref={triggerRef}
                     type="button"
                     onClick={() => setDropdownOpen((prev) => !prev)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-surface-border bg-[rgba(30,41,59,0.5)] px-3 py-2.5 transition-opacity hover:opacity-80"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-surface-border bg-surface px-3 py-2.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
                   >
@@ -191,7 +191,7 @@ export function TransferModal() {
                     <span className="font-mulish text-base font-bold text-text-heading">
                       {selectedToken?.symbol}
                     </span>
-                    <span className="material-icons text-[18px]! text-text-body">
+                    <span aria-hidden="true" className="material-icons text-[18px]! text-text-body">
                       expand_more
                     </span>
                   </button>
@@ -200,7 +200,9 @@ export function TransferModal() {
                   {dropdownOpen && (
                     <div
                       ref={dropdownRef}
-                      className="absolute left-0 top-full z-50 mt-1 min-w-[180px] origin-top-left animate-[dropdown-in_150ms_ease-out] rounded-xl border border-surface-border bg-modal-bg p-2 shadow-lg"
+                      role="listbox"
+                      aria-label="Select token"
+                      className="absolute left-0 top-full z-50 mt-1 min-w-[180px] origin-top-left animate-[dropdown-in_150ms_ease-out] motion-reduce:animate-none rounded-xl border border-surface-border bg-modal-bg p-2 shadow-lg"
                     >
                       {transferableTokens.map((token) => (
                         <button
@@ -241,8 +243,15 @@ export function TransferModal() {
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
+                  aria-invalid={isOverBalance}
+                  aria-describedby={isOverBalance ? "transfer-balance-error" : undefined}
                 />
               </div>
+              {isOverBalance && (
+                <p id="transfer-balance-error" className="pl-1 font-mulish text-xs text-tx-error-text">
+                  Insufficient balance
+                </p>
+              )}
             </div>
 
             {/* Recipient address section */}
@@ -254,7 +263,7 @@ export function TransferModal() {
 
               {/* Address input */}
               <div className="px-2.5 py-3">
-                <div className="flex items-center gap-3 rounded-2xl border border-surface-border bg-[rgba(255,255,255,0.05)] px-[17px] py-[7px]">
+                <div className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface px-[17px] py-[7px]">
                   <input
                     type="text"
                     placeholder="0x..."
@@ -265,8 +274,9 @@ export function TransferModal() {
                   />
                   {recipient.length > 0 && (
                     <span
+                      aria-label={addressValid ? "Valid address" : "Invalid address"}
                       className={`material-icons text-[24px]! ${
-                        addressValid ? "text-[#34d399]" : "text-tx-error-text"
+                        addressValid ? "text-tx-success-text" : "text-tx-error-text"
                       }`}
                     >
                       {addressValid ? "check_circle" : "cancel"}
@@ -277,11 +287,11 @@ export function TransferModal() {
             </div>
 
             {/* Transaction info summary */}
-            <div className="flex flex-col gap-3 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.05)] p-[21px] text-sm">
+            <div className="flex flex-col gap-3 rounded-2xl border border-surface-border bg-surface p-[21px] text-sm">
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Recipient</span>
                 <span className="flex items-center gap-1 font-mulish font-medium text-text-heading">
-                  <span className="material-icons text-[12px]! text-[#d3caff]">
+                  <span aria-hidden="true" className="material-icons text-[12px]! text-primary">
                     enhanced_encryption
                   </span>
                   {recipient && addressValid ? truncateAddress(recipient) : "Encrypted Hash"}
@@ -304,7 +314,7 @@ export function TransferModal() {
             {/* How it works */}
             <div className="flex gap-4 rounded-2xl border border-surface-border bg-surface p-3 backdrop-blur-sm">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                <span className="material-icons text-[24px]! text-primary-foreground">
+                <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
                   info
                 </span>
               </div>
@@ -332,14 +342,14 @@ export function TransferModal() {
             </div>
 
             {/* Progress tracker */}
-            <div className="flex w-full items-start">
+            <div className="flex w-full items-start" role="status" aria-live="polite">
               {/* Step 1: Approve — done */}
               <div className="flex-1">
                 <div className="h-1 w-full rounded-full bg-tx-success-text/30">
                   <div className="h-1 w-full rounded-full bg-tx-success-text" />
                 </div>
                 <div className="mt-2 flex items-center justify-center gap-1">
-                  <span className="material-icons text-[16px]! text-tx-success-text">
+                  <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
                     check_circle
                   </span>
                   <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-tx-success-text">
@@ -354,7 +364,7 @@ export function TransferModal() {
                   <div className="h-1 w-1/3 rounded-full bg-primary" />
                 </div>
                 <div className="mt-2 flex items-center justify-center gap-1">
-                  <span className="material-icons text-[16px]! text-primary">
+                  <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
                     sync
                   </span>
                   <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
@@ -367,7 +377,7 @@ export function TransferModal() {
               <div className="flex-1">
                 <div className="h-1 w-full rounded-full bg-surface-border" />
                 <div className="mt-2 flex items-center justify-center gap-1">
-                  <span className="material-icons text-[16px]! text-text-muted">
+                  <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
                     verified
                   </span>
                   <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-text-muted">
@@ -383,7 +393,7 @@ export function TransferModal() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                      <span className="material-icons text-[24px]! text-primary-foreground">
+                      <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
                         code
                       </span>
                     </div>
@@ -397,21 +407,21 @@ export function TransferModal() {
                     className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
                     aria-label="Copy code"
                   >
-                    <span className="material-icons text-[18px]! text-text-muted transition-colors">
+                    <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
                       {copied ? "check" : "content_copy"}
                     </span>
                   </button>
                 </div>
-                <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-[#94c1ff]">
+                <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
                   {TRANSFER_CODE}
                 </pre>
               </div>
             )}
 
             {/* Transfer complete status + Arbiscan link */}
-            <div className="flex flex-col items-center gap-1 py-2">
+            <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
               <div className="flex items-center gap-3">
-                <div className="size-3 rounded-full bg-[#00ffa2] opacity-70" />
+                <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
                 <span className="font-mulish text-sm font-medium text-text-body">
                   Confidential Transfer Complete
                 </span>
