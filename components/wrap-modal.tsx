@@ -139,7 +139,7 @@ export function WrapModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[40px] border-modal-border bg-modal-bg px-10 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[552px]"
+        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[40px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[552px]"
         showCloseButton={false}
       >
         {/* Top bar: Dev mode toggle (left) + Close button (right) */}
@@ -159,16 +159,16 @@ export function WrapModal() {
         <div className="flex min-w-0 w-full flex-col items-center gap-[26px]">
           {/* Header */}
           <div className="text-center">
-            <DialogTitle className="font-mulish text-[34px] font-bold leading-10 text-text-heading">
+            <DialogTitle className="font-mulish text-[26px] font-bold leading-10 text-text-heading md:text-[34px]">
               Convert Assets
             </DialogTitle>
-            <DialogDescription className="mt-2 font-mulish text-base leading-6 text-text-body">
-              {isWrap ? "Make your assets confidential" : "Return your assets to public"}
+            <DialogDescription className="mt-2 font-mulish text-sm leading-6 text-text-body md:text-base">
+              {isWrap ? "Move your assets into the private layer." : "Return your assets to public"}
             </DialogDescription>
           </div>
 
           {/* Glass card */}
-          <div className="flex w-full flex-col gap-[26px] rounded-[32px] border border-surface-border bg-surface px-10 py-5 backdrop-blur-sm">
+          <div className="flex w-full flex-col gap-[26px] rounded-[32px] border border-surface-border bg-surface p-5 backdrop-blur-sm md:px-10 md:py-5">
             {/* Tabs */}
             <div className="flex items-start justify-between">
               <button
@@ -196,13 +196,13 @@ export function WrapModal() {
             </div>
 
             {/* Amount label + balance */}
-            <div className="flex items-center justify-between text-xs">
+            <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center md:justify-between md:gap-0">
               <span className="font-mulish font-bold uppercase tracking-[1.2px] text-text-muted">
                 {isWrap ? "Amount to Wrap" : "Amount to Unwrap"}
               </span>
               <div className="flex items-center gap-1.5 font-mulish">
                 <span className="text-text-body">
-                  {isWrap ? "Public Asset :" : "Confidential Asset :"}
+                  {isWrap ? "Public Balance:" : "Confidential Balance:"}
                 </span>
                 <span className="text-text-heading">
                   {selectedToken ? `${selectedToken.formatted} ${selectedToken.symbol}` : "0"}
@@ -283,7 +283,7 @@ export function WrapModal() {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className={`min-w-0 flex-1 bg-transparent text-right font-mulish text-[30px] font-bold leading-9 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:rounded placeholder:text-text-muted ${
+                  className={`min-w-0 flex-1 bg-transparent text-right font-mulish text-2xl font-bold leading-9 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:rounded placeholder:text-text-muted md:text-[30px] ${
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
@@ -328,21 +328,38 @@ export function WrapModal() {
             <button
               type="button"
               disabled={!isValidAmount}
-              className="mx-auto flex w-[215px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
+              className="mx-auto flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[215px] md:px-5 md:py-3"
             >
-              <span aria-hidden="true" className="material-icons text-[20px]! text-primary-foreground">
+              <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
                 account_balance_wallet
               </span>
-              <span className="font-mulish text-lg font-bold text-primary-foreground">
+              <span className="font-mulish text-sm font-bold text-primary-foreground md:text-lg">
                 {isWrap ? "Wrap Assets" : "Unwrap Assets"}
               </span>
             </button>
+
+            {/* How it works */}
+            <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-sm md:p-6">
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
+                <span aria-hidden="true" className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!">
+                  info
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-mulish text-sm font-bold text-text-heading">How it works</p>
+                <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
+                  {isWrap
+                    ? "Wrapping moves your tokens from the public Arbitrum ledger into Confidential Token's private vault. Once wrapped, your balance and transfers are only visible to you."
+                    : "Unwrapping moves your confidential tokens back to the public Arbitrum ledger. Once unwrapped, your balance and transfers are visible on-chain."}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Progress tracker */}
-          <div className="flex w-full items-start" role="status" aria-live="polite">
+          <div className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0" role="status" aria-live="polite">
             {/* Step 1: Approve — done */}
-            <div className="flex-1">
+            <div className="w-[136px] md:w-auto md:flex-1">
               <div className="h-1 w-full rounded-full bg-tx-success-text/30">
                 <div className="h-1 w-full rounded-full bg-tx-success-text" />
               </div>
@@ -357,7 +374,7 @@ export function WrapModal() {
             </div>
 
             {/* Step 2: Wrap/Unwrap — in progress */}
-            <div className="flex-1">
+            <div className="w-[136px] md:w-auto md:flex-1">
               <div className="h-1 w-full rounded-full bg-surface-border">
                 <div className="h-1 w-1/3 rounded-full bg-primary" />
               </div>
@@ -366,13 +383,13 @@ export function WrapModal() {
                   sync
                 </span>
                 <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
-                  {isWrap ? "Wrap" : "Unwrap"}
+                  Convert
                 </span>
               </div>
             </div>
 
             {/* Step 3: Confirmed — pending */}
-            <div className="flex-1">
+            <div className="w-[136px] md:w-auto md:flex-1">
               <div className="h-1 w-full rounded-full bg-surface-border" />
               <div className="mt-2 flex items-center justify-center gap-1">
                 <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
@@ -385,26 +402,9 @@ export function WrapModal() {
             </div>
           </div>
 
-          {/* How it works */}
-          <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface p-6 backdrop-blur-sm">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-              <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
-                info
-              </span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-mulish text-sm font-bold text-text-heading">How it works</p>
-              <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
-                {isWrap
-                  ? "Wrapping moves your tokens from the public Arbitrum ledger into Confidential Token's private vault. Once wrapped, your balance and transfers are only visible to you."
-                  : "Unwrapping moves your confidential tokens back to the public Arbitrum ledger. Once unwrapped, your balance and transfers are visible on-chain."}
-              </p>
-            </div>
-          </div>
-
           {/* Function called (dev mode only) */}
           {devMode && (
-            <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-6 py-3 backdrop-blur-sm">
+            <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">

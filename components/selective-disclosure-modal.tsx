@@ -76,19 +76,19 @@ const PAST_VIEWERS: MockViewer[] = [
 function ViewerCard({ viewer }: { viewer: MockViewer }) {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-surface p-[21px] backdrop-blur-sm">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2.5 md:gap-4">
         <div
-          className={`flex size-10 shrink-0 items-center justify-center rounded-full ${viewer.iconBg}`}
+          className={`flex size-[29px] shrink-0 items-center justify-center rounded-full md:size-10 ${viewer.iconBg}`}
         >
           <span
             aria-hidden="true"
-            className={`material-icons text-[20px]! ${viewer.iconColor}`}
+            className={`material-icons text-[14px]! md:text-[20px]! ${viewer.iconColor}`}
           >
             {viewer.icon}
           </span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="font-mulish text-sm text-text-heading">
+          <span className="font-mulish text-xs text-text-heading md:text-sm">
             {viewer.address}
           </span>
           {viewer.scope === "full" ? (
@@ -102,7 +102,7 @@ function ViewerCard({ viewer }: { viewer: MockViewer }) {
           )}
         </div>
       </div>
-      <span className="font-mulish text-sm text-text-muted">
+      <span className="flex-1 text-right font-mulish text-[11px] text-text-muted md:flex-none md:text-sm">
         {viewer.date}
       </span>
     </div>
@@ -185,7 +185,7 @@ export function SelectiveDisclosureModal() {
 
         {/* Header */}
         <div className="w-full text-center">
-          <DialogTitle className="font-mulish text-[36px] font-bold leading-10 tracking-[-0.9px] text-text-heading">
+          <DialogTitle className="font-mulish text-[32px] font-bold leading-10 tracking-[-0.9px] text-text-heading md:text-[36px]">
             Selective Disclosure
           </DialogTitle>
           <DialogDescription className="mt-4 font-mulish text-lg leading-[29.25px] text-text-body">
@@ -195,10 +195,15 @@ export function SelectiveDisclosureModal() {
         </div>
 
         {/* Add a New Viewer — glass card */}
-        <div className="flex w-full flex-col gap-[35px] rounded-3xl border border-surface-border bg-surface p-5 backdrop-blur-sm">
-          <h3 className="font-mulish text-xl font-bold text-text-heading">
-            Add a New Viewer
-          </h3>
+        <div className="flex w-full flex-col gap-5 rounded-3xl border border-surface-border bg-surface p-5 backdrop-blur-sm md:gap-[35px]">
+          <div className="flex items-center justify-between">
+            <h3 className="font-mulish text-xl font-bold text-text-heading">
+              Add a New Viewer
+            </h3>
+            <span aria-hidden="true" className="material-icons text-[16px]! text-primary md:hidden">
+              visibility
+            </span>
+          </div>
 
           <div className="flex flex-col items-center gap-[26px]">
             {/* Viewer Address */}
@@ -222,7 +227,7 @@ export function SelectiveDisclosureModal() {
                 Scope of Access
               </span>
 
-              <div className="grid grid-cols-2 gap-5" role="radiogroup" aria-label="Scope of access">
+              <div className="flex flex-col gap-5 md:grid md:grid-cols-2" role="radiogroup" aria-label="Scope of access">
                 {/* Full Portfolio */}
                 <button
                   type="button"
@@ -291,11 +296,11 @@ export function SelectiveDisclosureModal() {
               </div>
 
               {/* Token list */}
-              <span className="font-mulish text-sm font-bold text-text-body">
-                Select Token to be disclosed
-              </span>
-
               <div className="flex flex-col gap-2">
+                <span className="font-mulish text-sm font-bold text-text-body">
+                  Select Token to be disclosed
+                </span>
+
                 {confidentialTokens.map((token) => {
                   const isChecked = selectedTokens.has(token.symbol);
                   const baseSymbol = token.symbol.replace(/^c/, "");
@@ -338,28 +343,6 @@ export function SelectiveDisclosureModal() {
               </div>
             </div>
 
-            {/* How it works */}
-            <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface p-3 backdrop-blur-lg">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
-                  info
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-mulish text-sm font-bold text-text-heading">
-                  How it works
-                </p>
-                <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
-                  Selective disclosure is tied to a specific encrypted handle.
-                  <br />
-                  The recipient can access data linked to that handle only.
-                  <br />
-                  If a new transaction updates the handle, previous access
-                  automatically becomes invalid.
-                </p>
-              </div>
-            </div>
-
             {/* CTA */}
             <button
               type="button"
@@ -371,11 +354,29 @@ export function SelectiveDisclosureModal() {
               </span>
             </button>
           </div>
+
+          {/* How it works — inside glass card on mobile */}
+          <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-lg md:p-3">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
+              <span aria-hidden="true" className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!">
+                info
+              </span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-mulish text-sm font-bold text-text-heading">
+                How it works
+              </p>
+              <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
+                Selective disclosure shares a handle or balance at a given moment.
+                The recipient can access data tied to that specific state only.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Function called (dev mode only) */}
         {devMode && (
-          <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-10 py-3 backdrop-blur-sm">
+          <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
@@ -424,39 +425,38 @@ export function SelectiveDisclosureModal() {
           ))}
         </div>
 
-        {/* Past Viewers */}
-        <div className="flex w-full items-center justify-between">
-          <span className="font-mulish text-base font-bold uppercase tracking-[1.4px] text-text-muted">
-            Past Viewers ({PAST_VIEWERS.length})
-          </span>
-          <button
-            type="button"
-            aria-disabled="true"
-            className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
-          >
-            See all
-          </button>
-        </div>
+        {/* Past Viewers — desktop only */}
+        <div className="hidden w-full flex-col gap-3 md:flex">
+          <div className="flex items-center justify-between">
+            <span className="font-mulish text-base font-bold uppercase tracking-[1.4px] text-text-muted">
+              Past Viewers ({PAST_VIEWERS.length})
+            </span>
+            <button
+              type="button"
+              aria-disabled="true"
+              className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
+            >
+              See all
+            </button>
+          </div>
 
-        <div className="flex w-full flex-col">
           {PAST_VIEWERS.map((viewer) => (
             <ViewerCard key={viewer.address + viewer.icon} viewer={viewer} />
           ))}
         </div>
 
         {/* Security Note */}
-        <div className="flex w-full items-center gap-3 rounded-xl bg-modal-bg p-2.5 backdrop-blur-sm">
-          <span aria-hidden="true" className="material-icons text-[24px]! text-tx-pending-text">
+        <div className="flex w-full items-start gap-3 rounded-xl bg-modal-bg p-2.5 backdrop-blur-sm">
+          <span aria-hidden="true" className="material-icons shrink-0 text-[24px]! text-tx-pending-text">
             info
           </span>
-          <div className="flex items-center gap-2.5 py-0.5 text-xs">
+          <div className="flex flex-col gap-1 py-0.5 text-xs md:flex-row md:items-center md:gap-2.5">
             <span className="font-mulish font-bold text-text-heading">
               Security Note:
             </span>
             <span className="font-mulish text-text-body">
-              Access is tied to the current handle state at the time of
-              disclosure. Any subsequent transaction that updates the handle
-              invalidates prior access.
+              Access is state-bound.
+              Any new transaction that updates the handle automatically invalidates prior access.
             </span>
           </div>
         </div>

@@ -130,7 +130,7 @@ export function TransferModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-10 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[552px]"
+        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[552px]"
         showCloseButton={false}
       >
         {/* Top bar: Dev mode toggle (left) + Close button (right) */}
@@ -150,7 +150,7 @@ export function TransferModal() {
         <div className="flex min-w-0 w-full flex-col items-center gap-[26px]">
           {/* Header */}
           <div className="text-center">
-            <DialogTitle className="font-mulish text-[36px] font-bold leading-10 tracking-[-0.9px] text-text-heading">
+            <DialogTitle className="font-mulish text-2xl font-bold leading-10 tracking-[-0.9px] text-text-heading md:text-[36px]">
               Confidential Transfer
             </DialogTitle>
             <DialogDescription className="mt-3 font-mulish text-base leading-6 text-text-body">
@@ -188,10 +188,10 @@ export function TransferModal() {
                         className="size-6"
                       />
                     )}
-                    <span className="font-mulish text-base font-bold text-text-heading">
+                    <span className="font-mulish text-sm font-bold text-text-heading md:text-base">
                       {selectedToken?.symbol}
                     </span>
-                    <span aria-hidden="true" className="material-icons text-[18px]! text-text-body">
+                    <span aria-hidden="true" className="material-icons text-[16px]! text-text-body md:text-[18px]!">
                       expand_more
                     </span>
                   </button>
@@ -290,7 +290,7 @@ export function TransferModal() {
             <div className="flex flex-col gap-3 rounded-2xl border border-surface-border bg-surface p-[21px] text-sm">
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Recipient</span>
-                <span className="flex items-center gap-1 font-mulish font-medium text-text-heading">
+                <span className="flex items-center gap-1 font-mulish text-[10px] font-medium text-text-heading md:text-sm">
                   <span aria-hidden="true" className="material-icons text-[12px]! text-primary">
                     enhanced_encryption
                   </span>
@@ -299,22 +299,22 @@ export function TransferModal() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Token</span>
-                <span className="font-mulish font-medium text-text-heading">
+                <span className="font-mulish text-[10px] font-medium text-text-heading md:text-sm">
                   {selectedToken?.symbol}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Network Fee</span>
-                <span className="font-mulish font-medium text-text-heading">
+                <span className="font-mulish text-[10px] font-medium text-text-heading md:text-sm">
                   ~0.0004 ETH
                 </span>
               </div>
             </div>
 
             {/* How it works */}
-            <div className="flex gap-4 rounded-2xl border border-surface-border bg-surface p-3 backdrop-blur-sm">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
+            <div className="flex gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-sm md:p-3">
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
+                <span aria-hidden="true" className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!">
                   info
                 </span>
               </div>
@@ -333,105 +333,105 @@ export function TransferModal() {
               <button
                 type="button"
                 disabled={!canTransfer}
-                className="flex w-[181px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-[18px] py-3 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[181px] md:px-[18px] md:py-3"
               >
-                <span className="font-mulish text-base font-bold text-primary-foreground">
-                  Transfer
+                <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
+                  Confirm & Sign
                 </span>
               </button>
             </div>
+          </div>
 
-            {/* Progress tracker */}
-            <div className="flex w-full items-start" role="status" aria-live="polite">
-              {/* Step 1: Approve — done */}
-              <div className="flex-1">
-                <div className="h-1 w-full rounded-full bg-tx-success-text/30">
-                  <div className="h-1 w-full rounded-full bg-tx-success-text" />
-                </div>
-                <div className="mt-2 flex items-center justify-center gap-1">
-                  <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
-                    check_circle
-                  </span>
-                  <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-tx-success-text">
-                    Approve
-                  </span>
-                </div>
+          {/* Progress tracker */}
+          <div className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0" role="status" aria-live="polite">
+            {/* Step 1: Approve — done */}
+            <div className="w-[136px] md:w-auto md:flex-1">
+              <div className="h-1 w-full rounded-full bg-tx-success-text/30">
+                <div className="h-1 w-full rounded-full bg-tx-success-text" />
               </div>
-
-              {/* Step 2: Transfer — in progress */}
-              <div className="flex-1">
-                <div className="h-1 w-full rounded-full bg-surface-border">
-                  <div className="h-1 w-1/3 rounded-full bg-primary" />
-                </div>
-                <div className="mt-2 flex items-center justify-center gap-1">
-                  <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
-                    sync
-                  </span>
-                  <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
-                    Transfer
-                  </span>
-                </div>
-              </div>
-
-              {/* Step 3: Confirmed — pending */}
-              <div className="flex-1">
-                <div className="h-1 w-full rounded-full bg-surface-border" />
-                <div className="mt-2 flex items-center justify-center gap-1">
-                  <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
-                    verified
-                  </span>
-                  <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-text-muted">
-                    Confirmed
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Function called (dev mode only) */}
-            {devMode && (
-              <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-10 py-3 backdrop-blur-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                      <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
-                        code
-                      </span>
-                    </div>
-                    <span className="font-mulish text-sm font-bold text-text-heading">
-                      Function called
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleCopyCode}
-                    className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
-                    aria-label="Copy code"
-                  >
-                    <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
-                      {copied ? "check" : "content_copy"}
-                    </span>
-                  </button>
-                </div>
-                <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
-                  {TRANSFER_CODE}
-                </pre>
-              </div>
-            )}
-
-            {/* Transfer complete status + Arbiscan link */}
-            <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
-              <div className="flex items-center gap-3">
-                <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
-                <span className="font-mulish text-sm font-medium text-text-body">
-                  Confidential Transfer Complete
+              <div className="mt-2 flex items-center justify-center gap-1">
+                <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
+                  check_circle
+                </span>
+                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-tx-success-text">
+                  Approve
                 </span>
               </div>
-              <ArbiscanLink
-                txHash="0x..."
-                label="View on Arbiscan"
-                className="text-xs"
-              />
             </div>
+
+            {/* Step 2: Transfer — in progress */}
+            <div className="w-[136px] md:w-auto md:flex-1">
+              <div className="h-1 w-full rounded-full bg-surface-border">
+                <div className="h-1 w-1/3 rounded-full bg-primary" />
+              </div>
+              <div className="mt-2 flex items-center justify-center gap-1">
+                <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
+                  sync
+                </span>
+                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
+                  Convert
+                </span>
+              </div>
+            </div>
+
+            {/* Step 3: Confirmed — pending */}
+            <div className="w-[136px] md:w-auto md:flex-1">
+              <div className="h-1 w-full rounded-full bg-surface-border" />
+              <div className="mt-2 flex items-center justify-center gap-1">
+                <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
+                  verified
+                </span>
+                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-text-muted">
+                  Confirmed
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Function called (dev mode only) */}
+          {devMode && (
+            <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
+                    <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
+                      code
+                    </span>
+                  </div>
+                  <span className="font-mulish text-sm font-bold text-text-heading">
+                    Function called
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyCode}
+                  className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
+                  aria-label="Copy code"
+                >
+                  <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
+                    {copied ? "check" : "content_copy"}
+                  </span>
+                </button>
+              </div>
+              <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
+                {TRANSFER_CODE}
+              </pre>
+            </div>
+          )}
+
+          {/* Transfer complete status + Arbiscan link */}
+          <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
+            <div className="flex items-center gap-3">
+              <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
+              <span className="font-mulish text-sm font-medium text-text-body">
+                Confidential Transfer Complete
+              </span>
+            </div>
+            <ArbiscanLink
+              txHash="0x..."
+              label="View on Arbiscan"
+              className="text-xs"
+            />
           </div>
         </div>
 

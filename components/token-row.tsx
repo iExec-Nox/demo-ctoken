@@ -17,7 +17,7 @@ export function TokenRow({
 }: TokenRowProps) {
   return (
     <div className="flex items-center justify-between border-t border-surface-border px-6 py-5">
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
         <div className="flex size-8 items-center justify-center rounded-full bg-primary">
           <Image
             src={icon}
@@ -37,7 +37,7 @@ export function TokenRow({
         </div>
       </div>
       <div className="text-right">
-        <p className="font-mulish text-lg font-bold leading-7 text-text-heading">
+        <p className="font-mulish text-base font-bold leading-7 text-text-heading md:text-lg">
           {formatted} {symbol}
         </p>
         {usdValue && (

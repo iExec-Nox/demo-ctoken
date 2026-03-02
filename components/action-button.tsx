@@ -16,12 +16,12 @@ export function ActionButton({
   const content = (
     <>
       <div
-        className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
+        className={`flex shrink-0 items-center justify-center size-[30px] rounded-[10px] md:size-10 md:rounded-xl ${
           disabled ? "bg-asset-icon-bg" : "bg-primary"
         }`}
       >
         <span
-          className={`material-icons text-[24px]! ${
+          className={`material-icons text-[20px]! md:text-[24px]! ${
             disabled ? "text-text-muted" : "text-primary-foreground"
           }`}
         >
@@ -30,7 +30,7 @@ export function ActionButton({
       </div>
       <div className="text-left">
         <p
-          className={`font-mulish text-base font-bold leading-6 ${
+          className={`font-mulish text-sm font-bold leading-6 md:text-base ${
             disabled ? "text-text-muted" : "text-text-heading"
           }`}
         >

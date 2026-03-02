@@ -14,7 +14,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
   const tokensWithBalance = balances.filter((b) => b.balance > 0n);
 
   return (
-    <Card className="gap-0 rounded-[25px] border-surface-border bg-asset-card-bg py-0">
+    <Card className="gap-0 rounded-3xl border-surface-border bg-asset-card-bg py-0">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">

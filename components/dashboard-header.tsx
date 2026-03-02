@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { WalletButton } from "@/components/wallet-button";
 import { DevModeToggle } from "@/components/dev-mode-toggle";
 import { Button } from "@/components/ui/button";
+import { MobileMenu } from "@/components/mobile-menu";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
 import { useFaucetModal } from "@/components/faucet-modal-provider";
 
@@ -21,11 +22,12 @@ export function DashboardHeader() {
   useWalletRedirect({ onDisconnect: "/" });
 
   return (
-    <header className="flex w-full items-center justify-between bg-background px-10 py-[9px]">
-      <div className="flex items-center gap-10">
+    <header className="flex w-full items-center justify-between bg-background px-5 py-[9px] md:px-10">
+      {/* Left: Logo + Nav */}
+      <div className="flex items-center gap-4 md:gap-10">
         <Logo font="inter" />
 
-        <nav className="flex items-center gap-6">
+        <nav className="hidden items-center gap-6 md:flex">
           {NAV_LINKS.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -53,18 +55,25 @@ export function DashboardHeader() {
         </nav>
       </div>
 
-      <div className="flex items-center gap-6">
-        <ThemeToggle />
-        <DevModeToggle />
+      {/* Right: Desktop actions + Mobile menu */}
+      <div className="flex items-center gap-4 md:gap-6">
+        {/* Desktop only */}
+        <div className="hidden items-center gap-6 md:flex">
+          <ThemeToggle />
+          <DevModeToggle />
+          <Button
+            asChild
+            className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
+          >
+            <Link href="#">Contact us</Link>
+          </Button>
+        </div>
 
-        <Button
-          asChild
-          className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
-        >
-          <Link href="#">Contact us</Link>
-        </Button>
-
+        {/* Always visible */}
         <WalletButton />
+
+        {/* Mobile only */}
+        <MobileMenu />
       </div>
     </header>
   );
