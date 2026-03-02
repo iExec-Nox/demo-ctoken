@@ -45,30 +45,30 @@ export function ExplorerContent() {
   }
 
   return (
-    <div className="flex flex-col gap-10 px-[114px] py-10">
+    <div className="flex flex-col gap-6 px-5 py-6 md:gap-10 md:px-10 md:py-10 lg:px-[114px]">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="font-anybody text-[30px] font-bold leading-9 tracking-tight text-text-heading">
+          <h1 className="font-anybody text-2xl font-bold leading-9 tracking-tight text-text-heading md:text-[30px]">
             Activity
           </h1>
-          <p className="mt-2 font-inter text-sm text-text-body">
+          <p className="mt-1 font-inter text-sm text-text-body md:mt-2">
             Monitor your confidential transactions on the Arbitrum network.
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex w-full items-center gap-4 md:w-auto">
           <span className="font-inter text-xs font-bold uppercase tracking-wider text-text-muted">
             Filter By:
           </span>
-          <div className="relative">
+          <div className="relative flex-1 md:flex-initial">
             <select
               value={filter}
               onChange={(e) =>
                 handleFilterChange(e.target.value as FilterValue)
               }
               aria-label="Filter by action type"
-              className="cursor-pointer appearance-none rounded-lg border border-surface-border bg-surface py-2 pl-4 pr-10 font-inter text-sm font-medium text-text-heading backdrop-blur-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full cursor-pointer appearance-none rounded-lg border border-surface-border bg-surface py-2 pl-4 pr-10 font-inter text-base font-medium text-text-heading backdrop-blur-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 md:w-auto md:text-sm"
             >
               {FILTER_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
