@@ -68,7 +68,7 @@ export function WalletButton() {
   return (
     <Button
       onClick={connect}
-      className="rounded-lg border border-primary-alpha-border bg-primary px-2 py-1 font-mulish text-xs font-bold text-primary-foreground hover:bg-primary-hover md:px-6 md:py-2 md:text-sm"
+      className="rounded-lg border border-primary-alpha-border bg-primary px-2 py-1 font-mulish text-xs font-bold text-primary-foreground hover:bg-primary-hover md:px-3.5 md:py-[10px] md:text-sm"
     >
       Connect Wallet
     </Button>
