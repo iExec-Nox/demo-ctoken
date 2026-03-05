@@ -18,7 +18,7 @@ export function Logo({
       <div
         className={`relative ${sizeClass} overflow-hidden rounded-[10px] bg-primary md:rounded-xl`}
       >
-        <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover" />
+        <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover brightness-0 invert" />
       </div>
       <span
         className={`${fontClass} text-sm font-bold tracking-tight text-logo-text md:text-xl`}
