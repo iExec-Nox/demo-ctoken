@@ -43,32 +43,32 @@ export function FaucetModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-w-[calc(100%-2rem)] gap-2.5 rounded-[40px] border-modal-border bg-modal-bg p-10 shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[714px]"
+        className="max-h-[90dvh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto rounded-[40px] border-modal-border bg-modal-bg p-[30px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[714px] sm:p-10"
         showCloseButton={false}
       >
         {/* Header */}
         <div className="flex flex-col items-center gap-2.5">
-          <div className="relative size-16 overflow-hidden rounded-xl bg-primary">
+          <div className="relative size-[35px] overflow-hidden rounded-[10px] bg-primary sm:size-16 sm:rounded-xl">
             <Image
               src="/nox-icon.png"
               alt=""
               fill
-              className="object-cover"
+              className="object-cover brightness-0 invert"
             />
           </div>
 
-          <DialogTitle className="font-mulish text-[34px] font-bold leading-10 text-text-heading">
+          <DialogTitle className="font-mulish text-[26px] font-bold leading-10 text-text-heading sm:text-[34px]">
             Faucets
           </DialogTitle>
 
-          <DialogDescription className="max-w-[448px] text-center font-mulish text-base leading-[26px] text-text-body">
+          <DialogDescription className="max-w-[448px] text-center font-mulish text-xs leading-[26px] text-text-body sm:text-base">
             Confidential transactions require testnet assets. Request tokens
             below to start exploring Confidential Token.
           </DialogDescription>
         </div>
 
         {/* Token cards */}
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 sm:flex-row">
           {FAUCET_TOKENS.map((token) => (
             <FaucetCard
               key={token.name}
