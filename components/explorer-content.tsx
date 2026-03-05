@@ -58,7 +58,7 @@ export function ExplorerContent() {
         </div>
 
         <div className="flex w-full items-center gap-4 md:w-auto">
-          <span className="font-inter text-xs font-bold uppercase tracking-wider text-text-muted">
+          <span className="font-inter text-xs font-bold tracking-wider text-text-muted">
             Filter By:
           </span>
           <div className="relative flex-1 md:flex-initial">
