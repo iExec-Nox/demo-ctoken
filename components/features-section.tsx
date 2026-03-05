@@ -3,21 +3,21 @@ import { FeatureCard } from "@/components/feature-card";
 const FEATURES = [
   {
     icon: "/feature-icon.svg",
-    title: "Wrap Public Tokens",
+    title: "DeFi Composability",
     description:
-      "Convert any ERC-20 into its confidential equivalent. Balances and amounts become encrypted by default.",
+      "Works seamlessly across existing and future DeFi ecosystems.",
   },
   {
     icon: "/feature-icon.svg",
-    title: "Transfer Privately",
+    title: "Selective Disclosure",
     description:
-      "Send tokens with encrypted balances and transaction values. Composable with existing DeFi infrastructure.",
+      "Define who can see what, and when. Grant regulators or auditors access when required.",
   },
   {
     icon: "/feature-icon.svg",
-    title: "Disclose with Control",
+    title: "Scalable Confidentiality",
     description:
-      "Grant selective viewing rights over balances or transactions. Access can be permissioned and revoked at any time.",
+      "Execute complex financial workflows confidentially at scale without redesigning smart contracts.",
   },
 ];
 

@@ -34,7 +34,7 @@ export function DashboardHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-3 py-1.5 font-inter text-sm font-medium transition-colors ${
+                className={`rounded-md px-3 py-[7px] font-inter text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-surface text-text-heading"
                     : "text-text-body hover:text-text-heading"
@@ -48,7 +48,7 @@ export function DashboardHeader() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="cursor-pointer rounded-md px-3 py-1.5 font-inter text-sm font-medium text-text-body transition-colors hover:text-text-heading"
+            className="cursor-pointer rounded-md px-3 py-[7px] font-inter text-sm font-medium text-text-body transition-colors hover:text-text-heading"
           >
             Faucet
           </button>

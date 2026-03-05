@@ -55,7 +55,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       )}
 
       {/* Title */}
-      <p className="font-mulish text-sm font-bold uppercase tracking-[1.4px] text-text-muted">
+      <p className="font-mulish text-sm font-bold text-text-muted">
         Action Center
       </p>
 

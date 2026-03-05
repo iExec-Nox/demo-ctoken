@@ -21,7 +21,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
           <span aria-hidden="true" className="material-icons text-[18px]! text-primary">
             public
           </span>
-          <p className="font-mulish text-sm font-bold uppercase tracking-[1.4px] text-asset-text-secondary">
+          <p className="font-mulish text-sm font-bold text-asset-text-secondary">
             Public Assets
           </p>
         </div>

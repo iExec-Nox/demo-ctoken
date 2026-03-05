@@ -9,7 +9,7 @@ export function ConfidentialAssets() {
           <span aria-hidden="true" className="material-icons text-[18px]! text-text-heading">
             visibility_off
           </span>
-          <p className="font-mulish text-sm font-bold uppercase tracking-[1.4px] text-asset-text-secondary">
+          <p className="font-mulish text-sm font-bold text-asset-text-secondary">
             Confidential Assets
           </p>
         </div>
