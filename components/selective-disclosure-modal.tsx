@@ -407,7 +407,7 @@ export function SelectiveDisclosureModal() {
 
         {/* Current Viewers */}
         <div className="flex w-full items-center justify-between">
-          <span className="font-mulish text-base font-bold uppercase tracking-[1.4px] text-text-muted">
+          <span className="font-mulish text-base font-bold tracking-[1.4px] text-text-muted">
             Current Viewers ({CURRENT_VIEWERS.length})
           </span>
           <button
@@ -428,7 +428,7 @@ export function SelectiveDisclosureModal() {
         {/* Past Viewers — desktop only */}
         <div className="hidden w-full flex-col gap-3 md:flex">
           <div className="flex items-center justify-between">
-            <span className="font-mulish text-base font-bold uppercase tracking-[1.4px] text-text-muted">
+            <span className="font-mulish text-base font-bold tracking-[1.4px] text-text-muted">
               Past Viewers ({PAST_VIEWERS.length})
             </span>
             <button
@@ -455,8 +455,7 @@ export function SelectiveDisclosureModal() {
               Security Note:
             </span>
             <span className="font-mulish text-text-body">
-              Access is state-bound.
-              Any new transaction that updates the handle automatically invalidates prior access.
+              Access is tied to the current handle state at the time of disclosure. Any subsequent transaction that updates the handle invalidates prior access.
             </span>
           </div>
         </div>

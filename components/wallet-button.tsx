@@ -40,7 +40,7 @@ export function WalletButton() {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-[200px] rounded-[7px] bg-dropdown-bg p-[10px]"
+          className="w-[150px] rounded-[7px] bg-dropdown-bg p-[10px]"
         >
           <DropdownMenuItem
             onClick={handleCopyAddress}

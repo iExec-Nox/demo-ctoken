@@ -163,7 +163,7 @@ export function WrapModal() {
               Convert Assets
             </DialogTitle>
             <DialogDescription className="mt-2 font-mulish text-sm leading-6 text-text-body md:text-base">
-              {isWrap ? "Move your assets into the private layer." : "Return your assets to public"}
+              {isWrap ? "Make your assets confidential" : "Return your assets to public"}
             </DialogDescription>
           </div>
 
@@ -197,12 +197,12 @@ export function WrapModal() {
 
             {/* Amount label + balance */}
             <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center md:justify-between md:gap-0">
-              <span className="font-mulish font-bold uppercase tracking-[1.2px] text-text-muted">
+              <span className="font-mulish font-bold tracking-[1.2px] text-text-muted">
                 {isWrap ? "Amount to Wrap" : "Amount to Unwrap"}
               </span>
               <div className="flex items-center gap-1.5 font-mulish">
                 <span className="text-text-body">
-                  {isWrap ? "Public Balance:" : "Confidential Balance:"}
+                  {isWrap ? "Public Asset :" : "Confidential Asset :"}
                 </span>
                 <span className="text-text-heading">
                   {selectedToken ? `${selectedToken.formatted} ${selectedToken.symbol}` : "0"}
@@ -367,7 +367,7 @@ export function WrapModal() {
                 <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
                   check_circle
                 </span>
-                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-tx-success-text">
+                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-tx-success-text">
                   Approve
                 </span>
               </div>
@@ -382,8 +382,8 @@ export function WrapModal() {
                 <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
                   sync
                 </span>
-                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
-                  Convert
+                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-primary">
+                  {isWrap ? "Wrap" : "Unwrap"}
                 </span>
               </div>
             </div>
@@ -395,7 +395,7 @@ export function WrapModal() {
                 <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
                   verified
                 </span>
-                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-text-muted">
+                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-text-muted">
                   Confirmed
                 </span>
               </div>

@@ -43,7 +43,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
   ] as const;
 
   return (
-    <Card className="w-full max-w-[300px] gap-7 rounded-3xl border-surface-border bg-surface p-[25px] backdrop-blur-sm md:w-[290px] md:max-w-none md:shrink-0">
+    <Card className="w-full max-w-[300px] gap-7 rounded-3xl border-surface-border bg-surface p-[25px] backdrop-blur-sm md:w-[300px] md:max-w-none md:shrink-0">
       {/* Warning banner */}
       {!hasBalance && (
         <div className="flex items-center gap-2 rounded-xl border border-info-banner-border bg-info-banner-bg p-[13px]">

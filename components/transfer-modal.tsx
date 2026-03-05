@@ -163,7 +163,7 @@ export function TransferModal() {
             {/* Amount section */}
             <div className="flex flex-col gap-4">
               {/* Label */}
-              <span className="pl-1 font-inter text-xs font-bold uppercase tracking-[1.2px] text-text-muted">
+              <span className="pl-1 font-inter text-xs font-bold tracking-[1.2px] text-text-muted">
                 Amount
               </span>
 
@@ -257,7 +257,7 @@ export function TransferModal() {
             {/* Recipient address section */}
             <div className="flex flex-col gap-4">
               {/* Label */}
-              <span className="pl-1 font-mulish text-xs font-bold uppercase tracking-[1.2px] text-text-muted">
+              <span className="pl-1 font-mulish text-xs font-bold tracking-[1.2px] text-text-muted">
                 Recipient Address
               </span>
 
@@ -336,7 +336,7 @@ export function TransferModal() {
                 className="flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[181px] md:px-[18px] md:py-3"
               >
                 <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
-                  Confirm & Sign
+                  Transfer
                 </span>
               </button>
             </div>
@@ -353,7 +353,7 @@ export function TransferModal() {
                 <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
                   check_circle
                 </span>
-                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-tx-success-text">
+                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-tx-success-text">
                   Approve
                 </span>
               </div>
@@ -368,8 +368,8 @@ export function TransferModal() {
                 <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
                   sync
                 </span>
-                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-primary">
-                  Convert
+                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-primary">
+                  Transfer
                 </span>
               </div>
             </div>
@@ -381,7 +381,7 @@ export function TransferModal() {
                 <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
                   verified
                 </span>
-                <span className="font-mulish text-[10px] font-bold uppercase tracking-[1px] text-text-muted">
+                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-text-muted">
                   Confirmed
                 </span>
               </div>

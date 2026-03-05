@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-05 — Reduire la largeur du dropdown WalletButton
+
+Reduction de la largeur du dropdown WalletButton de `w-[200px]` a `w-[150px]` pour un meilleur alignement visuel avec le bouton trigger.
+
+→ ADR : [ADR-0008](./decisions/0008-wallet-dropdown-match-trigger-width.md)
+
 ### 2026-03-01 — Page Activity Explorer
 
 Implémentation de la page `/explorer` avec table d'historique des transactions (Wrap, Transfer, Unwrap, Delegation), filtre dropdown par type d'action, pagination, liens Arbiscan, et données mock en attente du SDK. Suit le pattern Page → Content du dashboard avec tokens sémantiques light/dark.
