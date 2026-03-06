@@ -9,11 +9,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useTransferModal } from "./transfer-modal-provider";
-import { useTokenBalances } from "@/hooks/use-token-balances";
 import { useDevMode } from "@/hooks/use-dev-mode";
+import { useConfidentialTransfer, type TransferStep } from "@/hooks/use-confidential-transfer";
+import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
+import { useHandleClient } from "@/hooks/use-handle-client";
 import { DevModeToggle } from "./dev-mode-toggle";
 import { ArbiscanLink } from "./arbiscan-link";
-import { confidentialTokens } from "@/lib/tokens";
+import { confidentialTokens, wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
+import { formatUnits } from "viem";
 
 const TRANSFER_CODE = `function confidentialTransfer(
   address to,
@@ -34,11 +37,92 @@ function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
+function TransferProgressTracker({ step }: { step: TransferStep }) {
+  function stateFor(target: "encrypting" | "transferring" | "confirmed"): "pending" | "active" | "done" {
+    if (step === "idle" || step === "error") return "pending";
+    const steps: TransferStep[] = ["encrypting", "transferring", "confirmed"];
+    const current = steps.indexOf(step);
+    const idx = steps.indexOf(target);
+    if (current > idx) return "done";
+    if (current === idx) return target === "confirmed" ? "done" : "active";
+    return "pending";
+  }
+
+  return (
+    <div
+      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
+      role="status"
+      aria-live="polite"
+    >
+      <StepIndicator state={stateFor("encrypting")} icon="lock" label="Encrypt" />
+      <StepIndicator state={stateFor("transferring")} icon="sync" label="Transfer" />
+      <StepIndicator state={stateFor("confirmed")} icon="verified" label="Confirmed" />
+    </div>
+  );
+}
+
+function StepIndicator({
+  state,
+  icon,
+  label,
+}: {
+  state: "pending" | "active" | "done";
+  icon: string;
+  label: string;
+}) {
+  const barColor =
+    state === "done"
+      ? "bg-tx-success-text"
+      : state === "active"
+        ? "bg-primary"
+        : "bg-surface-border";
+  const barWidth = state === "done" ? "w-full" : state === "active" ? "w-1/2" : "w-0";
+  const iconColor =
+    state === "done"
+      ? "text-tx-success-text"
+      : state === "active"
+        ? "text-primary"
+        : "text-text-muted";
+  const textColor = iconColor;
+  const displayIcon = state === "done" ? "check_circle" : icon;
+
+  return (
+    <div className="w-[136px] md:w-auto md:flex-1">
+      <div className="h-1 w-full rounded-full bg-surface-border">
+        <div
+          className={`h-1 rounded-full transition-all duration-500 ${barColor} ${barWidth}`}
+        />
+      </div>
+      <div className="mt-2 flex items-center justify-center gap-1">
+        <span
+          aria-hidden="true"
+          className={`material-icons text-[16px]! ${iconColor} ${state === "active" ? "animate-spin motion-reduce:animate-none" : ""}`}
+        >
+          {displayIcon}
+        </span>
+        <span
+          className={`font-mulish text-[10px] font-bold tracking-[1px] ${textColor}`}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function TransferModal() {
   const { open, setOpen } = useTransferModal();
-  const { balances } = useTokenBalances();
   const { enabled: devMode } = useDevMode();
-  const [selectedSymbol, setSelectedSymbol] = useState(confidentialTokens[0]?.symbol ?? "cUSDC");
+  const { step, error, txHash, transfer, reset } = useConfidentialTransfer();
+  const { balances: confidentialBalances } = useConfidentialBalances();
+  const { handleClient } = useHandleClient();
+  const [decryptedAmounts, setDecryptedAmounts] = useState<Record<string, string>>({});
+  const [decryptingSymbol, setDecryptingSymbol] = useState<string | null>(null);
+  // Default to first token with a real deployed address (cRLC), not placeholder cUSDC
+  const defaultSymbol = confidentialTokens.find((t) => t.address && t.address.length === 42)?.symbol
+    ?? confidentialTokens[0]?.symbol
+    ?? "cRLC";
+  const [selectedSymbol, setSelectedSymbol] = useState(defaultSymbol);
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -46,20 +130,7 @@ export function TransferModal() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Map confidential tokens with balances (using base token balance for now)
-  const transferableTokens = confidentialTokens.map((ct) => {
-    const baseSymbol = ct.symbol.replace(/^c/, "");
-    const bal = balances.find((b) => b.symbol === baseSymbol);
-    return {
-      symbol: ct.symbol,
-      icon: ct.icon,
-      decimals: ct.decimals,
-      balance: bal?.balance ?? 0n,
-      formatted: bal?.formatted ?? "0",
-    };
-  });
-
-  const selectedToken = transferableTokens.find((t) => t.symbol === selectedSymbol) ?? transferableTokens[0];
+  const isProcessing = step === "encrypting" || step === "transferring";
 
   // Reset state when modal opens
   useEffect(() => {
@@ -68,8 +139,9 @@ export function TransferModal() {
       setRecipient("");
       setDropdownOpen(false);
       setCopied(false);
+      reset();
     }
-  }, [open]);
+  }, [open, reset]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -112,6 +184,11 @@ export function TransferModal() {
     setDropdownOpen(false);
   }, []);
 
+  const handleMax = useCallback(() => {
+    const decrypted = decryptedAmounts[selectedSymbol];
+    if (decrypted) setAmount(decrypted);
+  }, [decryptedAmounts, selectedSymbol]);
+
   const handleCopyCode = useCallback(() => {
     navigator.clipboard.writeText(TRANSFER_CODE).then(() => {
       setCopied(true);
@@ -119,13 +196,64 @@ export function TransferModal() {
     });
   }, []);
 
+  // Decrypt a confidential balance inline
+  const handleDecryptBalance = useCallback(
+    async (cSymbol: string) => {
+      if (!handleClient || decryptingSymbol) return;
+      const cBalance = confidentialBalances.find((b) => b.symbol === cSymbol);
+      if (!cBalance || !cBalance.isInitialized) return;
+
+      setDecryptingSymbol(cSymbol);
+      try {
+        const { value } = await handleClient.decrypt(cBalance.handle);
+        const formatted = formatUnits(
+          typeof value === "bigint" ? value : BigInt(String(value)),
+          cBalance.decimals,
+        );
+        setDecryptedAmounts((prev) => ({ ...prev, [cSymbol]: formatted }));
+      } catch (err) {
+        console.error("[TransferModal] Decrypt error:", err);
+      } finally {
+        setDecryptingSymbol(null);
+      }
+    },
+    [handleClient, decryptingSymbol, confidentialBalances],
+  );
+
+  // Get the confidential balance display for a token
+  const getConfidentialDisplay = useCallback(
+    (cSymbol: string) => {
+      const decrypted = decryptedAmounts[cSymbol];
+      if (decrypted !== undefined) return decrypted;
+      const cBalance = confidentialBalances.find((b) => b.symbol === cSymbol);
+      if (!cBalance?.isInitialized) return "0";
+      return null; // null = encrypted, needs decrypt
+    },
+    [decryptedAmounts, confidentialBalances],
+  );
+
+  // Find the base token config for the SDK hook
+  const baseSymbol = selectedSymbol.replace(/^c/, "");
+  const selectedTokenConfig = wrappableTokenConfigs.find(
+    (t) => t.symbol === baseSymbol,
+  );
+
+  const selectedCToken = confidentialTokens.find((t) => t.symbol === selectedSymbol);
+
+  const handleTransfer = useCallback(async () => {
+    if (!selectedTokenConfig || !amount || !recipient) return;
+    await transfer(selectedTokenConfig, amount, recipient);
+  }, [selectedTokenConfig, amount, recipient, transfer]);
+
   // Validation
   const parsedAmount = parseFloat(amount) || 0;
-  const maxAmount = parseFloat(selectedToken?.formatted ?? "0") || 0;
-  const isOverBalance = parsedAmount > maxAmount;
+  const hasDecryptedBalance = decryptedAmounts[selectedSymbol] !== undefined;
+  const maxAmountStr = decryptedAmounts[selectedSymbol] ?? "0";
+  const maxAmount = parseFloat(maxAmountStr) || 0;
+  const isOverBalance = hasDecryptedBalance && parsedAmount > maxAmount;
   const isValidAmount = parsedAmount > 0 && !isOverBalance;
   const addressValid = isValidAddress(recipient);
-  const canTransfer = isValidAmount && addressValid;
+  const canTransfer = isValidAmount && addressValid && !isProcessing;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -162,13 +290,44 @@ export function TransferModal() {
           <div className="flex w-full flex-col gap-[26px] rounded-3xl border border-surface-border bg-surface px-5 py-[15px] backdrop-blur-sm">
             {/* Amount section */}
             <div className="flex flex-col gap-4">
-              {/* Label */}
-              <span className="pl-1 font-inter text-xs font-bold tracking-[1.2px] text-text-muted">
-                Amount
-              </span>
+              {/* Label + balance */}
+              <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center md:justify-between md:gap-0">
+                <span className="pl-1 font-inter text-xs font-bold tracking-[1.2px] text-text-muted">
+                  Amount
+                </span>
+                <div className="flex items-center gap-1.5 pl-1 font-mulish">
+                  <span className="text-text-body">Balance :</span>
+                  <span className="flex items-center gap-1 text-text-heading">
+                    {(() => {
+                      const display = getConfidentialDisplay(selectedSymbol);
+                      if (display === null) {
+                        return (
+                          <>
+                            <span>****** {selectedSymbol}</span>
+                            {decryptingSymbol === selectedSymbol ? (
+                              <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleDecryptBalance(selectedSymbol)}
+                                className="cursor-pointer transition-opacity hover:opacity-70"
+                                aria-label="Reveal balance"
+                              >
+                                <span className="material-icons text-[12px]! text-primary">visibility</span>
+                              </button>
+                            )}
+                          </>
+                        );
+                      }
+                      return `${display} ${selectedSymbol}`;
+                    })()}
+                  </span>
+                </div>
+              </div>
 
               {/* Input area */}
-              <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-surface px-4 py-[17px]">
+              <div className="flex flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-4 py-[17px]">
+                <div className="flex items-center justify-between">
                 {/* Token selector */}
                 <div className="relative">
                   <button
@@ -179,9 +338,9 @@ export function TransferModal() {
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
                   >
-                    {selectedToken && (
+                    {selectedCToken && (
                       <Image
-                        src={selectedToken.icon}
+                        src={selectedCToken.icon}
                         alt=""
                         width={24}
                         height={24}
@@ -189,7 +348,7 @@ export function TransferModal() {
                       />
                     )}
                     <span className="font-mulish text-sm font-bold text-text-heading md:text-base">
-                      {selectedToken?.symbol}
+                      {selectedSymbol}
                     </span>
                     <span aria-hidden="true" className="material-icons text-[16px]! text-text-body md:text-[18px]!">
                       expand_more
@@ -202,32 +361,64 @@ export function TransferModal() {
                       ref={dropdownRef}
                       role="listbox"
                       aria-label="Select token"
-                      className="absolute left-0 top-full z-50 mt-1 min-w-[180px] origin-top-left animate-[dropdown-in_150ms_ease-out] motion-reduce:animate-none rounded-xl border border-surface-border bg-modal-bg p-2 shadow-lg"
+                      className="absolute left-0 top-full z-50 mt-1 min-w-[220px] origin-top-left animate-[dropdown-in_150ms_ease-out] motion-reduce:animate-none rounded-xl border border-surface-border bg-modal-bg p-2 shadow-lg"
                     >
-                      {transferableTokens.map((token) => (
-                        <button
-                          key={token.symbol}
-                          type="button"
-                          onClick={() => handleSelectToken(token.symbol)}
-                          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-surface ${
-                            token.symbol === selectedSymbol ? "bg-surface" : ""
-                          }`}
-                        >
-                          <Image
-                            src={token.icon}
-                            alt=""
-                            width={24}
-                            height={24}
-                            className="size-6"
-                          />
-                          <span className="font-mulish text-sm font-bold text-text-heading">
-                            {token.symbol}
-                          </span>
-                          <span className="ml-auto font-mulish text-xs text-text-body">
-                            {token.formatted}
-                          </span>
-                        </button>
-                      ))}
+                      {confidentialTokens.map((token) => {
+                        const confidentialDisplay = getConfidentialDisplay(token.symbol);
+                        return (
+                          <button
+                            key={token.symbol}
+                            type="button"
+                            onClick={() => handleSelectToken(token.symbol)}
+                            className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-surface ${
+                              token.symbol === selectedSymbol ? "bg-surface" : ""
+                            }`}
+                          >
+                            <Image
+                              src={token.icon}
+                              alt=""
+                              width={24}
+                              height={24}
+                              className="size-6"
+                            />
+                            <span className="font-mulish text-sm font-bold text-text-heading">
+                              {token.symbol}
+                            </span>
+                            <span className="ml-auto flex items-center gap-1.5 font-mulish text-xs text-text-body">
+                              {confidentialDisplay === null ? (
+                                <>
+                                  <span>******</span>
+                                  {decryptingSymbol === token.symbol ? (
+                                    <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
+                                  ) : (
+                                    <span
+                                      role="button"
+                                      tabIndex={0}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDecryptBalance(token.symbol);
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                          handleDecryptBalance(token.symbol);
+                                        }
+                                      }}
+                                      className="cursor-pointer transition-opacity hover:opacity-70"
+                                      aria-label={`Reveal ${token.symbol} balance`}
+                                    >
+                                      <span className="material-icons text-[14px]! text-primary">visibility</span>
+                                    </span>
+                                  )}
+                                </>
+                              ) : (
+                                <span>{confidentialDisplay}</span>
+                              )}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -246,6 +437,19 @@ export function TransferModal() {
                   aria-invalid={isOverBalance}
                   aria-describedby={isOverBalance ? "transfer-balance-error" : undefined}
                 />
+                </div>
+
+                {/* Network + MAX */}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-mulish text-text-muted">Arbitrum Sepolia</span>
+                  <button
+                    type="button"
+                    onClick={handleMax}
+                    className="cursor-pointer font-mulish font-bold text-primary transition-opacity hover:opacity-80"
+                  >
+                    MAX
+                  </button>
+                </div>
               </div>
               {isOverBalance && (
                 <p id="transfer-balance-error" className="pl-1 font-mulish text-xs text-tx-error-text">
@@ -300,7 +504,7 @@ export function TransferModal() {
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Token</span>
                 <span className="font-mulish text-[10px] font-medium text-text-heading md:text-sm">
-                  {selectedToken?.symbol}
+                  {selectedSymbol}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -328,65 +532,81 @@ export function TransferModal() {
               </div>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="flex flex-col gap-2 rounded-xl border border-tx-error-text/30 bg-tx-error-bg px-4 py-3">
+                <div className="flex items-start gap-2">
+                  <span aria-hidden="true" className="material-icons text-[18px]! text-tx-error-text">
+                    error
+                  </span>
+                  <p className="min-w-0 flex-1 font-mulish text-xs text-tx-error-text">
+                    {error}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="cursor-pointer self-end font-mulish text-xs font-bold text-tx-error-text underline"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
             {/* CTA */}
             <div className="flex justify-center">
               <button
                 type="button"
                 disabled={!canTransfer}
+                onClick={handleTransfer}
                 className="flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[181px] md:px-[18px] md:py-3"
               >
-                <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
-                  Transfer
-                </span>
+                {isProcessing ? (
+                  <>
+                    <span aria-hidden="true" className="material-icons animate-spin motion-reduce:animate-none text-[16px]! text-primary-foreground md:text-[20px]!">
+                      sync
+                    </span>
+                    <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
+                      {step === "encrypting" ? "Encrypting..." : "Transferring..."}
+                    </span>
+                  </>
+                ) : step === "confirmed" ? (
+                  <>
+                    <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
+                      check_circle
+                    </span>
+                    <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
+                      Transferred!
+                    </span>
+                  </>
+                ) : (
+                  <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
+                    Transfer
+                  </span>
+                )}
               </button>
             </div>
           </div>
 
           {/* Progress tracker */}
-          <div className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0" role="status" aria-live="polite">
-            {/* Step 1: Approve — done */}
-            <div className="w-[136px] md:w-auto md:flex-1">
-              <div className="h-1 w-full rounded-full bg-tx-success-text/30">
-                <div className="h-1 w-full rounded-full bg-tx-success-text" />
-              </div>
-              <div className="mt-2 flex items-center justify-center gap-1">
-                <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
-                  check_circle
-                </span>
-                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-tx-success-text">
-                  Approve
-                </span>
-              </div>
-            </div>
+          <TransferProgressTracker step={step} />
 
-            {/* Step 2: Transfer — in progress */}
-            <div className="w-[136px] md:w-auto md:flex-1">
-              <div className="h-1 w-full rounded-full bg-surface-border">
-                <div className="h-1 w-1/3 rounded-full bg-primary" />
-              </div>
-              <div className="mt-2 flex items-center justify-center gap-1">
-                <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
-                  sync
-                </span>
-                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-primary">
-                  Transfer
+          {/* Arbiscan link on success */}
+          {step === "confirmed" && txHash && (
+            <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
+              <div className="flex items-center gap-3">
+                <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
+                <span className="font-mulish text-sm font-medium text-text-body">
+                  Confidential Transfer Complete
                 </span>
               </div>
+              <ArbiscanLink
+                txHash={txHash}
+                label="View on Arbiscan"
+                className="text-xs"
+              />
             </div>
-
-            {/* Step 3: Confirmed — pending */}
-            <div className="w-[136px] md:w-auto md:flex-1">
-              <div className="h-1 w-full rounded-full bg-surface-border" />
-              <div className="mt-2 flex items-center justify-center gap-1">
-                <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
-                  verified
-                </span>
-                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-text-muted">
-                  Confirmed
-                </span>
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Function called (dev mode only) */}
           {devMode && (
@@ -418,21 +638,6 @@ export function TransferModal() {
               </pre>
             </div>
           )}
-
-          {/* Transfer complete status + Arbiscan link */}
-          <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
-            <div className="flex items-center gap-3">
-              <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
-              <span className="font-mulish text-sm font-medium text-text-body">
-                Confidential Transfer Complete
-              </span>
-            </div>
-            <ArbiscanLink
-              txHash="0x..."
-              label="View on Arbiscan"
-              className="text-xs"
-            />
-          </div>
         </div>
 
         {/* Cancel */}
