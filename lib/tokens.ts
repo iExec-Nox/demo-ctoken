@@ -37,7 +37,7 @@ export const tokens: TokenConfig[] = [
     icon: "/icon-rlc.svg",
     coingeckoId: "iexec-rlc",
     wrappable: true,
-    confidentialAddress: "0x...", // TODO: replace with deployed cRLC address
+    confidentialAddress: "0x271f46e78f2fe59817854dabde47729ac4935765",
   },
 ];
 

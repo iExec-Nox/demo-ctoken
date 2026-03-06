@@ -11,8 +11,10 @@ import {
 import { useWrapModal } from "./wrap-modal-provider";
 import { useTokenBalances } from "@/hooks/use-token-balances";
 import { useDevMode } from "@/hooks/use-dev-mode";
+import { useWrap, type WrapStep } from "@/hooks/use-wrap";
 import { DevModeToggle } from "./dev-mode-toggle";
 import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
+import { ArbiscanLink } from "./arbiscan-link";
 
 const WRAP_CODE = `function wrap(address to, uint256 amount) public virtual override returns (euint256) {
     // take ownership of the underlying tokens
@@ -34,15 +36,102 @@ const UNWRAP_CODE = `function unwrap(uint256 amount) public virtual override ret
     return underlyingAmount;
 }`;
 
+function ProgressTracker({ step, isWrap }: { step: WrapStep; isWrap: boolean }) {
+  // Determine state of each step
+  const approveState =
+    step === "approving"
+      ? "active"
+      : step === "wrapping" || step === "confirmed"
+        ? "done"
+        : step === "error"
+          ? "done" // keep approve as done if error happened during wrap
+          : "pending";
+
+  const wrapState =
+    step === "wrapping"
+      ? "active"
+      : step === "confirmed"
+        ? "done"
+        : "pending";
+
+  const confirmedState = step === "confirmed" ? "done" : "pending";
+
+  // If error happened during approving, reset approve to pending
+  const approveDisplay = step === "error" ? "pending" : approveState;
+
+  return (
+    <div
+      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
+      role="status"
+      aria-live="polite"
+    >
+      <StepIndicator state={approveDisplay} icon="check_circle" label="Approve" />
+      <StepIndicator state={wrapState} icon="sync" label={isWrap ? "Wrap" : "Unwrap"} />
+      <StepIndicator state={confirmedState} icon="verified" label="Confirmed" />
+    </div>
+  );
+}
+
+function StepIndicator({
+  state,
+  icon,
+  label,
+}: {
+  state: "pending" | "active" | "done";
+  icon: string;
+  label: string;
+}) {
+  const barColor =
+    state === "done"
+      ? "bg-tx-success-text"
+      : state === "active"
+        ? "bg-primary"
+        : "bg-surface-border";
+  const barWidth = state === "done" ? "w-full" : state === "active" ? "w-1/2" : "w-0";
+  const iconColor =
+    state === "done"
+      ? "text-tx-success-text"
+      : state === "active"
+        ? "text-primary"
+        : "text-text-muted";
+  const textColor = iconColor;
+  const displayIcon = state === "done" ? "check_circle" : icon;
+
+  return (
+    <div className="w-[136px] md:w-auto md:flex-1">
+      <div className="h-1 w-full rounded-full bg-surface-border">
+        <div
+          className={`h-1 rounded-full transition-all duration-500 ${barColor} ${barWidth}`}
+        />
+      </div>
+      <div className="mt-2 flex items-center justify-center gap-1">
+        <span
+          aria-hidden="true"
+          className={`material-icons text-[16px]! ${iconColor} ${state === "active" ? "animate-spin motion-reduce:animate-none" : ""}`}
+        >
+          {displayIcon}
+        </span>
+        <span
+          className={`font-mulish text-[10px] font-bold tracking-[1px] ${textColor}`}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function WrapModal() {
   const { open, setOpen, activeTab, setActiveTab } = useWrapModal();
   const { balances } = useTokenBalances();
   const { enabled: devMode } = useDevMode();
-  const [selectedSymbol, setSelectedSymbol] = useState("USDC");
+  const { step, error: wrapError, wrapTxHash, wrap, reset: resetWrap } = useWrap();
+  const [selectedSymbol, setSelectedSymbol] = useState("RLC");
   const [amount, setAmount] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const isProcessing = step === "approving" || step === "wrapping";
 
   // Map wrappable tokens with balances
   const wrappableTokens = wrappableTokenConfigs.map((t) => {
@@ -58,13 +147,14 @@ export function WrapModal() {
 
   const selectedToken = wrappableTokens.find((t) => t.symbol === selectedSymbol) ?? wrappableTokens[0];
 
-  // Reset amount when modal opens or tab changes
+  // Reset amount and wrap state when modal opens or tab changes
   useEffect(() => {
     if (open) {
       setAmount("");
       setDropdownOpen(false);
+      resetWrap();
     }
-  }, [open, activeTab]);
+  }, [open, activeTab, resetWrap]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -116,6 +206,16 @@ export function WrapModal() {
     setAmount("");
     setDropdownOpen(false);
   }, []);
+
+  // Find the original token config for the wrap hook
+  const selectedTokenConfig = wrappableTokenConfigs.find(
+    (t) => t.symbol === selectedSymbol
+  );
+
+  const handleWrap = useCallback(async () => {
+    if (!selectedTokenConfig || !amount) return;
+    await wrap(selectedTokenConfig, amount);
+  }, [selectedTokenConfig, amount, wrap]);
 
   // Validation
   const parsedAmount = parseFloat(amount) || 0;
@@ -324,18 +424,60 @@ export function WrapModal() {
               </div>
             </div>
 
+            {/* Error message */}
+            {wrapError && (
+              <div className="flex items-start gap-2 rounded-xl border border-tx-error-text/30 bg-tx-error-bg px-4 py-3">
+                <span aria-hidden="true" className="material-icons text-[18px]! text-tx-error-text">
+                  error
+                </span>
+                <p className="min-w-0 flex-1 font-mulish text-xs text-tx-error-text">
+                  {wrapError}
+                </p>
+                <button
+                  type="button"
+                  onClick={resetWrap}
+                  className="cursor-pointer font-mulish text-xs font-bold text-tx-error-text underline"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
             {/* CTA */}
             <button
               type="button"
-              disabled={!isValidAmount}
+              disabled={isWrap ? (!isValidAmount || isProcessing) : !isValidAmount}
+              onClick={isWrap ? handleWrap : undefined}
               className="mx-auto flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[215px] md:px-5 md:py-3"
             >
-              <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
-                account_balance_wallet
-              </span>
-              <span className="font-mulish text-sm font-bold text-primary-foreground md:text-lg">
-                {isWrap ? "Wrap Assets" : "Unwrap Assets"}
-              </span>
+              {isProcessing ? (
+                <>
+                  <span aria-hidden="true" className="material-icons animate-spin motion-reduce:animate-none text-[16px]! text-primary-foreground md:text-[20px]!">
+                    sync
+                  </span>
+                  <span className="font-mulish text-sm font-bold text-primary-foreground md:text-lg">
+                    {step === "approving" ? "Approving..." : "Wrapping..."}
+                  </span>
+                </>
+              ) : step === "confirmed" ? (
+                <>
+                  <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
+                    check_circle
+                  </span>
+                  <span className="font-mulish text-sm font-bold text-primary-foreground md:text-lg">
+                    Wrapped!
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
+                    account_balance_wallet
+                  </span>
+                  <span className="font-mulish text-sm font-bold text-primary-foreground md:text-lg">
+                    {isWrap ? "Wrap Assets" : "Unwrap Assets"}
+                  </span>
+                </>
+              )}
             </button>
 
             {/* How it works */}
@@ -357,50 +499,12 @@ export function WrapModal() {
           </div>
 
           {/* Progress tracker */}
-          <div className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0" role="status" aria-live="polite">
-            {/* Step 1: Approve — done */}
-            <div className="w-[136px] md:w-auto md:flex-1">
-              <div className="h-1 w-full rounded-full bg-tx-success-text/30">
-                <div className="h-1 w-full rounded-full bg-tx-success-text" />
-              </div>
-              <div className="mt-2 flex items-center justify-center gap-1">
-                <span aria-hidden="true" className="material-icons text-[16px]! text-tx-success-text">
-                  check_circle
-                </span>
-                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-tx-success-text">
-                  Approve
-                </span>
-              </div>
-            </div>
+          <ProgressTracker step={step} isWrap={isWrap} />
 
-            {/* Step 2: Wrap/Unwrap — in progress */}
-            <div className="w-[136px] md:w-auto md:flex-1">
-              <div className="h-1 w-full rounded-full bg-surface-border">
-                <div className="h-1 w-1/3 rounded-full bg-primary" />
-              </div>
-              <div className="mt-2 flex items-center justify-center gap-1">
-                <span aria-hidden="true" className="material-icons text-[16px]! text-primary">
-                  sync
-                </span>
-                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-primary">
-                  {isWrap ? "Wrap" : "Unwrap"}
-                </span>
-              </div>
-            </div>
-
-            {/* Step 3: Confirmed — pending */}
-            <div className="w-[136px] md:w-auto md:flex-1">
-              <div className="h-1 w-full rounded-full bg-surface-border" />
-              <div className="mt-2 flex items-center justify-center gap-1">
-                <span aria-hidden="true" className="material-icons text-[16px]! text-text-muted">
-                  verified
-                </span>
-                <span className="font-mulish text-[10px] font-bold tracking-[1px] text-text-muted">
-                  Confirmed
-                </span>
-              </div>
-            </div>
-          </div>
+          {/* Arbiscan link on success */}
+          {step === "confirmed" && wrapTxHash && (
+            <ArbiscanLink txHash={wrapTxHash} />
+          )}
 
           {/* Function called (dev mode only) */}
           {devMode && (
