@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { erc20Abi, parseUnits } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
+import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import type { TokenConfig } from "@/lib/tokens";
 
 export type WrapStep = "idle" | "approving" | "wrapping" | "confirmed" | "error";
@@ -26,6 +27,7 @@ export function useWrap(): UseWrapResult {
 
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
+  const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
     setStep("idle");
@@ -120,6 +122,7 @@ export function useWrap(): UseWrapResult {
         setWrapTxHash(wrapTx);
 
         setStep("confirmed");
+        invalidateBalances();
         console.log("[useWrap] Wrap complete!");
       } catch (err) {
         const message =
