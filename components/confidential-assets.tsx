@@ -130,9 +130,9 @@ function ConfidentialTokenRow({
           <Image
             src={token.icon}
             alt={`${token.name} icon`}
-            width={14}
-            height={14}
-            className="size-3.5"
+            width={18}
+            height={18}
+            className="size-4.5 object-contain"
           />
         </div>
         <div>
