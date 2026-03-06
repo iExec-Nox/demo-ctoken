@@ -10,18 +10,27 @@ import {
 import { useSelectiveDisclosureModal } from "./selective-disclosure-modal-provider";
 import { useDevMode } from "@/hooks/use-dev-mode";
 import { DevModeToggle } from "./dev-mode-toggle";
+import { ArbiscanLink } from "./arbiscan-link";
 import { confidentialTokens } from "@/lib/tokens";
+import { useAddViewer, type AddViewerStep } from "@/hooks/use-add-viewer";
+import { NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 
 type ScopeType = "full" | "specific";
 
-const ALLOW_CODE = `const txHash = await walletClient.writeContract({
-  address: NOX_ADDRESS,
-  abi: NOX_ABI,
-  functionName: 'allow',
-  args: [
-    '0xabc123...', // handle bytes32
-    '0xdef456...', // adresse à autoriser
-  ],
+const ADD_VIEWER_CODE = `// 1. Read the balance handle
+const handle = await publicClient.readContract({
+  address: cTokenAddress,
+  abi: confidentialTokenAbi,
+  functionName: 'confidentialBalanceOf',
+  args: [userAddress],
+});
+
+// 2. Grant viewer access on NoxCompute
+await walletClient.writeContract({
+  address: '${NOX_COMPUTE_ADDRESS}',
+  abi: noxComputeAbi,
+  functionName: 'addViewer',
+  args: [handle, viewerAddress],
 });`;
 
 interface MockViewer {
@@ -109,24 +118,121 @@ function ViewerCard({ viewer }: { viewer: MockViewer }) {
   );
 }
 
+function DisclosureProgressTracker({ step }: { step: AddViewerStep }) {
+  function stateFor(
+    target: "reading-handle" | "granting" | "confirmed",
+  ): "pending" | "active" | "done" {
+    if (step === "idle" || step === "error") return "pending";
+    const steps: AddViewerStep[] = ["reading-handle", "granting", "confirmed"];
+    const current = steps.indexOf(step);
+    const idx = steps.indexOf(target);
+    if (current > idx) return "done";
+    if (current === idx) return target === "confirmed" ? "done" : "active";
+    return "pending";
+  }
+
+  return (
+    <div
+      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
+      role="status"
+      aria-live="polite"
+    >
+      <StepIndicator
+        state={stateFor("reading-handle")}
+        icon="search"
+        label="Read Handle"
+      />
+      <StepIndicator
+        state={stateFor("granting")}
+        icon="sync"
+        label="Grant Access"
+      />
+      <StepIndicator
+        state={stateFor("confirmed")}
+        icon="verified"
+        label="Confirmed"
+      />
+    </div>
+  );
+}
+
+function StepIndicator({
+  state,
+  icon,
+  label,
+}: {
+  state: "pending" | "active" | "done";
+  icon: string;
+  label: string;
+}) {
+  const barColor =
+    state === "done"
+      ? "bg-tx-success-text"
+      : state === "active"
+        ? "bg-primary"
+        : "bg-surface-border";
+  const barWidth =
+    state === "done" ? "w-full" : state === "active" ? "w-1/2" : "w-0";
+  const iconColor =
+    state === "done"
+      ? "text-tx-success-text"
+      : state === "active"
+        ? "text-primary"
+        : "text-text-muted";
+  const textColor = iconColor;
+  const displayIcon = state === "done" ? "check_circle" : icon;
+
+  return (
+    <div className="w-[136px] md:w-auto md:flex-1">
+      <div className="h-1 w-full rounded-full bg-surface-border">
+        <div
+          className={`h-1 rounded-full transition-all duration-500 ${barColor} ${barWidth}`}
+        />
+      </div>
+      <div className="mt-2 flex items-center justify-center gap-1">
+        <span
+          aria-hidden="true"
+          className={`material-icons text-[16px]! ${iconColor} ${state === "active" ? "animate-spin motion-reduce:animate-none" : ""}`}
+        >
+          {displayIcon}
+        </span>
+        <span
+          className={`font-mulish text-[10px] font-bold tracking-[1px] ${textColor}`}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function SelectiveDisclosureModal() {
   const { open, setOpen } = useSelectiveDisclosureModal();
   const { enabled: devMode } = useDevMode();
+  const { step, error, txHash, grant, reset } = useAddViewer();
 
   const [viewerAddress, setViewerAddress] = useState("");
   const [scope, setScope] = useState<ScopeType>("specific");
-  const [selectedTokens, setSelectedTokens] = useState<Set<string>>(new Set());
+  const [selectedTokens, setSelectedTokens] = useState<Set<string>>(
+    new Set(),
+  );
   const [copied, setCopied] = useState(false);
 
-  const handleOpenChange = useCallback((isOpen: boolean) => {
-    setOpen(isOpen);
-    if (isOpen) {
-      setViewerAddress("");
-      setScope("specific");
-      setSelectedTokens(new Set());
-      setCopied(false);
-    }
-  }, [setOpen]);
+  const isProcessing = step === "reading-handle" || step === "granting";
+
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
+      setOpen(isOpen);
+      if (isOpen) {
+        setViewerAddress("");
+        setScope("specific");
+        setSelectedTokens(new Set());
+        setCopied(false);
+        reset();
+      }
+    },
+    [setOpen, reset],
+  );
 
   const handleScopeChange = useCallback((newScope: ScopeType) => {
     setScope(newScope);
@@ -150,19 +256,26 @@ export function SelectiveDisclosureModal() {
         return next;
       });
     },
-    [scope]
+    [scope],
   );
 
   const handleCopyCode = useCallback(() => {
-    navigator.clipboard.writeText(ALLOW_CODE).then(() => {
+    navigator.clipboard.writeText(ADD_VIEWER_CODE).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   }, []);
 
+  const handleGrant = useCallback(async () => {
+    const tokensToGrant = confidentialTokens.filter((t) =>
+      selectedTokens.has(t.symbol),
+    );
+    await grant(viewerAddress, tokensToGrant);
+  }, [viewerAddress, selectedTokens, grant]);
+
   const isValidAddress = /^0x[a-fA-F0-9]{40}$/.test(viewerAddress);
   const hasTokenSelected = selectedTokens.size > 0;
-  const canGrant = isValidAddress && hasTokenSelected;
+  const canGrant = isValidAddress && hasTokenSelected && !isProcessing;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -200,7 +313,10 @@ export function SelectiveDisclosureModal() {
             <h3 className="font-mulish text-xl font-bold text-text-heading">
               Add a New Viewer
             </h3>
-            <span aria-hidden="true" className="material-icons text-[16px]! text-primary md:hidden">
+            <span
+              aria-hidden="true"
+              className="material-icons text-[16px]! text-primary md:hidden"
+            >
               visibility
             </span>
           </div>
@@ -208,7 +324,10 @@ export function SelectiveDisclosureModal() {
           <div className="flex flex-col items-center gap-[26px]">
             {/* Viewer Address */}
             <div className="flex w-full flex-col gap-[11px]">
-              <label htmlFor="viewer-address" className="font-mulish text-sm font-bold text-text-body">
+              <label
+                htmlFor="viewer-address"
+                className="font-mulish text-sm font-bold text-text-body"
+              >
                 Viewer Address
               </label>
               <input
@@ -217,7 +336,8 @@ export function SelectiveDisclosureModal() {
                 placeholder="0x..."
                 value={viewerAddress}
                 onChange={(e) => setViewerAddress(e.target.value)}
-                className="h-[50px] w-full rounded-xl border border-surface-border bg-surface px-4 font-mulish text-base text-text-heading outline-none transition-colors placeholder:text-text-heading/60 focus-visible:ring-2 focus-visible:ring-primary/50"
+                disabled={isProcessing || step === "confirmed"}
+                className="h-[50px] w-full rounded-xl border border-surface-border bg-surface px-4 font-mulish text-base text-text-heading outline-none transition-colors placeholder:text-text-heading/60 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50"
               />
             </div>
 
@@ -227,14 +347,19 @@ export function SelectiveDisclosureModal() {
                 Scope of Access
               </span>
 
-              <div className="flex flex-col gap-5 md:grid md:grid-cols-2" role="radiogroup" aria-label="Scope of access">
+              <div
+                className="flex flex-col gap-5 md:grid md:grid-cols-2"
+                role="radiogroup"
+                aria-label="Scope of access"
+              >
                 {/* Full Portfolio */}
                 <button
                   type="button"
                   role="radio"
                   aria-checked={scope === "full"}
                   onClick={() => handleScopeChange("full")}
-                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors ${
+                  disabled={isProcessing || step === "confirmed"}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors disabled:cursor-default disabled:opacity-50 ${
                     scope === "full"
                       ? "border-primary bg-primary-alpha-18"
                       : "border-surface-border bg-surface"
@@ -267,7 +392,8 @@ export function SelectiveDisclosureModal() {
                   role="radio"
                   aria-checked={scope === "specific"}
                   onClick={() => handleScopeChange("specific")}
-                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors ${
+                  disabled={isProcessing || step === "confirmed"}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors disabled:cursor-default disabled:opacity-50 ${
                     scope === "specific"
                       ? "border-primary bg-primary-alpha-18"
                       : "border-surface-border bg-surface"
@@ -311,7 +437,11 @@ export function SelectiveDisclosureModal() {
                       role="checkbox"
                       aria-checked={isChecked}
                       onClick={() => toggleToken(token.symbol)}
-                      disabled={scope === "full"}
+                      disabled={
+                        scope === "full" ||
+                        isProcessing ||
+                        step === "confirmed"
+                      }
                       className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-surface-border bg-surface px-[17px] py-2 transition-colors hover:opacity-80 disabled:cursor-default disabled:opacity-70"
                     >
                       <div className="flex items-center gap-2.5">
@@ -323,7 +453,10 @@ export function SelectiveDisclosureModal() {
                           }`}
                         >
                           {isChecked && (
-                            <span aria-hidden="true" className="material-icons text-[12px]! text-primary-foreground">
+                            <span
+                              aria-hidden="true"
+                              className="material-icons text-[12px]! text-primary-foreground"
+                            >
                               check
                             </span>
                           )}
@@ -347,18 +480,60 @@ export function SelectiveDisclosureModal() {
             <button
               type="button"
               disabled={!canGrant}
+              onClick={handleGrant}
               className="flex w-[181px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-[18px] py-3 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <span className="font-mulish text-base font-bold text-primary-foreground">
-                Grant Access
-              </span>
+              {isProcessing ? (
+                <>
+                  <span
+                    aria-hidden="true"
+                    className="material-icons animate-spin text-[16px]! text-primary-foreground motion-reduce:animate-none"
+                  >
+                    sync
+                  </span>
+                  <span className="font-mulish text-base font-bold text-primary-foreground">
+                    {step === "reading-handle"
+                      ? "Reading..."
+                      : "Granting..."}
+                  </span>
+                </>
+              ) : step === "confirmed" ? (
+                <>
+                  <span
+                    aria-hidden="true"
+                    className="material-icons text-[16px]! text-primary-foreground"
+                  >
+                    check_circle
+                  </span>
+                  <span className="font-mulish text-base font-bold text-primary-foreground">
+                    Granted!
+                  </span>
+                </>
+              ) : (
+                <span className="font-mulish text-base font-bold text-primary-foreground">
+                  Grant Access
+                </span>
+              )}
             </button>
+
+            {/* Error message */}
+            {step === "error" && error && (
+              <p
+                className="w-full text-center font-mulish text-sm text-tx-error-text"
+                role="alert"
+              >
+                {error}
+              </p>
+            )}
           </div>
 
           {/* How it works — inside glass card on mobile */}
           <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-lg md:p-3">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
-              <span aria-hidden="true" className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!">
+              <span
+                aria-hidden="true"
+                className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!"
+              >
                 info
               </span>
             </div>
@@ -367,12 +542,37 @@ export function SelectiveDisclosureModal() {
                 How it works
               </p>
               <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
-                Selective disclosure shares a handle or balance at a given moment.
-                The recipient can access data tied to that specific state only.
+                Selective disclosure shares a handle or balance at a given
+                moment. The recipient can access data tied to that specific
+                state only.
               </p>
             </div>
           </div>
         </div>
+
+        {/* Progress tracker */}
+        <DisclosureProgressTracker step={step} />
+
+        {/* Arbiscan link on success */}
+        {step === "confirmed" && txHash && (
+          <div
+            className="flex flex-col items-center gap-1 py-2"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
+              <span className="font-mulish text-sm font-medium text-text-body">
+                Viewer Access Granted
+              </span>
+            </div>
+            <ArbiscanLink
+              txHash={txHash}
+              label="View on Arbiscan"
+              className="text-xs"
+            />
+          </div>
+        )}
 
         {/* Function called (dev mode only) */}
         {devMode && (
@@ -380,7 +580,10 @@ export function SelectiveDisclosureModal() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                  <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
+                  <span
+                    aria-hidden="true"
+                    className="material-icons text-[24px]! text-primary-foreground"
+                  >
                     code
                   </span>
                 </div>
@@ -394,13 +597,16 @@ export function SelectiveDisclosureModal() {
                 className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
                 aria-label="Copy code"
               >
-                <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
+                <span
+                  aria-hidden="true"
+                  className="material-icons text-[18px]! text-text-muted transition-colors"
+                >
                   {copied ? "check" : "content_copy"}
                 </span>
               </button>
             </div>
             <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
-              {ALLOW_CODE}
+              {ADD_VIEWER_CODE}
             </pre>
           </div>
         )}
@@ -447,7 +653,10 @@ export function SelectiveDisclosureModal() {
 
         {/* Security Note */}
         <div className="flex w-full items-start gap-3 rounded-xl bg-modal-bg p-2.5 backdrop-blur-sm">
-          <span aria-hidden="true" className="material-icons shrink-0 text-[24px]! text-tx-pending-text">
+          <span
+            aria-hidden="true"
+            className="material-icons shrink-0 text-[24px]! text-tx-pending-text"
+          >
             info
           </span>
           <div className="flex flex-col gap-1 py-0.5 text-xs md:flex-row md:items-center md:gap-2.5">
@@ -455,7 +664,9 @@ export function SelectiveDisclosureModal() {
               Security Note:
             </span>
             <span className="font-mulish text-text-body">
-              Access is tied to the current handle state at the time of disclosure. Any subsequent transaction that updates the handle invalidates prior access.
+              Access is tied to the current handle state at the time of
+              disclosure. Any subsequent transaction that updates the handle
+              invalidates prior access.
             </span>
           </div>
         </div>
