@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { parseUnits } from "viem";
+import { parseUnits, decodeEventLog } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
@@ -68,26 +68,6 @@ export function useUnwrap(): UseUnwrapResult {
     };
   }, [publicClient]);
 
-  const verifyUnwrapRequest = useCallback(
-    async (cTokenAddress: `0x${string}`, handle: `0x${string}`) => {
-      if (!publicClient) return null;
-      try {
-        const requester = await publicClient.readContract({
-          address: cTokenAddress,
-          abi: confidentialTokenAbi,
-          functionName: "unwrapRequester",
-          args: [handle],
-        });
-        console.log("[useUnwrap] unwrapRequester(%s) =>", handle, requester);
-        return requester;
-      } catch (err) {
-        console.error("[useUnwrap] unwrapRequester call failed:", err);
-        return null;
-      }
-    },
-    [publicClient],
-  );
-
   const executeFinalize = useCallback(
     async (
       cTokenAddress: `0x${string}`,
@@ -100,21 +80,6 @@ export function useUnwrap(): UseUnwrapResult {
 
       const gasOverrides = await estimateGas();
 
-      // Diagnostic: verify the handle is registered before calling finalizeUnwrap
-      const requester = await verifyUnwrapRequest(cTokenAddress, handle);
-      console.log("[useUnwrap] ---- FINALIZE DEBUG ----");
-      console.log("[useUnwrap] handle for finalizeUnwrap:", handle);
-      console.log("[useUnwrap] handle length:", handle.length);
-      console.log("[useUnwrap] clearAmount:", parsedAmount.toString());
-      console.log("[useUnwrap] unwrapRequester result:", requester);
-      console.log("[useUnwrap] requester === address(0)?", requester === "0x0000000000000000000000000000000000000000");
-      console.log("[useUnwrap] ---- END DEBUG ----");
-
-      if (requester === "0x0000000000000000000000000000000000000000") {
-        console.warn("[useUnwrap] Handle NOT registered in _unwrapRequests — finalizeUnwrap will revert!");
-        console.warn("[useUnwrap] The contract likely stores a different handle. Check unwrap tx logs.");
-      }
-
       const finalizeTx = await writeContractAsync({
         address: cTokenAddress,
         abi: confidentialTokenAbi,
@@ -123,14 +88,12 @@ export function useUnwrap(): UseUnwrapResult {
         ...gasOverrides,
       });
 
-      console.log("[useUnwrap] FinalizeUnwrap tx sent:", finalizeTx);
       setFinalizeTxHash(finalizeTx);
       setStep("confirmed");
       invalidateBalances();
       finalizeParamsRef.current = null;
-      console.log("[useUnwrap] Unwrap complete!");
     },
-    [writeContractAsync, estimateGas, verifyUnwrapRequest],
+    [writeContractAsync, estimateGas, invalidateBalances],
   );
 
   const retryFinalize = useCallback(async () => {
@@ -185,15 +148,6 @@ export function useUnwrap(): UseUnwrapResult {
       const parsedAmount = parseUnits(amount, token.decimals);
       const cTokenAddress = token.confidentialAddress as `0x${string}`;
 
-      console.log("[useUnwrap] Starting unwrap flow", {
-        token: token.symbol,
-        amount,
-        parsedAmount: parsedAmount.toString(),
-        decimals: token.decimals,
-        cToken: cTokenAddress,
-        user: address,
-      });
-
       try {
         const gasOverrides = await estimateGas();
 
@@ -202,26 +156,14 @@ export function useUnwrap(): UseUnwrapResult {
         setError(null);
         setIsFinalizeError(false);
 
-        console.log("[useUnwrap] Step 1: Encrypting amount via Gateway");
-
         const { handle, handleProof } = await handleClient.encryptInput(
           parsedAmount,
           "uint256",
           cTokenAddress,
         );
 
-        console.log("[useUnwrap] encryptInput result:", {
-          handle,
-          handleProofLength: handleProof.length,
-        });
-
         // Step 2: Initiate unwrap (from and to = msg.sender)
         setStep("unwrapping");
-
-        console.log("[useUnwrap] Step 2: Initiating unwrap", {
-          from: address,
-          to: address,
-        });
 
         const unwrapTx = await writeContractAsync({
           address: cTokenAddress,
@@ -231,52 +173,51 @@ export function useUnwrap(): UseUnwrapResult {
           ...gasOverrides,
         });
 
-        console.log("[useUnwrap] Unwrap tx sent:", unwrapTx);
         setUnwrapTxHash(unwrapTx);
 
-        // Wait for unwrap tx to be mined before finalizing
-        let finalizeHandle: `0x${string}` = handle;
+        // Step 2b: Extract the contract-generated handle from UnwrapRequested event.
+        // The contract creates a NEW handle via _burn() — it is NOT the encryptInput handle.
+        // See ERC7984ERC20Wrapper._unwrap(): `euint256 unwrapAmount = _burn(from, amount)`
+        if (!publicClient) {
+          throw new Error("Public client not available");
+        }
 
-        if (publicClient) {
-          console.log("[useUnwrap] Waiting for unwrap tx confirmation...");
-          const receipt = await publicClient.waitForTransactionReceipt({
-            hash: unwrapTx,
-          });
-          console.log("[useUnwrap] Unwrap tx confirmed in block", receipt.blockNumber);
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: unwrapTx,
+        });
 
-          // Extract the real handle from cRLC contract logs.
-          // The contract creates an internal handle during unwrap() and stores it
-          // in _unwrapRequests — this is NOT the same as the encryptInput handle.
-          // We scan logs from the cRLC address for a bytes32 data value,
-          // then verify it with unwrapRequester().
-          const cTokenLogs = receipt.logs.filter(
-            (log) => log.address.toLowerCase() === cTokenAddress.toLowerCase() && log.data.length === 66
-          );
+        // Decode the UnwrapRequested event to get the contract's handle
+        let finalizeHandle: `0x${string}` | null = null;
 
-          console.log("[useUnwrap] cRLC logs with bytes32 data:", cTokenLogs.length);
-
-          for (const log of cTokenLogs) {
-            const candidateHandle = log.data as `0x${string}`;
-            const requester = await verifyUnwrapRequest(cTokenAddress, candidateHandle);
-            if (requester && requester !== "0x0000000000000000000000000000000000000000") {
-              console.log("[useUnwrap] Found registered handle in logs:", candidateHandle);
-              console.log("[useUnwrap] Registered for address:", requester);
-              finalizeHandle = candidateHandle;
+        for (const log of receipt.logs) {
+          if (log.address.toLowerCase() !== cTokenAddress.toLowerCase()) continue;
+          try {
+            const decoded = decodeEventLog({
+              abi: confidentialTokenAbi,
+              data: log.data,
+              topics: log.topics,
+            });
+            if (decoded.eventName === "UnwrapRequested") {
+              finalizeHandle = (decoded.args as { amount: `0x${string}` }).amount;
               break;
             }
+          } catch {
+            // Not this event, skip
           }
+        }
 
-          if (finalizeHandle === handle) {
-            console.warn("[useUnwrap] Could not find a different registered handle in logs — using encryptInput handle as fallback");
-          } else {
-            console.log("[useUnwrap] Using handle from contract logs instead of encryptInput handle");
-            console.log("[useUnwrap]   encryptInput handle:", handle);
-            console.log("[useUnwrap]   contract handle:    ", finalizeHandle);
-          }
+        if (!finalizeHandle) {
+          throw new Error(
+            "Could not find UnwrapRequested event in transaction logs — unwrap may have failed silently"
+          );
         }
 
         // Store finalize params in case it fails and needs retry
         finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle, parsedAmount };
+
+        // Brief delay to avoid RPC rate limiting (unwrap confirmation generates
+        // several rapid calls; the public Arbitrum Sepolia RPC throttles bursts)
+        await new Promise((resolve) => setTimeout(resolve, 3000));
 
         // Step 3: Finalize unwrap
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);

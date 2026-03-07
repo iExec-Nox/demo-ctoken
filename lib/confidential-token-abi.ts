@@ -61,12 +61,12 @@ export const confidentialTokenAbi = [
       { name: "amount", type: "uint256" },
     ],
     name: "wrap",
-    outputs: [],
+    outputs: [{ name: "", type: "bytes32" }],
     stateMutability: "nonpayable",
     type: "function",
   },
 
-  // Unwrap step 1: initiate
+  // Unwrap step 1: initiate — returns a NEW handle (different from input)
   {
     inputs: [
       { name: "from", type: "address" },
@@ -75,22 +75,41 @@ export const confidentialTokenAbi = [
       { name: "inputProof", type: "bytes" },
     ],
     name: "unwrap",
-    outputs: [],
+    outputs: [{ name: "", type: "bytes32" }],
     stateMutability: "nonpayable",
     type: "function",
   },
 
-  // Unwrap step 2: finalize
+  // Unwrap step 2: finalize (handle must be the one from UnwrapRequested event)
   {
     inputs: [
-      { name: "handle", type: "bytes32" },
-      { name: "clearAmount", type: "uint256" },
+      { name: "unwrapAmount", type: "bytes32" },
+      { name: "cleartextAmount", type: "uint256" },
       { name: "decryptionProof", type: "bytes" },
     ],
     name: "finalizeUnwrap",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
+  },
+
+  // Events: unwrap lifecycle
+  {
+    inputs: [
+      { name: "receiver", type: "address", indexed: true },
+      { name: "amount", type: "bytes32", indexed: false },
+    ],
+    name: "UnwrapRequested",
+    type: "event",
+  },
+  {
+    inputs: [
+      { name: "receiver", type: "address", indexed: true },
+      { name: "encryptedAmount", type: "bytes32", indexed: false },
+      { name: "cleartextAmount", type: "uint256", indexed: false },
+    ],
+    name: "UnwrapFinalized",
+    type: "event",
   },
 
   // Confidential transfer (always with proof)
