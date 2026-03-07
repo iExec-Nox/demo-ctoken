@@ -15,7 +15,6 @@ import { useWrap, type WrapStep } from "@/hooks/use-wrap";
 import { useUnwrap, type UnwrapStep } from "@/hooks/use-unwrap";
 import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
 import { useHandleClient } from "@/hooks/use-handle-client";
-import { DevModeToggle } from "./dev-mode-toggle";
 import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
 import { ArbiscanLink } from "./arbiscan-link";
 import { useEstimatedFee } from "@/hooks/use-estimated-fee";
@@ -332,9 +331,8 @@ export function WrapModal() {
         className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[40px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[552px]"
         showCloseButton={false}
       >
-        {/* Top bar: Dev mode toggle (left) + Close button (right) */}
-        <div className="flex w-full items-center justify-between">
-          <DevModeToggle label="Dev Mode" />
+        {/* Close button */}
+        <div className="flex w-full items-center justify-end">
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -687,7 +685,7 @@ export function WrapModal() {
             <ArbiscanLink txHash={finalizeTxHash} />
           )}
 
-          {/* Function called (dev mode only) */}
+          {/* Function called */}
           {devMode && (
             <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-6">
               <div className="flex items-center justify-between">

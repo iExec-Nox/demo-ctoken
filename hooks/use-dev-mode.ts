@@ -5,11 +5,12 @@ import { useCallback, useSyncExternalStore } from "react";
 const STORAGE_KEY = "nox-dev-mode";
 
 function getSnapshot(): boolean {
-  return localStorage.getItem(STORAGE_KEY) === "true";
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored === null ? true : stored === "true";
 }
 
 function getServerSnapshot(): boolean {
-  return false;
+  return true;
 }
 
 function subscribe(callback: () => void): () => void {

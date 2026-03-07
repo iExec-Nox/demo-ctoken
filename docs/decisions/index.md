@@ -10,3 +10,4 @@
 | 0006 | [Modale Selective Disclosure avec Context React](./0006-selective-disclosure-modal.md) | 2026-03-01 | Accepté |
 | 0007 | [Page Activity Explorer](./0007-activity-explorer-page.md) | 2026-03-01 | Accepté |
 | 0008 | [Largeur dropdown WalletButton alignee sur le trigger](./0008-wallet-dropdown-match-trigger-width.md) | 2026-03-05 | Accepté |
+| 0011 | [Developer mode enabled by default, toggle removed from modals](./0011-default-devmode-dashboard.md) | 2026-03-07 | Accepté |

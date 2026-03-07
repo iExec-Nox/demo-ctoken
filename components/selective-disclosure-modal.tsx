@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { useSelectiveDisclosureModal } from "./selective-disclosure-modal-provider";
 import { useDevMode } from "@/hooks/use-dev-mode";
-import { DevModeToggle } from "./dev-mode-toggle";
 import { ArbiscanLink } from "./arbiscan-link";
 import { confidentialTokens } from "@/lib/tokens";
 import { useAddViewer, type AddViewerStep } from "@/hooks/use-add-viewer";
@@ -283,9 +282,8 @@ export function SelectiveDisclosureModal() {
         className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-[18px] overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[34px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[784px]"
         showCloseButton={false}
       >
-        {/* Top bar: Dev mode toggle (left) + Close button (right) */}
-        <div className="flex w-full items-center justify-between">
-          <DevModeToggle label="Dev Mode" />
+        {/* Close button */}
+        <div className="flex w-full items-center justify-end">
           <button
             type="button"
             onClick={() => handleOpenChange(false)}
@@ -574,7 +572,7 @@ export function SelectiveDisclosureModal() {
           </div>
         )}
 
-        {/* Function called (dev mode only) */}
+        {/* Function called */}
         {devMode && (
           <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-10">
             <div className="flex items-center justify-between">
