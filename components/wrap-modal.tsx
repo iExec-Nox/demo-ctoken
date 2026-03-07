@@ -18,6 +18,7 @@ import { useHandleClient } from "@/hooks/use-handle-client";
 import { DevModeToggle } from "./dev-mode-toggle";
 import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
 import { ArbiscanLink } from "./arbiscan-link";
+import { useEstimatedFee } from "@/hooks/use-estimated-fee";
 import { formatUnits } from "viem";
 
 const WRAP_CODE = `function wrap(address to, uint256 amount) public virtual override returns (euint256) {
@@ -166,6 +167,8 @@ export function WrapModal() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const isWrap = activeTab === "wrap";
+  // Gas limits: wrap (approve + wrap) ~150k, unwrap (encrypt + unwrap + finalize) ~300k
+  const { fee: estimatedFee } = useEstimatedFee(isWrap ? 150_000n : 300_000n);
   const isWrapProcessing = wrapStep === "approving" || wrapStep === "wrapping";
   const isUnwrapProcessing = unwrapStep === "encrypting" || unwrapStep === "unwrapping" || unwrapStep === "finalizing";
   const isProcessing = isWrap ? isWrapProcessing : isUnwrapProcessing;
@@ -575,7 +578,7 @@ export function WrapModal() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-muted">Estimated Gas Fee</span>
-                <span className="font-mulish text-text-body">~0.0001 ETH</span>
+                <span className="font-mulish text-text-body">{estimatedFee ?? "..."} ETH</span>
               </div>
             </div>
 

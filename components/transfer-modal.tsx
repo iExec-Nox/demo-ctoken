@@ -15,6 +15,7 @@ import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { DevModeToggle } from "./dev-mode-toggle";
 import { ArbiscanLink } from "./arbiscan-link";
+import { useEstimatedFee } from "@/hooks/use-estimated-fee";
 import { confidentialTokens, wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
 import { formatUnits } from "viem";
 
@@ -114,6 +115,7 @@ export function TransferModal() {
   const { open, setOpen } = useTransferModal();
   const { enabled: devMode } = useDevMode();
   const { step, error, txHash, transfer, reset } = useConfidentialTransfer();
+  const { fee: estimatedFee } = useEstimatedFee(200_000n);
   const { balances: confidentialBalances } = useConfidentialBalances();
   const { handleClient } = useHandleClient();
   const [decryptedAmounts, setDecryptedAmounts] = useState<Record<string, string>>({});
@@ -510,8 +512,7 @@ export function TransferModal() {
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Network Fee</span>
                 <span className="font-mulish text-[10px] font-medium text-text-heading md:text-sm">
-                  {/* TODO: replace with dynamic fee via useGasPrice() */}
-                  ~0.0004 ETH
+                  {estimatedFee ?? "..."} ETH
                 </span>
               </div>
             </div>
