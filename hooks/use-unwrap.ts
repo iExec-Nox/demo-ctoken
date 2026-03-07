@@ -215,10 +215,6 @@ export function useUnwrap(): UseUnwrapResult {
         // Store finalize params in case it fails and needs retry
         finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle, parsedAmount };
 
-        // Brief delay to avoid RPC rate limiting (unwrap confirmation generates
-        // several rapid calls; the public Arbitrum Sepolia RPC throttles bursts)
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-
         // Step 3: Finalize unwrap
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);
       } catch (err) {

@@ -116,6 +116,8 @@ export function useAddViewer(): UseAddViewerResult {
             ...gasOverrides,
           });
 
+          // Wait for tx to be mined before sending the next one
+          await publicClient.waitForTransactionReceipt({ hash: tx });
           lastTxHash = tx;
         }
 

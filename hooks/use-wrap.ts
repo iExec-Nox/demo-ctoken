@@ -65,22 +65,16 @@ export function useWrap(): UseWrapResult {
       });
 
       try {
-        // Fetch current EIP-1559 fees from the network and add a 20% buffer.
-        // The user never pays maxFeePerGas — it's a ceiling. Actual cost = baseFee + priorityFee.
-        // The buffer prevents "maxFeePerGas < baseFee" errors when baseFee fluctuates between blocks.
-        let gasOverrides: { maxFeePerGas?: bigint; maxPriorityFeePerGas?: bigint } = {};
-        if (publicClient) {
+        // Helper: fetch fresh EIP-1559 fees with a 20% buffer.
+        // MetaMask under-estimates gas on Arbitrum Sepolia, so we must override.
+        const freshGas = async () => {
+          if (!publicClient) return {};
           const fees = await publicClient.estimateFeesPerGas();
-          const maxFeePerGas = (fees.maxFeePerGas * 120n) / 100n;
-          const maxPriorityFeePerGas = (fees.maxPriorityFeePerGas * 120n) / 100n;
-          gasOverrides = { maxFeePerGas, maxPriorityFeePerGas };
-          console.log("[useWrap] Gas fees (network + 20% buffer)", {
-            networkMaxFee: fees.maxFeePerGas.toString(),
-            networkPriorityFee: fees.maxPriorityFeePerGas.toString(),
-            appliedMaxFee: maxFeePerGas.toString(),
-            appliedPriorityFee: maxPriorityFeePerGas.toString(),
-          });
-        }
+          return {
+            maxFeePerGas: (fees.maxFeePerGas * 120n) / 100n,
+            maxPriorityFeePerGas: (fees.maxPriorityFeePerGas * 120n) / 100n,
+          };
+        };
 
         // Step 1: Approve exact amount on ERC-20
         setStep("approving");
@@ -96,17 +90,17 @@ export function useWrap(): UseWrapResult {
           abi: erc20Abi,
           functionName: "approve",
           args: [cTokenAddress, parsedAmount],
-          ...gasOverrides,
+          ...(await freshGas()),
         });
 
         console.log("[useWrap] Approve tx sent:", approveTx);
         setApproveTxHash(approveTx);
 
-        // Brief delay to avoid RPC rate limiting (the public Arbitrum Sepolia
-        // RPC throttles bursts of rapid contract calls)
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        // Wait for approve to be mined before calling wrap — the on-chain
+        // allowance must be effective for the wrap to succeed
+        await publicClient!.waitForTransactionReceipt({ hash: approveTx });
 
-        // Step 2: Wrap on cToken contract
+        // Step 2: Wrap on cToken contract (re-estimate gas fresh)
         setStep("wrapping");
 
         console.log("[useWrap] Step 2: Wrapping", {
@@ -119,7 +113,7 @@ export function useWrap(): UseWrapResult {
           abi: confidentialTokenAbi,
           functionName: "wrap",
           args: [address, parsedAmount],
-          ...gasOverrides,
+          ...(await freshGas()),
         });
 
         console.log("[useWrap] Wrap tx sent:", wrapTx);
