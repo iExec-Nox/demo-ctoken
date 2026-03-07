@@ -212,8 +212,8 @@ export function TransferModal() {
           cBalance.decimals,
         );
         setDecryptedAmounts((prev) => ({ ...prev, [cSymbol]: formatted }));
-      } catch (err) {
-        console.error("[TransferModal] Decrypt error:", err);
+      } catch {
+        // Decrypt failed silently — user can retry
       } finally {
         setDecryptingSymbol(null);
       }

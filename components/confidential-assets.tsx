@@ -90,23 +90,14 @@ function ConfidentialTokenRow({
     if (!handleClient || decryptState !== "hidden") return;
 
     setDecryptState("decrypting");
-    console.log("[decrypt] Starting decrypt for", token.symbol, {
-      handle: token.handle,
-    });
 
     try {
-      const { value, solidityType } = await handleClient.decrypt(token.handle);
-      console.log("[decrypt] Success:", {
-        value: String(value),
-        solidityType,
-        decimals: token.decimals,
-      });
+      const { value } = await handleClient.decrypt(token.handle);
 
       const formatted = formatUnits(typeof value === "bigint" ? value : BigInt(String(value)), token.decimals);
       setDecryptedAmount(formatted);
       setDecryptState("revealed");
-    } catch (err) {
-      console.error("[decrypt] Error:", err);
+    } catch {
       setDecryptState("hidden");
     }
   }, [handleClient, decryptState, token]);

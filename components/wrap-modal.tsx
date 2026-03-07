@@ -266,8 +266,8 @@ export function WrapModal() {
           cBalance.decimals,
         );
         setDecryptedAmounts((prev) => ({ ...prev, [symbol]: formatted }));
-      } catch (err) {
-        console.error("[WrapModal] Decrypt error:", err);
+      } catch {
+        // Decrypt failed silently — user can retry
       } finally {
         setDecryptingSymbol(null);
       }
