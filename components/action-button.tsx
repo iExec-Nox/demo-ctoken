@@ -52,6 +52,7 @@ export function ActionButton({
       <div
         className="flex w-full items-center gap-4 rounded-2xl border border-surface-border bg-surface p-4 cursor-not-allowed opacity-30"
         role="button"
+        tabIndex={-1}
         aria-disabled="true"
         aria-label={`${label} — ${description}`}
       >
