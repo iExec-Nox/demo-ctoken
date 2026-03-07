@@ -102,6 +102,10 @@ export function useWrap(): UseWrapResult {
         console.log("[useWrap] Approve tx sent:", approveTx);
         setApproveTxHash(approveTx);
 
+        // Brief delay to avoid RPC rate limiting (the public Arbitrum Sepolia
+        // RPC throttles bursts of rapid contract calls)
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
         // Step 2: Wrap on cToken contract
         setStep("wrapping");
 
