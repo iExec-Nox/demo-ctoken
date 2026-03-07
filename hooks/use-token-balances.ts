@@ -78,10 +78,7 @@ export function useTokenBalances() {
     return result;
   }, [nativeBalance, erc20Results]);
 
-  const hasAnyBalance = useMemo(
-    () => balances.some((b) => b.balance > 0n),
-    [balances]
-  );
+  const hasAnyBalance = balances.some((b) => b.balance > 0n);
 
   const isLoading = !isReady || isReconnecting || isNativeLoading || isErc20Loading;
 

@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { parseUnits, decodeEventLog } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
+import { estimateGasOverrides } from "@/lib/gas";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import type { TokenConfig } from "@/lib/tokens";
@@ -59,15 +60,6 @@ export function useUnwrap(): UseUnwrapResult {
     finalizeParamsRef.current = null;
   }, []);
 
-  const estimateGas = useCallback(async () => {
-    if (!publicClient) return {};
-    const fees = await publicClient.estimateFeesPerGas();
-    return {
-      maxFeePerGas: (fees.maxFeePerGas * 120n) / 100n,
-      maxPriorityFeePerGas: (fees.maxPriorityFeePerGas * 120n) / 100n,
-    };
-  }, [publicClient]);
-
   const executeFinalize = useCallback(
     async (
       cTokenAddress: `0x${string}`,
@@ -78,7 +70,7 @@ export function useUnwrap(): UseUnwrapResult {
       setError(null);
       setIsFinalizeError(false);
 
-      const gasOverrides = await estimateGas();
+      const gasOverrides = await estimateGasOverrides(publicClient);
 
       const finalizeTx = await writeContractAsync({
         address: cTokenAddress,
@@ -94,7 +86,7 @@ export function useUnwrap(): UseUnwrapResult {
       invalidateBalances();
       finalizeParamsRef.current = null;
     },
-    [writeContractAsync, estimateGas, invalidateBalances],
+    [writeContractAsync, publicClient, invalidateBalances],
   );
 
   const retryFinalize = useCallback(async () => {
@@ -119,7 +111,6 @@ export function useUnwrap(): UseUnwrapResult {
           ? message.slice(0, 200) + "..."
           : message;
 
-      console.error("[useUnwrap] Retry finalize error:", err);
       setError(displayMessage);
       setStep("error");
       setIsFinalizeError(true);
@@ -150,7 +141,7 @@ export function useUnwrap(): UseUnwrapResult {
       const cTokenAddress = token.confidentialAddress as `0x${string}`;
 
       try {
-        const gasOverrides = await estimateGas();
+        const gasOverrides = await estimateGasOverrides(publicClient);
 
         // Step 1: Encrypt the amount via Handle Gateway
         setStep("encrypting");
@@ -233,14 +224,13 @@ export function useUnwrap(): UseUnwrapResult {
             ? message.slice(0, 200) + "..."
             : message;
 
-        console.error("[useUnwrap] Error:", err);
         setError(displayMessage);
         setStep("error");
         // If unwrap tx was sent but finalize failed, flag it
         setIsFinalizeError(finalizeParamsRef.current !== null);
       }
     },
-    [address, handleClient, writeContractAsync, publicClient, estimateGas, executeFinalize],
+    [address, handleClient, writeContractAsync, publicClient, executeFinalize],
   );
 
   return {

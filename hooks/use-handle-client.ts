@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { useWalletClient } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { createViemHandleClient, type HandleClient } from "@iexec-nox/handle";
@@ -19,10 +18,9 @@ export function useHandleClient() {
     retry: false,
   });
 
-  const errorMessage = useMemo(
-    () => (error ? (error instanceof Error ? error.message : String(error)) : null),
-    [error],
-  );
+  const errorMessage = error
+    ? (error instanceof Error ? error.message : String(error))
+    : null;
 
   return { handleClient, error: errorMessage };
 }

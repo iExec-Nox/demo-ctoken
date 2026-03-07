@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
+import { estimateGasOverrides } from "@/lib/gas";
 import {
   noxComputeAbi,
   NOX_COMPUTE_ADDRESS,
@@ -61,12 +62,7 @@ export function useAddViewer(): UseAddViewerResult {
       const viewer = viewerAddress as `0x${string}`;
 
       try {
-        // Gas overrides with 20% buffer
-        const fees = await publicClient.estimateFeesPerGas();
-        const gasOverrides = {
-          maxFeePerGas: (fees.maxFeePerGas * 120n) / 100n,
-          maxPriorityFeePerGas: (fees.maxPriorityFeePerGas * 120n) / 100n,
-        };
+        const gasOverrides = await estimateGasOverrides(publicClient);
 
         // Step 1: Read balance handles for each selected token
         setStep("reading-handle");
@@ -138,7 +134,6 @@ export function useAddViewer(): UseAddViewerResult {
             ? message.slice(0, 200) + "..."
             : message;
 
-        console.error("[useAddViewer] Error:", err);
         setError(displayMessage);
         setStep("error");
       }
