@@ -1,11 +1,23 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useConnectWallet } from "@/hooks/use-connect-wallet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export function HeroSection() {
   const { connect } = useConnectWallet();
+  const { isConnected } = useAppKitAccount();
+  const router = useRouter();
+
+  function handleTryItNow() {
+    if (isConnected) {
+      router.push("/dashboard");
+    } else {
+      connect();
+    }
+  }
 
   return (
     <section className="flex w-full flex-col items-center gap-5 px-10 py-10 md:gap-10 md:px-20 md:py-[60px] lg:px-40 lg:py-16">
@@ -21,7 +33,7 @@ export function HeroSection() {
       </p>
       <div className="flex w-full items-start justify-center gap-5">
         <Button
-          onClick={connect}
+          onClick={handleTryItNow}
           className="h-auto rounded-xl bg-primary px-2.5 py-2 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover md:px-[18px] md:py-3 md:text-base"
         >
           <span aria-hidden="true" className="material-icons text-base! leading-7 md:text-xl!">account_balance_wallet</span>
