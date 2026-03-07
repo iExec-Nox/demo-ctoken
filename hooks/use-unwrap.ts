@@ -84,6 +84,7 @@ export function useUnwrap(): UseUnwrapResult {
         address: cTokenAddress,
         abi: confidentialTokenAbi,
         functionName: "finalizeUnwrap",
+        // TODO: replace mock proof with real decryption proof from NoxCompute
         args: [handle, parsedAmount, "0x00"],
         ...gasOverrides,
       });

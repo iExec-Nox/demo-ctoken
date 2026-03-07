@@ -510,6 +510,7 @@ export function TransferModal() {
               <div className="flex items-center justify-between">
                 <span className="font-mulish text-text-body">Network Fee</span>
                 <span className="font-mulish text-[10px] font-medium text-text-heading md:text-sm">
+                  {/* TODO: replace with dynamic fee via useGasPrice() */}
                   ~0.0004 ETH
                 </span>
               </div>
