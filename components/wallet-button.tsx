@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useDisconnect } from "wagmi";
 import { useConnectWallet } from "@/hooks/use-connect-wallet";
@@ -21,6 +21,8 @@ export function WalletButton() {
   const { address, isConnected } = useAppKitAccount();
   const { disconnect } = useDisconnect();
   const router = useRouter();
+  const pathname = usePathname();
+  const isDashboard = pathname.startsWith("/dashboard");
 
   function handleCopyAddress() {
     if (address) navigator.clipboard.writeText(address);
@@ -44,13 +46,15 @@ export function WalletButton() {
           align="end"
           className="w-[150px] rounded-[7px] bg-dropdown-bg p-[10px]"
         >
-          <DropdownMenuItem
-            onClick={() => router.push("/dashboard")}
-            className="cursor-pointer gap-2 font-mulish text-xs font-semibold leading-5 text-dropdown-link"
-          >
-            <span aria-hidden="true" className="material-icons text-[14px]!">dashboard</span>
-            Dashboard
-          </DropdownMenuItem>
+          {!isDashboard && (
+            <DropdownMenuItem
+              onClick={() => router.push("/dashboard")}
+              className="cursor-pointer gap-2 font-mulish text-xs font-semibold leading-5 text-dropdown-link"
+            >
+              <span aria-hidden="true" className="material-icons text-[14px]!">dashboard</span>
+              Dashboard
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onClick={handleCopyAddress}
             className="cursor-pointer gap-2 font-mulish text-xs font-semibold leading-5 text-dropdown-link"
