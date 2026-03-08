@@ -1,6 +1,6 @@
-import { Topbar } from "@/components/topbar";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { Topbar } from "@/components/layout/topbar";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 
 export default function LandingLayout({
   children,

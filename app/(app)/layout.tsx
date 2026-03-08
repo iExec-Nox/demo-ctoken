@@ -1,5 +1,5 @@
-import { DashboardHeader } from "@/components/dashboard-header";
-import { Footer } from "@/components/footer";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { Footer } from "@/components/layout/footer";
 
 export default function AppLayout({
   children,

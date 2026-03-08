@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Logo } from "@/components/logo";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { WalletButton } from "@/components/wallet-button";
-import { DevModeToggle } from "@/components/dev-mode-toggle";
+import { Logo } from "@/components/shared/logo";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { WalletButton } from "@/components/shared/wallet-button";
+import { DevModeToggle } from "@/components/shared/dev-mode-toggle";
 import { Button } from "@/components/ui/button";
-import { MobileMenu } from "@/components/mobile-menu";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
-import { useFaucetModal } from "@/components/faucet-modal-provider";
+import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
 
 const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },

@@ -9,10 +9,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { DevModeToggle } from "@/components/dev-mode-toggle";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { DevModeToggle } from "@/components/shared/dev-mode-toggle";
 import { Button } from "@/components/ui/button";
-import { useFaucetModal } from "@/components/faucet-modal-provider";
+import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
 import { useState } from "react";
 
 const NAV_LINKS = [

@@ -14,13 +14,13 @@ import { useDevMode } from "@/hooks/use-dev-mode";
 import { useWrap } from "@/hooks/use-wrap";
 import { useUnwrap } from "@/hooks/use-unwrap";
 import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
-import { ArbiscanLink } from "./arbiscan-link";
+import { ArbiscanLink } from "@/components/shared/arbiscan-link";
 import { useEstimatedFee } from "@/hooks/use-estimated-fee";
 import { useDecryptBalance } from "@/hooks/use-decrypt-balance";
 import { useDropdown } from "@/hooks/use-dropdown";
-import { ProgressTracker, type ProgressStep } from "./step-indicator";
-import { CodeSection } from "./code-section";
-import { InfoCard } from "./info-card";
+import { ProgressTracker, type ProgressStep } from "@/components/shared/step-indicator";
+import { CodeSection } from "@/components/shared/code-section";
+import { InfoCard } from "@/components/shared/info-card";
 
 const WRAP_CODE = `function wrap(address to, uint256 amount) public virtual override returns (euint256) {
     // take ownership of the underlying tokens
