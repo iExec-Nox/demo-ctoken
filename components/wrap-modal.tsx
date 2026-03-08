@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -11,14 +11,16 @@ import {
 import { useWrapModal } from "./wrap-modal-provider";
 import { useTokenBalances } from "@/hooks/use-token-balances";
 import { useDevMode } from "@/hooks/use-dev-mode";
-import { useWrap, type WrapStep } from "@/hooks/use-wrap";
-import { useUnwrap, type UnwrapStep } from "@/hooks/use-unwrap";
-import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
-import { useHandleClient } from "@/hooks/use-handle-client";
+import { useWrap } from "@/hooks/use-wrap";
+import { useUnwrap } from "@/hooks/use-unwrap";
 import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
 import { ArbiscanLink } from "./arbiscan-link";
 import { useEstimatedFee } from "@/hooks/use-estimated-fee";
-import { formatUnits } from "viem";
+import { useDecryptBalance } from "@/hooks/use-decrypt-balance";
+import { useDropdown } from "@/hooks/use-dropdown";
+import { ProgressTracker, type ProgressStep } from "./step-indicator";
+import { CodeSection } from "./code-section";
+import { InfoCard } from "./info-card";
 
 const WRAP_CODE = `function wrap(address to, uint256 amount) public virtual override returns (euint256) {
     // take ownership of the underlying tokens
@@ -43,112 +45,18 @@ function finalizeUnwrap(
     bytes decryptionProof
 ) external;`;
 
-function WrapProgressTracker({ step }: { step: WrapStep }) {
-  const approveState =
-    step === "approving"
-      ? "active"
-      : step === "wrapping" || step === "confirmed"
-        ? "done"
-        : step === "error"
-          ? "pending"
-          : "pending";
+const WRAP_STEPS: ProgressStep[] = [
+  { key: "approving", icon: "check_circle", label: "Approve" },
+  { key: "wrapping", icon: "sync", label: "Wrap" },
+  { key: "confirmed", icon: "verified", label: "Confirmed" },
+];
 
-  const wrapState =
-    step === "wrapping"
-      ? "active"
-      : step === "confirmed"
-        ? "done"
-        : "pending";
-
-  const confirmedState = step === "confirmed" ? "done" : "pending";
-
-  return (
-    <div
-      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
-      role="status"
-      aria-live="polite"
-    >
-      <StepIndicator state={approveState} icon="check_circle" label="Approve" />
-      <StepIndicator state={wrapState} icon="sync" label="Wrap" />
-      <StepIndicator state={confirmedState} icon="verified" label="Confirmed" />
-    </div>
-  );
-}
-
-function UnwrapProgressTracker({ step }: { step: UnwrapStep }) {
-  const STEPS: UnwrapStep[] = ["encrypting", "unwrapping", "finalizing", "confirmed"];
-
-  function stateFor(target: UnwrapStep): "pending" | "active" | "done" {
-    if (step === "idle" || step === "error") return "pending";
-    const current = STEPS.indexOf(step);
-    const idx = STEPS.indexOf(target);
-    if (current > idx) return "done";
-    if (current === idx) return target === "confirmed" ? "done" : "active";
-    return "pending";
-  }
-
-  return (
-    <div
-      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
-      role="status"
-      aria-live="polite"
-    >
-      <StepIndicator state={stateFor("encrypting")} icon="lock" label="Encrypt" />
-      <StepIndicator state={stateFor("unwrapping")} icon="sync" label="Unwrap" />
-      <StepIndicator state={stateFor("finalizing")} icon="check_circle" label="Finalize" />
-      <StepIndicator state={stateFor("confirmed")} icon="verified" label="Confirmed" />
-    </div>
-  );
-}
-
-function StepIndicator({
-  state,
-  icon,
-  label,
-}: {
-  state: "pending" | "active" | "done";
-  icon: string;
-  label: string;
-}) {
-  const barColor =
-    state === "done"
-      ? "bg-tx-success-text"
-      : state === "active"
-        ? "bg-primary"
-        : "bg-surface-border";
-  const barWidth = state === "done" ? "w-full" : state === "active" ? "w-1/2" : "w-0";
-  const iconColor =
-    state === "done"
-      ? "text-tx-success-text"
-      : state === "active"
-        ? "text-primary"
-        : "text-text-muted";
-  const textColor = iconColor;
-  const displayIcon = state === "done" ? "check_circle" : icon;
-
-  return (
-    <div className="w-[136px] md:w-auto md:flex-1">
-      <div className="h-1 w-full rounded-full bg-surface-border">
-        <div
-          className={`h-1 rounded-full transition-all duration-500 ${barColor} ${barWidth}`}
-        />
-      </div>
-      <div className="mt-2 flex items-center justify-center gap-1">
-        <span
-          aria-hidden="true"
-          className={`material-icons text-[16px]! ${iconColor} ${state === "active" ? "animate-spin motion-reduce:animate-none" : ""}`}
-        >
-          {displayIcon}
-        </span>
-        <span
-          className={`font-mulish text-[10px] font-bold tracking-[1px] ${textColor}`}
-        >
-          {label}
-        </span>
-      </div>
-    </div>
-  );
-}
+const UNWRAP_STEPS: ProgressStep[] = [
+  { key: "encrypting", icon: "lock", label: "Encrypt" },
+  { key: "unwrapping", icon: "sync", label: "Unwrap" },
+  { key: "finalizing", icon: "check_circle", label: "Finalize" },
+  { key: "confirmed", icon: "verified", label: "Confirmed" },
+];
 
 export function WrapModal() {
   const { open, setOpen, activeTab, setActiveTab } = useWrapModal();
@@ -156,15 +64,11 @@ export function WrapModal() {
   const { enabled: devMode } = useDevMode();
   const { step: wrapStep, error: wrapError, wrapTxHash, wrap, reset: resetWrap } = useWrap();
   const { step: unwrapStep, error: unwrapError, isFinalizeError, finalizeTxHash, unwrap, retryFinalize, reset: resetUnwrap } = useUnwrap();
-  const { balances: confidentialBalances } = useConfidentialBalances();
-  const { handleClient } = useHandleClient();
-  const [decryptedAmounts, setDecryptedAmounts] = useState<Record<string, string>>({});
-  const [decryptingSymbol, setDecryptingSymbol] = useState<string | null>(null);
+  const { decryptedAmounts, decryptingSymbol, decrypt: handleDecryptBalance, getConfidentialDisplay } = useDecryptBalance();
+  const { open: dropdownOpen, setOpen: setDropdownOpen, triggerRef, contentRef: dropdownRef } = useDropdown();
   const [selectedSymbol, setSelectedSymbol] = useState("RLC");
+  const cSelectedSymbol = `c${selectedSymbol}`;
   const [amount, setAmount] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
   const isWrap = activeTab === "wrap";
   // Gas limits: wrap (approve + wrap) ~150k, unwrap (encrypt + unwrap + finalize) ~300k
   const { fee: estimatedFee } = useEstimatedFee(isWrap ? 150_000n : 300_000n);
@@ -195,36 +99,8 @@ export function WrapModal() {
       resetWrap();
       resetUnwrap();
     }
-  }, [open, activeTab, resetWrap, resetUnwrap]);
+  }, [open, activeTab, resetWrap, resetUnwrap, setDropdownOpen]);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleMouseDown(e: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [dropdownOpen]);
-
-  // Close dropdown on Escape
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [dropdownOpen]);
 
   const handleAmountChange = useCallback(
     (value: string) => {
@@ -240,52 +116,16 @@ export function WrapModal() {
     if (isWrap) {
       if (selectedToken) setAmount(selectedToken.formatted);
     } else {
-      const decrypted = decryptedAmounts[selectedSymbol];
+      const decrypted = decryptedAmounts[cSelectedSymbol];
       if (decrypted) setAmount(decrypted);
     }
-  }, [isWrap, selectedToken, decryptedAmounts, selectedSymbol]);
+  }, [isWrap, selectedToken, decryptedAmounts, cSelectedSymbol]);
 
   const handleSelectToken = useCallback((symbol: string) => {
     setSelectedSymbol(symbol);
     setAmount("");
     setDropdownOpen(false);
-  }, []);
-
-  // Decrypt a confidential balance inline
-  const handleDecryptBalance = useCallback(
-    async (symbol: string) => {
-      if (!handleClient || decryptingSymbol) return;
-      const cBalance = confidentialBalances.find((b) => b.symbol === `c${symbol}`);
-      if (!cBalance || !cBalance.isInitialized) return;
-
-      setDecryptingSymbol(symbol);
-      try {
-        const { value } = await handleClient.decrypt(cBalance.handle);
-        const formatted = formatUnits(
-          typeof value === "bigint" ? value : BigInt(String(value)),
-          cBalance.decimals,
-        );
-        setDecryptedAmounts((prev) => ({ ...prev, [symbol]: formatted }));
-      } catch {
-        // Decrypt failed silently — user can retry
-      } finally {
-        setDecryptingSymbol(null);
-      }
-    },
-    [handleClient, decryptingSymbol, confidentialBalances],
-  );
-
-  // Get the confidential balance display for a token (unwrap mode)
-  const getConfidentialDisplay = useCallback(
-    (symbol: string) => {
-      const decrypted = decryptedAmounts[symbol];
-      if (decrypted !== undefined) return decrypted;
-      const cBalance = confidentialBalances.find((b) => b.symbol === `c${symbol}`);
-      if (!cBalance?.isInitialized) return "0";
-      return null; // null = encrypted, needs decrypt
-    },
-    [decryptedAmounts, confidentialBalances],
-  );
+  }, [setDropdownOpen]);
 
   // Find the original token config for the wrap hook
   const selectedTokenConfig = wrappableTokenConfigs.find(
@@ -304,24 +144,14 @@ export function WrapModal() {
 
   // Validation
   const parsedAmount = parseFloat(amount) || 0;
-  const hasDecryptedBalance = !isWrap && decryptedAmounts[selectedSymbol] !== undefined;
+  const hasDecryptedBalance = !isWrap && decryptedAmounts[cSelectedSymbol] !== undefined;
   const maxAmountStr = isWrap
     ? (selectedToken?.formatted ?? "0")
-    : (decryptedAmounts[selectedSymbol] ?? "0");
+    : (decryptedAmounts[cSelectedSymbol] ?? "0");
   const maxAmount = parseFloat(maxAmountStr) || 0;
   // Only check over-balance if we know the balance (wrap always, unwrap only if decrypted)
   const isOverBalance = (isWrap || hasDecryptedBalance) && parsedAmount > maxAmount;
   const isValidAmount = parsedAmount > 0 && !isOverBalance;
-
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyCode = useCallback(() => {
-    const code = activeTab === "wrap" ? WRAP_CODE : UNWRAP_CODE;
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [activeTab]);
 
   const cTokenSymbol = `c${selectedToken?.symbol ?? "USDC"}`;
 
@@ -399,17 +229,17 @@ export function WrapModal() {
                 ) : (
                   <span className="flex items-center gap-1 text-text-heading">
                     {(() => {
-                      const display = getConfidentialDisplay(selectedSymbol);
+                      const display = getConfidentialDisplay(cSelectedSymbol);
                       if (display === null) {
                         return (
                           <>
                             <span>****** {cTokenSymbol}</span>
-                            {decryptingSymbol === selectedSymbol ? (
+                            {decryptingSymbol === cSelectedSymbol ? (
                               <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
                             ) : (
                               <button
                                 type="button"
-                                onClick={() => handleDecryptBalance(selectedSymbol)}
+                                onClick={() => handleDecryptBalance(cSelectedSymbol)}
                                 className="cursor-pointer transition-opacity hover:opacity-70"
                                 aria-label="Reveal balance"
                               >
@@ -434,7 +264,7 @@ export function WrapModal() {
                   <button
                     ref={triggerRef}
                     type="button"
-                    onClick={() => setDropdownOpen((prev) => !prev)}
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex cursor-pointer items-center gap-1.5 rounded-full border border-surface-border bg-surface px-3 py-1.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
@@ -467,7 +297,8 @@ export function WrapModal() {
                       }`}
                     >
                       {wrappableTokens.map((token) => {
-                        const confidentialDisplay = getConfidentialDisplay(token.symbol);
+                        const cSymbol = `c${token.symbol}`;
+                        const confidentialDisplay = getConfidentialDisplay(cSymbol);
                         return (
                           <button
                             key={token.symbol}
@@ -485,7 +316,7 @@ export function WrapModal() {
                               className="size-5"
                             />
                             <span className="font-mulish text-sm font-bold text-text-heading">
-                              {isWrap ? token.symbol : `c${token.symbol}`}
+                              {isWrap ? token.symbol : cSymbol}
                             </span>
                             {isWrap ? (
                               <span className="ml-auto font-mulish text-xs text-text-body">
@@ -496,7 +327,7 @@ export function WrapModal() {
                                 {confidentialDisplay === null ? (
                                   <>
                                     <span>******</span>
-                                    {decryptingSymbol === token.symbol ? (
+                                    {decryptingSymbol === cSymbol ? (
                                       <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
                                     ) : (
                                       <span
@@ -504,13 +335,13 @@ export function WrapModal() {
                                         tabIndex={0}
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          handleDecryptBalance(token.symbol);
+                                          handleDecryptBalance(cSymbol);
                                         }}
                                         onKeyDown={(e) => {
                                           if (e.key === "Enter" || e.key === " ") {
                                             e.stopPropagation();
                                             e.preventDefault();
-                                            handleDecryptBalance(token.symbol);
+                                            handleDecryptBalance(cSymbol);
                                           }
                                         }}
                                         className="cursor-pointer transition-opacity hover:opacity-70"
@@ -653,29 +484,18 @@ export function WrapModal() {
             </button>
 
             {/* How it works */}
-            <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-sm md:p-6">
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
-                <span aria-hidden="true" className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!">
-                  info
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-mulish text-sm font-bold text-text-heading">How it works</p>
-                <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
-                  {isWrap
-                    ? "Wrapping moves your tokens from the public Arbitrum ledger into Confidential Token's private vault. Once wrapped, your balance and transfers are only visible to you."
-                    : "Unwrapping moves your confidential tokens back to the public Arbitrum ledger. Once unwrapped, your balance and transfers are visible on-chain."}
-                </p>
-              </div>
-            </div>
+            <InfoCard>
+              {isWrap
+                ? "Wrapping moves your tokens from the public Arbitrum ledger into Confidential Token's private vault. Once wrapped, your balance and transfers are only visible to you."
+                : "Unwrapping moves your confidential tokens back to the public Arbitrum ledger. Once unwrapped, your balance and transfers are visible on-chain."}
+            </InfoCard>
           </div>
 
           {/* Progress tracker */}
-          {isWrap ? (
-            <WrapProgressTracker step={wrapStep} />
-          ) : (
-            <UnwrapProgressTracker step={unwrapStep} />
-          )}
+          <ProgressTracker
+            currentStep={isWrap ? wrapStep : unwrapStep}
+            steps={isWrap ? WRAP_STEPS : UNWRAP_STEPS}
+          />
 
           {/* Arbiscan link on success */}
           {isWrap && wrapStep === "confirmed" && wrapTxHash && (
@@ -687,33 +507,7 @@ export function WrapModal() {
 
           {/* Function called */}
           {devMode && (
-            <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                    <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
-                      code
-                    </span>
-                  </div>
-                  <span className="font-mulish text-sm font-bold text-text-heading">
-                    Function called
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCopyCode}
-                  className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
-                  aria-label="Copy code"
-                >
-                  <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
-                    {copied ? "check" : "content_copy"}
-                  </span>
-                </button>
-              </div>
-              <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
-                {isWrap ? WRAP_CODE : UNWRAP_CODE}
-              </pre>
-            </div>
+            <CodeSection code={isWrap ? WRAP_CODE : UNWRAP_CODE} />
           )}
         </div>
 

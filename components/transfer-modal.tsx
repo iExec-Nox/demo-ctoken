@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -10,13 +10,17 @@ import {
 } from "@/components/ui/dialog";
 import { useTransferModal } from "./transfer-modal-provider";
 import { useDevMode } from "@/hooks/use-dev-mode";
-import { useConfidentialTransfer, type TransferStep } from "@/hooks/use-confidential-transfer";
-import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
-import { useHandleClient } from "@/hooks/use-handle-client";
-import { ArbiscanLink } from "./arbiscan-link";
+import { useConfidentialTransfer } from "@/hooks/use-confidential-transfer";
 import { useEstimatedFee } from "@/hooks/use-estimated-fee";
+import { useDecryptBalance } from "@/hooks/use-decrypt-balance";
+import { useDropdown } from "@/hooks/use-dropdown";
+import { ProgressTracker, type ProgressStep } from "./step-indicator";
+import { CodeSection } from "./code-section";
+import { InfoCard } from "./info-card";
+import { ErrorMessage } from "./error-message";
+import { TxSuccessStatus } from "./tx-success-status";
 import { confidentialTokens, wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
-import { formatUnits, isAddress } from "viem";
+import { isAddress } from "viem";
 import { truncateAddress } from "@/lib/utils";
 
 const TRANSFER_CODE = `function confidentialTransfer(
@@ -29,88 +33,19 @@ const TRANSFER_CODE = `function confidentialTransfer(
       Nox.fromExternal(encryptedAmount, inputProof));
 }`;
 
-function TransferProgressTracker({ step }: { step: TransferStep }) {
-  function stateFor(target: "encrypting" | "transferring" | "confirmed"): "pending" | "active" | "done" {
-    if (step === "idle" || step === "error") return "pending";
-    const steps: TransferStep[] = ["encrypting", "transferring", "confirmed"];
-    const current = steps.indexOf(step);
-    const idx = steps.indexOf(target);
-    if (current > idx) return "done";
-    if (current === idx) return target === "confirmed" ? "done" : "active";
-    return "pending";
-  }
-
-  return (
-    <div
-      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
-      role="status"
-      aria-live="polite"
-    >
-      <StepIndicator state={stateFor("encrypting")} icon="lock" label="Encrypt" />
-      <StepIndicator state={stateFor("transferring")} icon="sync" label="Transfer" />
-      <StepIndicator state={stateFor("confirmed")} icon="verified" label="Confirmed" />
-    </div>
-  );
-}
-
-function StepIndicator({
-  state,
-  icon,
-  label,
-}: {
-  state: "pending" | "active" | "done";
-  icon: string;
-  label: string;
-}) {
-  const barColor =
-    state === "done"
-      ? "bg-tx-success-text"
-      : state === "active"
-        ? "bg-primary"
-        : "bg-surface-border";
-  const barWidth = state === "done" ? "w-full" : state === "active" ? "w-1/2" : "w-0";
-  const iconColor =
-    state === "done"
-      ? "text-tx-success-text"
-      : state === "active"
-        ? "text-primary"
-        : "text-text-muted";
-  const textColor = iconColor;
-  const displayIcon = state === "done" ? "check_circle" : icon;
-
-  return (
-    <div className="w-[136px] md:w-auto md:flex-1">
-      <div className="h-1 w-full rounded-full bg-surface-border">
-        <div
-          className={`h-1 rounded-full transition-all duration-500 ${barColor} ${barWidth}`}
-        />
-      </div>
-      <div className="mt-2 flex items-center justify-center gap-1">
-        <span
-          aria-hidden="true"
-          className={`material-icons text-[16px]! ${iconColor} ${state === "active" ? "animate-spin motion-reduce:animate-none" : ""}`}
-        >
-          {displayIcon}
-        </span>
-        <span
-          className={`font-mulish text-[10px] font-bold tracking-[1px] ${textColor}`}
-        >
-          {label}
-        </span>
-      </div>
-    </div>
-  );
-}
+const TRANSFER_STEPS: ProgressStep[] = [
+  { key: "encrypting", icon: "lock", label: "Encrypt" },
+  { key: "transferring", icon: "sync", label: "Transfer" },
+  { key: "confirmed", icon: "verified", label: "Confirmed" },
+];
 
 export function TransferModal() {
   const { open, setOpen } = useTransferModal();
   const { enabled: devMode } = useDevMode();
   const { step, error, txHash, transfer, reset } = useConfidentialTransfer();
   const { fee: estimatedFee } = useEstimatedFee(200_000n);
-  const { balances: confidentialBalances } = useConfidentialBalances();
-  const { handleClient } = useHandleClient();
-  const [decryptedAmounts, setDecryptedAmounts] = useState<Record<string, string>>({});
-  const [decryptingSymbol, setDecryptingSymbol] = useState<string | null>(null);
+  const { decryptedAmounts, decryptingSymbol, decrypt: handleDecryptBalance, getConfidentialDisplay } = useDecryptBalance();
+  const { open: dropdownOpen, setOpen: setDropdownOpen, triggerRef, contentRef: dropdownRef } = useDropdown();
   // Default to first token with a real deployed address (cRLC), not placeholder cUSDC
   const defaultSymbol = confidentialTokens.find((t) => t.address && t.address.length === 42)?.symbol
     ?? confidentialTokens[0]?.symbol
@@ -118,10 +53,6 @@ export function TransferModal() {
   const [selectedSymbol, setSelectedSymbol] = useState(defaultSymbol);
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const isProcessing = step === "encrypting" || step === "transferring";
 
@@ -131,39 +62,10 @@ export function TransferModal() {
       setAmount("");
       setRecipient("");
       setDropdownOpen(false);
-      setCopied(false);
       reset();
     }
-  }, [open, reset]);
+  }, [open, reset, setDropdownOpen]);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleMouseDown(e: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [dropdownOpen]);
-
-  // Close dropdown on Escape
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [dropdownOpen]);
 
   const handleAmountChange = useCallback((value: string) => {
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
@@ -175,55 +77,12 @@ export function TransferModal() {
     setSelectedSymbol(symbol);
     setAmount("");
     setDropdownOpen(false);
-  }, []);
+  }, [setDropdownOpen]);
 
   const handleMax = useCallback(() => {
     const decrypted = decryptedAmounts[selectedSymbol];
     if (decrypted) setAmount(decrypted);
   }, [decryptedAmounts, selectedSymbol]);
-
-  const handleCopyCode = useCallback(() => {
-    navigator.clipboard.writeText(TRANSFER_CODE).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, []);
-
-  // Decrypt a confidential balance inline
-  const handleDecryptBalance = useCallback(
-    async (cSymbol: string) => {
-      if (!handleClient || decryptingSymbol) return;
-      const cBalance = confidentialBalances.find((b) => b.symbol === cSymbol);
-      if (!cBalance || !cBalance.isInitialized) return;
-
-      setDecryptingSymbol(cSymbol);
-      try {
-        const { value } = await handleClient.decrypt(cBalance.handle);
-        const formatted = formatUnits(
-          typeof value === "bigint" ? value : BigInt(String(value)),
-          cBalance.decimals,
-        );
-        setDecryptedAmounts((prev) => ({ ...prev, [cSymbol]: formatted }));
-      } catch {
-        // Decrypt failed silently — user can retry
-      } finally {
-        setDecryptingSymbol(null);
-      }
-    },
-    [handleClient, decryptingSymbol, confidentialBalances],
-  );
-
-  // Get the confidential balance display for a token
-  const getConfidentialDisplay = useCallback(
-    (cSymbol: string) => {
-      const decrypted = decryptedAmounts[cSymbol];
-      if (decrypted !== undefined) return decrypted;
-      const cBalance = confidentialBalances.find((b) => b.symbol === cSymbol);
-      if (!cBalance?.isInitialized) return "0";
-      return null; // null = encrypted, needs decrypt
-    },
-    [decryptedAmounts, confidentialBalances],
-  );
 
   // Find the base token config for the SDK hook
   const baseSymbol = selectedSymbol.replace(/^c/, "");
@@ -325,7 +184,7 @@ export function TransferModal() {
                   <button
                     ref={triggerRef}
                     type="button"
-                    onClick={() => setDropdownOpen((prev) => !prev)}
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-surface-border bg-surface px-3 py-2.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
@@ -508,42 +367,14 @@ export function TransferModal() {
             </div>
 
             {/* How it works */}
-            <div className="flex gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-sm md:p-3">
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
-                <span aria-hidden="true" className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!">
-                  info
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-mulish text-sm font-bold text-text-heading">How it works</p>
-                <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
-                  Amounts are encrypted.
-                  <br />
-                  The transfer is verified on-chain without revealing values.
-                </p>
-              </div>
-            </div>
+            <InfoCard className="md:!p-3">
+              Amounts are encrypted.
+              <br />
+              The transfer is verified on-chain without revealing values.
+            </InfoCard>
 
             {/* Error message */}
-            {error && (
-              <div className="flex flex-col gap-2 rounded-xl border border-tx-error-text/30 bg-tx-error-bg px-4 py-3">
-                <div className="flex items-start gap-2">
-                  <span aria-hidden="true" className="material-icons text-[18px]! text-tx-error-text">
-                    error
-                  </span>
-                  <p className="min-w-0 flex-1 font-mulish text-xs text-tx-error-text">
-                    {error}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="cursor-pointer self-end font-mulish text-xs font-bold text-tx-error-text underline"
-                >
-                  Retry
-                </button>
-              </div>
-            )}
+            {error && <ErrorMessage error={error} onRetry={reset} />}
 
             {/* CTA */}
             <div className="flex justify-center">
@@ -581,55 +412,15 @@ export function TransferModal() {
           </div>
 
           {/* Progress tracker */}
-          <TransferProgressTracker step={step} />
+          <ProgressTracker currentStep={step} steps={TRANSFER_STEPS} />
 
           {/* Arbiscan link on success */}
           {step === "confirmed" && txHash && (
-            <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
-              <div className="flex items-center gap-3">
-                <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
-                <span className="font-mulish text-sm font-medium text-text-body">
-                  Confidential Transfer Complete
-                </span>
-              </div>
-              <ArbiscanLink
-                txHash={txHash}
-                label="View on Arbiscan"
-                className="text-xs"
-              />
-            </div>
+            <TxSuccessStatus message="Confidential Transfer Complete" txHash={txHash} />
           )}
 
           {/* Function called */}
-          {devMode && (
-            <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                    <span aria-hidden="true" className="material-icons text-[24px]! text-primary-foreground">
-                      code
-                    </span>
-                  </div>
-                  <span className="font-mulish text-sm font-bold text-text-heading">
-                    Function called
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCopyCode}
-                  className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
-                  aria-label="Copy code"
-                >
-                  <span aria-hidden="true" className="material-icons text-[18px]! text-text-muted transition-colors">
-                    {copied ? "check" : "content_copy"}
-                  </span>
-                </button>
-              </div>
-              <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
-                {TRANSFER_CODE}
-              </pre>
-            </div>
-          )}
+          {devMode && <CodeSection code={TRANSFER_CODE} />}
         </div>
 
         {/* Cancel */}

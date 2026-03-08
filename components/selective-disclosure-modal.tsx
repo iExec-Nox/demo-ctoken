@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/dialog";
 import { useSelectiveDisclosureModal } from "./selective-disclosure-modal-provider";
 import { useDevMode } from "@/hooks/use-dev-mode";
-import { ArbiscanLink } from "./arbiscan-link";
 import { confidentialTokens } from "@/lib/tokens";
-import { useAddViewer, type AddViewerStep } from "@/hooks/use-add-viewer";
+import { useAddViewer } from "@/hooks/use-add-viewer";
 import { NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 import { isAddress } from "viem";
+import { ProgressTracker, type ProgressStep } from "./step-indicator";
+import { CodeSection } from "./code-section";
+import { InfoCard } from "./info-card";
+import { TxSuccessStatus } from "./tx-success-status";
 
 type ScopeType = "full" | "specific";
 
@@ -118,93 +121,11 @@ function ViewerCard({ viewer }: { viewer: MockViewer }) {
   );
 }
 
-function DisclosureProgressTracker({ step }: { step: AddViewerStep }) {
-  function stateFor(
-    target: "reading-handle" | "granting" | "confirmed",
-  ): "pending" | "active" | "done" {
-    if (step === "idle" || step === "error") return "pending";
-    const steps: AddViewerStep[] = ["reading-handle", "granting", "confirmed"];
-    const current = steps.indexOf(step);
-    const idx = steps.indexOf(target);
-    if (current > idx) return "done";
-    if (current === idx) return target === "confirmed" ? "done" : "active";
-    return "pending";
-  }
-
-  return (
-    <div
-      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
-      role="status"
-      aria-live="polite"
-    >
-      <StepIndicator
-        state={stateFor("reading-handle")}
-        icon="search"
-        label="Read Handle"
-      />
-      <StepIndicator
-        state={stateFor("granting")}
-        icon="sync"
-        label="Grant Access"
-      />
-      <StepIndicator
-        state={stateFor("confirmed")}
-        icon="verified"
-        label="Confirmed"
-      />
-    </div>
-  );
-}
-
-function StepIndicator({
-  state,
-  icon,
-  label,
-}: {
-  state: "pending" | "active" | "done";
-  icon: string;
-  label: string;
-}) {
-  const barColor =
-    state === "done"
-      ? "bg-tx-success-text"
-      : state === "active"
-        ? "bg-primary"
-        : "bg-surface-border";
-  const barWidth =
-    state === "done" ? "w-full" : state === "active" ? "w-1/2" : "w-0";
-  const iconColor =
-    state === "done"
-      ? "text-tx-success-text"
-      : state === "active"
-        ? "text-primary"
-        : "text-text-muted";
-  const textColor = iconColor;
-  const displayIcon = state === "done" ? "check_circle" : icon;
-
-  return (
-    <div className="w-[136px] md:w-auto md:flex-1">
-      <div className="h-1 w-full rounded-full bg-surface-border">
-        <div
-          className={`h-1 rounded-full transition-all duration-500 ${barColor} ${barWidth}`}
-        />
-      </div>
-      <div className="mt-2 flex items-center justify-center gap-1">
-        <span
-          aria-hidden="true"
-          className={`material-icons text-[16px]! ${iconColor} ${state === "active" ? "animate-spin motion-reduce:animate-none" : ""}`}
-        >
-          {displayIcon}
-        </span>
-        <span
-          className={`font-mulish text-[10px] font-bold tracking-[1px] ${textColor}`}
-        >
-          {label}
-        </span>
-      </div>
-    </div>
-  );
-}
+const DISCLOSURE_STEPS: ProgressStep[] = [
+  { key: "reading-handle", icon: "search", label: "Read Handle" },
+  { key: "granting", icon: "sync", label: "Grant Access" },
+  { key: "confirmed", icon: "verified", label: "Confirmed" },
+];
 
 export function SelectiveDisclosureModal() {
   const { open, setOpen } = useSelectiveDisclosureModal();
@@ -216,7 +137,6 @@ export function SelectiveDisclosureModal() {
   const [selectedTokens, setSelectedTokens] = useState<Set<string>>(
     new Set(),
   );
-  const [copied, setCopied] = useState(false);
 
   const isProcessing = step === "reading-handle" || step === "granting";
 
@@ -227,7 +147,6 @@ export function SelectiveDisclosureModal() {
         setViewerAddress("");
         setScope("specific");
         setSelectedTokens(new Set());
-        setCopied(false);
         reset();
       }
     },
@@ -258,13 +177,6 @@ export function SelectiveDisclosureModal() {
     },
     [scope],
   );
-
-  const handleCopyCode = useCallback(() => {
-    navigator.clipboard.writeText(ADD_VIEWER_CODE).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, []);
 
   const handleGrant = useCallback(async () => {
     const tokensToGrant = confidentialTokens.filter((t) =>
@@ -539,88 +451,23 @@ export function SelectiveDisclosureModal() {
           </div>
 
           {/* How it works — inside glass card on mobile */}
-          <div className="flex w-full gap-4 rounded-2xl border border-surface-border bg-surface px-3 py-2.5 backdrop-blur-lg md:p-3">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary md:size-10">
-              <span
-                aria-hidden="true"
-                className="material-icons text-[14px]! text-primary-foreground md:text-[24px]!"
-              >
-                info
-              </span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-mulish text-sm font-bold text-text-heading">
-                How it works
-              </p>
-              <p className="mt-1 font-mulish text-xs leading-[19.5px] text-text-body">
-                Selective disclosure shares a handle or balance at a given
-                moment. The recipient can access data tied to that specific
-                state only.
-              </p>
-            </div>
-          </div>
+          <InfoCard className="backdrop-blur-lg md:!p-3">
+            Selective disclosure shares a handle or balance at a given
+            moment. The recipient can access data tied to that specific
+            state only.
+          </InfoCard>
         </div>
 
         {/* Progress tracker */}
-        <DisclosureProgressTracker step={step} />
+        <ProgressTracker currentStep={step} steps={DISCLOSURE_STEPS} />
 
         {/* Arbiscan link on success */}
         {step === "confirmed" && txHash && (
-          <div
-            className="flex flex-col items-center gap-1 py-2"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="flex items-center gap-3">
-              <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
-              <span className="font-mulish text-sm font-medium text-text-body">
-                Viewer Access Granted
-              </span>
-            </div>
-            <ArbiscanLink
-              txHash={txHash}
-              label="View on Arbiscan"
-              className="text-xs"
-            />
-          </div>
+          <TxSuccessStatus message="Viewer Access Granted" txHash={txHash} />
         )}
 
         {/* Function called */}
-        {devMode && (
-          <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary">
-                  <span
-                    aria-hidden="true"
-                    className="material-icons text-[24px]! text-primary-foreground"
-                  >
-                    code
-                  </span>
-                </div>
-                <span className="font-mulish text-sm font-bold text-text-heading">
-                  Function called
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="flex cursor-pointer items-center justify-center rounded-lg p-1.5 transition-colors hover:bg-surface-border/50"
-                aria-label="Copy code"
-              >
-                <span
-                  aria-hidden="true"
-                  className="material-icons text-[18px]! text-text-muted transition-colors"
-                >
-                  {copied ? "check" : "content_copy"}
-                </span>
-              </button>
-            </div>
-            <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
-              {ADD_VIEWER_CODE}
-            </pre>
-          </div>
-        )}
+        {devMode && <CodeSection code={ADD_VIEWER_CODE} />}
 
         {/* Current Viewers */}
         <div className="flex w-full items-center justify-between">
