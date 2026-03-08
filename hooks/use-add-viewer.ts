@@ -5,6 +5,7 @@ import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
+import { formatTransactionError } from "@/lib/utils";
 import {
   noxComputeAbi,
   NOX_COMPUTE_ADDRESS,
@@ -34,7 +35,7 @@ interface UseAddViewerResult {
 export function useAddViewer(): UseAddViewerResult {
   const { address } = useAccount();
   const publicClient = usePublicClient();
-  const { writeContractAsync } = useWriteContract();
+  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
 
   const [step, setStep] = useState<AddViewerStep>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +45,8 @@ export function useAddViewer(): UseAddViewerResult {
     setStep("idle");
     setError(null);
     setTxHash(undefined);
-  }, []);
+    resetWriteContract();
+  }, [resetWriteContract]);
 
   const grant = useCallback(
     async (viewerAddress: string, tokens: TokenConfig[]) => {
@@ -130,21 +132,7 @@ export function useAddViewer(): UseAddViewerResult {
         setTxHash(lastTxHash);
         setStep("confirmed");
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Transaction failed";
-
-        const isUserRejection =
-          message.includes("User rejected") ||
-          message.includes("user rejected") ||
-          message.includes("denied");
-
-        const displayMessage = isUserRejection
-          ? "Transaction rejected by user"
-          : message.length > 200
-            ? message.slice(0, 200) + "..."
-            : message;
-
-        setError(displayMessage);
+        setError(formatTransactionError(err));
         setStep("error");
       }
     },

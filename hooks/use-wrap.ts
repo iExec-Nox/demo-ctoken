@@ -5,6 +5,7 @@ import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { erc20Abi, parseUnits } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
+import { formatTransactionError } from "@/lib/utils";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import type { TokenConfig } from "@/lib/tokens";
 
@@ -26,7 +27,7 @@ export function useWrap(): UseWrapResult {
   const [approveTxHash, setApproveTxHash] = useState<`0x${string}` | undefined>();
   const [wrapTxHash, setWrapTxHash] = useState<`0x${string}` | undefined>();
 
-  const { writeContractAsync } = useWriteContract();
+  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
   const publicClient = usePublicClient();
   const invalidateBalances = useInvalidateBalances();
 
@@ -35,7 +36,8 @@ export function useWrap(): UseWrapResult {
     setError(null);
     setApproveTxHash(undefined);
     setWrapTxHash(undefined);
-  }, []);
+    resetWriteContract();
+  }, [resetWriteContract]);
 
   const wrap = useCallback(
     async (token: TokenConfig, amount: string) => {
@@ -103,22 +105,7 @@ export function useWrap(): UseWrapResult {
         setStep("confirmed");
         invalidateBalances();
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Transaction failed";
-
-        // Clean up user rejection messages
-        const isUserRejection =
-          message.includes("User rejected") ||
-          message.includes("user rejected") ||
-          message.includes("denied");
-
-        const displayMessage = isUserRejection
-          ? "Transaction rejected by user"
-          : message.length > 200
-            ? message.slice(0, 200) + "..."
-            : message;
-
-        setError(displayMessage);
+        setError(formatTransactionError(err));
         setStep("error");
       }
     },

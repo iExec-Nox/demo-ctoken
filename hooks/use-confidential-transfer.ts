@@ -5,6 +5,7 @@ import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { parseUnits, isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
+import { formatTransactionError } from "@/lib/utils";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import type { TokenConfig } from "@/lib/tokens";
@@ -31,7 +32,7 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
 
-  const { writeContractAsync } = useWriteContract();
+  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
   const publicClient = usePublicClient();
   const invalidateBalances = useInvalidateBalances();
 
@@ -39,7 +40,8 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
     setStep("idle");
     setError(null);
     setTxHash(undefined);
-  }, []);
+    resetWriteContract();
+  }, [resetWriteContract]);
 
   const transfer = useCallback(
     async (token: TokenConfig, amount: string, recipient: string) => {
@@ -110,21 +112,7 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
         setStep("confirmed");
         invalidateBalances();
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Transaction failed";
-
-        const isUserRejection =
-          message.includes("User rejected") ||
-          message.includes("user rejected") ||
-          message.includes("denied");
-
-        const displayMessage = isUserRejection
-          ? "Transaction rejected by user"
-          : message.length > 200
-            ? message.slice(0, 200) + "..."
-            : message;
-
-        setError(displayMessage);
+        setError(formatTransactionError(err));
         setStep("error");
       }
     },

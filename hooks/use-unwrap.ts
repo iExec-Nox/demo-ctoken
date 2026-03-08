@@ -5,6 +5,7 @@ import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { parseUnits, decodeEventLog } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
+import { formatTransactionError } from "@/lib/utils";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import type { TokenConfig } from "@/lib/tokens";
@@ -105,19 +106,7 @@ export function useUnwrap(): UseUnwrapResult {
 
       await executeFinalize(params.cTokenAddress, params.handle, params.parsedAmount);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Transaction failed";
-      const isUserRejection =
-        message.includes("User rejected") ||
-        message.includes("user rejected") ||
-        message.includes("denied");
-      const displayMessage = isUserRejection
-        ? "Transaction rejected by user"
-        : message.length > 200
-          ? message.slice(0, 200) + "..."
-          : message;
-
-      setError(displayMessage);
+      setError(formatTransactionError(err));
       setStep("error");
       setIsFinalizeError(true);
     }
@@ -219,21 +208,7 @@ export function useUnwrap(): UseUnwrapResult {
         // Step 3: Finalize unwrap
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Transaction failed";
-
-        const isUserRejection =
-          message.includes("User rejected") ||
-          message.includes("user rejected") ||
-          message.includes("denied");
-
-        const displayMessage = isUserRejection
-          ? "Transaction rejected by user"
-          : message.length > 200
-            ? message.slice(0, 200) + "..."
-            : message;
-
-        setError(displayMessage);
+        setError(formatTransactionError(err));
         setStep("error");
         // If unwrap tx was sent but finalize failed, flag it
         setIsFinalizeError(finalizeParamsRef.current !== null);
