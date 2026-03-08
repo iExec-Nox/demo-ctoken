@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-08 — Réorganisation des composants par dossiers thématiques
+
+Regroupement des 44 composants à plat en 6 sous-dossiers thématiques (layout, landing, dashboard, explorer, modals, shared) pour améliorer la lisibilité et la navigation. Mise à jour de tous les imports, aucun changement fonctionnel.
+
+→ ADR : [ADR-0012](./decisions/0012-reorganize-components-folders.md)
+
 ### 2026-03-05 — Reduire la largeur du dropdown WalletButton
 
 Reduction de la largeur du dropdown WalletButton de `w-[200px]` a `w-[150px]` pour un meilleur alignement visuel avec le bouton trigger.
