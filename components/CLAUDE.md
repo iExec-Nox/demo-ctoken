@@ -125,26 +125,24 @@ absolute right-0 top-full origin-top-right animate-[dropdown-in_150ms_ease-out] 
 
 ## Current Inventory
 
+See `memory/architecture.md` for the full component inventory organized by subfolder.
+
+### Shared Components (`shared/`)
+
+Components extracted from modals to avoid duplication (2+ usages = extract) :
+
 | Component | File | Description |
 |-----------|------|-------------|
-| `Topbar` | `topbar.tsx` | Testnet indicator + "Get Test Tokens" link |
-| `Header` | `header.tsx` | Logo + ThemeToggle + Connect Wallet / Wallet dropdown |
-| `ThemeToggle` | `theme-toggle.tsx` | Sun/moon button to switch light/dark theme |
-| `Logo` | `logo.tsx` | Reusable logo (icon + text) with configurable `iconSize` and `font` |
-| `HeroSection` | `hero-section.tsx` | Landing title, subtitle, 2 CTAs (Try It Now / Talk to us) |
-| `FeatureCard` | `feature-card.tsx` | Reusable card: icon + title + description |
-| `FeaturesSection` | `features-section.tsx` | 3 feature cards driven by `FEATURES` data array |
-| `Footer` | `footer.tsx` | Logo + nav links (Documentation, Github, Terms) + copyright |
-| `TxStatus` | `tx-status.tsx` | Transaction lifecycle badge: idle, pending (animated), success, error |
-| `ArbiscanLink` | `arbiscan-link.tsx` | Link to `sepolia.arbiscan.io/tx/{hash}`, opens in new tab |
-
----
-
-## Shared Components (to implement)
-
-### `<DeveloperModeProvider />`
-
-Wraps the app. When Developer Mode is active, injects a floating log panel and annotates SDK calls.
+| `Logo` | `logo.tsx` | Logo (icon + texte), taille configurable |
+| `ThemeToggle` | `theme-toggle.tsx` | Bouton sun/moon |
+| `WalletButton` | `wallet-button.tsx` | Bouton wallet (connect/connected) |
+| `DevModeToggle` | `dev-mode-toggle.tsx` | Toggle dev mode global |
+| `TxStatus` | `tx-status.tsx` | Badge lifecycle tx (idle, pending, success, error) |
+| `TxSuccessStatus` | `tx-success-status.tsx` | Badge succes + lien Arbiscan |
+| `ArbiscanLink` | `arbiscan-link.tsx` | Lien Arbiscan (new tab) |
+| `CodeSection` | `code-section.tsx` | Section dev mode : titre + copier + `<pre>` Solidity |
+| `InfoCard` | `info-card.tsx` | Card "How it works" avec icone info |
+| `ErrorMessage` | `error-message.tsx` | Affichage erreur + bouton retry |
 
 ---
 
@@ -153,4 +151,6 @@ Wraps the app. When Developer Mode is active, injects a floating log panel and a
 | File | Description |
 |------|-------------|
 | `nox-icon.png` | Logo icon (1024x1024 PNG) — used in Header and Footer |
+| `nox-icon-white.png` | Logo icon white variant |
 | `feature-icon.svg` | Lightning/bolt SVG — used in FeatureCard |
+| Token icons | `eth.svg`, `rlc.svg`, `usdc.svg`, etc. |

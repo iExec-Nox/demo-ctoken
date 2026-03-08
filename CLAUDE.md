@@ -17,7 +17,7 @@ Build a web3 frontend demo showcasing the **Nox confidential computing protocol*
 - **Framework:** Next.js 16 (App Router, Turbopack)
 - **Styling:** Tailwind CSS v4 + shadcn/ui (New York style)
 - **Web3:** wagmi v2 + viem + Reown AppKit (wallet connection — see ADR-0001)
-- **State:** React Context (FaucetModalProvider, WrapModalProvider, TransferModalProvider, ThemeProvider)
+- **State:** React Context (FaucetModalProvider, WrapModalProvider, TransferModalProvider, SelectiveDisclosureModalProvider, ThemeProvider)
 - **Nox SDK:** Import SDK functions for `encrypt`, `decrypt`, `wrap`, `confidentialTransfer`, `shareView`
 - **Chain:** Arbitrum Sepolia (chainId: 421614)
 - **Prices:** CoinGecko API via Next.js API route (`app/api/prices/route.ts`, revalidate 60s)
@@ -28,10 +28,21 @@ Build a web3 frontend demo showcasing the **Nox confidential computing protocol*
 
 ```
 /app
+  /(landing)          # Landing page + Terms (Header + Footer layout)
+  /(app)              # Dashboard, Explorer (Topbar + DashboardHeader layout)
+  /api/prices         # CoinGecko proxy
 /components
-/lib
-/hooks
-
+  /layout             # Topbar, Header, Footer, DashboardHeader, MobileMenu
+  /landing            # HeroSection, FeatureCard, FeaturesSection
+  /dashboard          # DashboardContent, Assets, ActionCenter, TokenRow
+  /modals             # Faucet, Wrap, Transfer, SelectiveDisclosure (Provider + Modal)
+  /shared             # Reusable: Logo, CodeSection, InfoCard, ErrorMessage, TxStatus...
+  /explorer           # ExplorerContent, ActivityTable
+  /ui                 # shadcn primitives (do not modify directly)
+  providers.tsx       # Provider nesting hierarchy
+/hooks                # Transaction hooks, balance hooks, UI hooks
+/lib                  # contracts, tokens, wagmi, gas, format, utils, ABIs
+/docs/decisions       # ADR-0001 to ADR-0012
 ```
 
 ---
@@ -72,7 +83,7 @@ Build a web3 frontend demo showcasing the **Nox confidential computing protocol*
 - Portfolio header with total value (USD) via CoinGecko prices
 - Public assets section (ETH, USDC, RLC) with real balances via wagmi
 - Confidential assets section (cUSDC placeholder — empty state)
-- Action Center: Wrap, Unwrap, Transfer (wired), Selective Disclosure (TODO) buttons — disabled when no balance
+- Action Center: Wrap, Unwrap, Transfer, Selective Disclosure buttons — disabled when no balance
 - Privacy Status card
 - Empty portfolio state with faucet CTA
 - Skeleton loader (`loading.tsx`)
@@ -93,15 +104,10 @@ Build a web3 frontend demo showcasing the **Nox confidential computing protocol*
 - Amount input with balance validation + MAX button
 - Transaction details (1:1 ratio, estimated gas)
 - Progress tracker: Approve → Wrap/Unwrap → Confirmed
-- Dev Mode toggle (top-left) + code section (Solidity function)
+- Code section visible when Dev Mode is on (global toggle, not per-modal)
 - Cancel button
 
-**SDK call (TODO — wire when contracts deployed):**
-
-```ts
-await noxSDK.wrap({ token: "USDC", amount, userAddress });
-await noxSDK.unwrap({ cToken: "cUSDC", amount, userAddress });
-```
+**SDK wiring:** Done for RLC/cRLC. Hooks: `useWrap`, `useUnwrap` in `/hooks`. See `nox-contracts.md` for detailed flows.
 
 ---
 
@@ -116,34 +122,28 @@ await noxSDK.unwrap({ cToken: "cUSDC", amount, userAddress });
 - Transaction info summary (Recipient → Encrypted Hash, Token, Network Fee)
 - "How it works" info card
 - Progress tracker: Approve → Transfer → Confirmed
-- Dev Mode toggle + code section (`confidentialTransfer` Solidity function)
+- Code section visible when Dev Mode is on (global toggle)
 - "Confidential Transfer Complete" status + Arbiscan link
-- Network Fee: static ~0.0004 ETH for now (TODO: dynamic via `useGasPrice()` when SDK/ABI available)
+- Network Fee: dynamic via `useEstimatedFee` hook (see ADR-0010)
 
-**SDK call (TODO — wire when contracts deployed):**
-
-```ts
-await noxSDK.confidentialTransfer({ cToken, amount, recipient });
-```
+**SDK wiring:** Done for cRLC. Hook: `useConfidentialTransfer` in `/hooks`.
 
 ---
 
-### 6. Delegate View / Manage ACL (`/delegate`)
+### 6. Selective Disclosure / ACL (modal) — DONE
 
-**Priority:** Must Have (major differentiator — competitors rarely expose ACL in UI)
+**Priority:** Must Have — **Status: Implemented (see ADR-0009)**
 
-- Add auditor/viewer address + select scope (specific token or full portfolio)
-- List of current delegated viewers with revoke button
-- On confirm: call `shareView()` on the cToken contract
-- Show success confirmation and update the delegate list
+- Modal via `SelectiveDisclosureModalProvider` + `SelectiveDisclosureModal`
+- Add viewer address (validated with `isAddress()` from viem)
+- On confirm: reads balance handle via `confidentialBalanceOf`, then calls `addViewer(handle, viewerAddress)` on NoxCompute contract
+- Progress tracker: Read Handle → Granting Access → Confirmed
+- Code section visible when Dev Mode is on
 - Use case framing: compliance, audits, enterprise adoption
 
-**SDK call:**
+**SDK wiring:** Done. Hook: `useAddViewer` in `/hooks`. Note: `addViewer` is per-handle (not per-token) — must be re-called after each tx that changes the balance handle.
 
-```ts
-await noxSDK.shareView({ scope: "cUSDC" | "all", auditorAddress });
-await noxSDK.revokeView({ auditorAddress });
-```
+**Not yet implemented:** List of current viewers, revoke functionality.
 
 ---
 
@@ -202,27 +202,34 @@ Toutes les modales du projet suivent le même pattern. Pour créer une nouvelle 
 3. **Hook** (`useXxxModal()`) — Exposé par le provider pour déclencher l'ouverture depuis n'importe quel composant
 4. **Câblage** — Ajouter `<XxxModalProvider>` dans `providers.tsx` (s'imbrique après le dernier modal provider)
 
-**Modales existantes :** FaucetModal, WrapModal, TransferModal
+**Modales existantes :** FaucetModal, WrapModal, TransferModal, SelectiveDisclosureModal
 
 **Hiérarchie des providers** dans `providers.tsx` :
 ```
-ThemeProvider → WagmiProvider → QueryClientProvider → FaucetModalProvider → WrapModalProvider → TransferModalProvider → {children}
+ThemeProvider → WagmiProvider → QueryClientProvider → TooltipProvider → FaucetModalProvider → WrapModalProvider → TransferModalProvider → SelectiveDisclosureModalProvider → {children}
 ```
 
-### Dev Mode dans les modales
+### Dev Mode (ADR-0011)
 
-Pattern standard pour toutes les modales d'action :
-- **Toggle** `<DevModeToggle label="Dev Mode" />` en haut à gauche de la modale
-- **Section code** en bas : icône "code" + titre "Function called" + bouton copier + `<pre>` avec le code Solidity du smart contract
+- **Enabled by default** — premier visiteur voit immédiatement les sections code (différenciateur clé)
+- **Toggle global** dans `DashboardHeader` et mobile menu — pas de toggle dans les modales individuelles
+- Hook : `useDevMode()` (persisté en localStorage, retourne `true` si absent)
+- **Section code** en bas des modales : composant `<CodeSection>` (shared) — titre "Function called" + bouton copier + `<pre>` Solidity
 - Conditionnel : `{devMode && ( ... )}`
-- Hook : `useDevMode()` (persisté en localStorage)
 
-### Progress Tracker (3 étapes)
+### Shared Components (extracted from modals)
 
-Pattern visuel réutilisé dans Wrap et Transfer :
-- **Étape 1** : Approve (vert, check_circle)
-- **Étape 2** : Action spécifique — Wrap/Unwrap/Transfer (bleu primary, sync)
-- **Étape 3** : Confirmed (gris muted, verified)
+Les patterns visuels dupliqués ont été extraits dans `components/shared/` :
+- **`<CodeSection>`** — Section dev mode avec titre + copier + `<pre>` Solidity
+- **`<InfoCard>`** — Card "How it works" avec icône info
+- **`<ErrorMessage>`** — Affichage erreur + bouton retry
+- **`<TxSuccessStatus>`** — Badge succès + lien Arbiscan
+
+### Progress Tracker
+
+Composant non-extrait (inline dans chaque modale) mais suit le même pattern :
+- 3-4 étapes selon l'opération (Approve → Action → Confirmed)
+- Icônes Material : `check_circle` (done), `sync` (en cours), `verified` (confirmed)
 - Barres de progression colorées entre les étapes
 
 ### Token Config — Source unique de vérité
@@ -235,39 +242,41 @@ Pattern visuel réutilisé dans Wrap et Transfer :
 
 **Pour ajouter un nouveau cToken :** ajouter `wrappable: true` et `confidentialAddress: "0x..."` au token de base. Pas de double source de vérité.
 
----
-
-## Contract Addresses (Arbitrum Sepolia — TBD, placeholder)
+### Contract Addresses — Source unique (`lib/contracts.ts`)
 
 ```ts
-// lib/contracts.ts
-export const CONTRACTS = {
-  WRAPPER: "0x...", // ERC-7984 wrapper contract
-  USDC: "0x...", // Testnet USDC
-  cUSDC: "0x...", // Confidential USDC
-  FAUCET: "0x...", // Testnet faucet
-};
+export const NOX_COMPUTE_ADDRESS = "0x5633472D35E18464CA24Ab974954fB3b1B122eA6";
+export const ZERO_ADDRESS = "0x" + "0".repeat(40);
+export const ZERO_HANDLE = "0x" + "0".repeat(64);
 ```
 
-> ⚠️ Replace with real deployed addresses before testing.
+Les adresses des tokens (RLC, cRLC) sont dans `lib/tokens.ts` (via `address` et `confidentialAddress`).
+Les ABIs sont dans `lib/confidential-token-abi.ts` et `lib/nox-compute-abi.ts`.
 
----
+### Transaction Hook Pattern
 
-## Nox SDK Integration (`lib/nox-sdk.ts`)
-
-Wrap all SDK calls in a single module for easy mocking and replacement:
+Tous les hooks de transaction suivent le même contrat :
 
 ```ts
-import { NoxSDK } from "@iexec/nox-sdk" // adjust import path
+type Step = "idle" | "step1" | "step2" | ... | "confirmed" | "error";
 
-export async function wrapToken(params: WrapParams) { ... }
-export async function unwrapToken(params: UnwrapParams) { ... }
-export async function confidentialTransfer(params: TransferParams) { ... }
-export async function shareView(params: ShareViewParams) { ... }
-export async function revokeView(params: RevokeViewParams) { ... }
-export async function encryptValue(value: bigint, publicKey: string) { ... }
-export async function decryptValue(handle: string, privateKey: string) { ... }
+interface UseXxxResult {
+  step: Step;
+  error: string | null;
+  txHash?: `0x${string}`;
+  action: (...args) => Promise<void>;
+  reset: () => void;
+}
 ```
+
+Hooks existants : `useWrap`, `useUnwrap`, `useConfidentialTransfer`, `useAddViewer`.
+Erreurs formatées via `formatTransactionError()` dans `lib/utils.ts`.
+
+### Gas & Fee Estimation
+
+- **`lib/gas.ts`** — `estimateGasOverrides(publicClient)` : fetche les fees EIP-1559 avec buffer 20%
+- **`useEstimatedFee(gasLimit)`** — Hook retournant le fee dynamique (gasPrice × gasLimit), auto-refresh avec chaque bloc
+- Gas limits par opération : Wrap ~150k, Unwrap ~300k, Transfer ~200k
 
 ---
 
@@ -336,15 +345,32 @@ See [`/.claude/skills/commit/SKILL.md`](./.claude/skills/commit/SKILL.md) for fu
 | Landing / Connect Wallet | Must Have           | Done                      |
 | Faucet                   | Must Have           | Done                      |
 | Dashboard                | Must Have           | Done                      |
-| Wrap / Unwrap            | Must Have           | Done (UI, SDK TODO)       |
-| Transfer                 | Must Have           | Done (UI, SDK TODO)       |
-| Delegate View / ACL      | Must Have           | TODO — next priority      |
-| Activity Explorer        | Must Have           | TODO                      |
-| Developer Mode           | Must Have           | TODO                      |
-| Arbiscan Links           | Must Have           | Done (component ready)    |
+| Wrap / Unwrap            | Must Have           | Done (UI + SDK wired)     |
+| Transfer                 | Must Have           | Done (UI + SDK wired)     |
+| Selective Disclosure/ACL | Must Have           | Done (UI + SDK wired)     |
+| Activity Explorer        | Must Have           | Done (UI, subgraph TBD)   |
+| Developer Mode           | Must Have           | Done (global, default on) |
+| Arbiscan Links           | Must Have           | Done                      |
 | Light/Dark Theme         | Done                | Done                      |
+| Terms of Use             | Must Have           | Done                      |
+| Dynamic Network Fees     | Must Have           | Done (ADR-0010)           |
 | Responsive mode          | Must Have           | TODO                      |
 | Settings page            | Must Have for EthCC | TODO                      |
+| Viewer list + revoke     | Nice to Have        | TODO                      |
+
+---
+
+## Web3 Best Practices
+
+- **Address validation:** Toujours utiliser `isAddress()` de viem — jamais de regex custom
+- **Transaction receipts:** Toujours `waitForTransactionReceipt({ hash })` après `writeContractAsync` avant de passer à l'étape suivante
+- **Event decoding:** Utiliser `decodeEventLog()` de viem avec l'ABI — jamais de scan heuristique des logs bruts
+- **Approve exact:** Montant exact uniquement (pas d'infinite approval) — choix de sécurité du protocole Nox
+- **Custom RPC:** Configurer `NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC` pour éviter le rate-limiting du RPC public (surtout sur Vercel)
+- **Gas overrides:** Utiliser `estimateGasOverrides()` de `lib/gas.ts` — MetaMask sous-estime le gas sur Arbitrum
+- **Cooldowns inter-étapes:** 2-3s de délai entre les tx séquentielles (approve → wrap, unwrap → finalize) car NoxCompute (TEE) a un délai de traitement
+- **HandleClient client-side only:** `@iexec-nox/handle` utilise Web Crypto API — jamais d'import côté serveur (SSR)
+- **Handles are ephemeral:** Le handle de balance change après chaque tx — toujours re-lire `confidentialBalanceOf` après une opération
 
 ---
 
@@ -352,11 +378,11 @@ See [`/.claude/skills/commit/SKILL.md`](./.claude/skills/commit/SKILL.md) for fu
 
 - Project is scaffolded with Next.js 16 + wagmi + Reown AppKit + Tailwind v4 + shadcn/ui
 - Real balances are fetched via wagmi hooks (ETH native, USDC, RLC on Arbitrum Sepolia)
+- Confidential balances are handles (bytes32) read via `confidentialBalanceOf`, decrypted on user click via `useDecryptBalance`
 - Prices fetched via CoinGecko API route (`app/api/prices/route.ts`)
-- The Nox SDK is not yet available — create `lib/nox-sdk.ts` abstraction when contract addresses/ABIs are provided
-- Keep all smart contract interactions behind the `lib/nox-sdk.ts` abstraction layer for easy swap-out
-- **Next priorities:** Delegate View modal (Selective Disclosure button), then Activity Explorer, then Developer Mode page, then Settings
-- **Network Fee:** statique (~0.0004 ETH) dans les modales — TODO rendre dynamique via `useGasPrice()` de wagmi quand le SDK/ABI sera disponible
-- **SDK wiring:** Toutes les modales (Wrap, Transfer) ont l'UI prête mais les appels SDK sont en attente du déploiement des smart contracts
+- SDK wiring is done for RLC/cRLC — smart contract interactions are in dedicated hooks (`/hooks/use-wrap.ts`, `use-unwrap.ts`, `use-confidential-transfer.ts`, `use-add-viewer.ts`)
+- ABIs are in `lib/confidential-token-abi.ts` and `lib/nox-compute-abi.ts`
+- **Next priorities:** Responsive mode, Settings page, Viewer list + revoke, on-chain subgraph for Activity Explorer
 - EthCC is a hard deadline — ensure Settings (theme toggle) and all Must Have features are complete before that date
 - Design system is documented in `components/CLAUDE.md` — always use semantic tokens, never hardcode colors
+- USDC/cUSDC addresses not yet deployed — only RLC/cRLC are available on testnet
