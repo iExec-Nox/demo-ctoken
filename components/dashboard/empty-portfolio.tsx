@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useFaucetModal } from "@/components/faucet-modal-provider";
+import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
 
 export function EmptyPortfolio() {
   const { setOpen } = useFaucetModal();

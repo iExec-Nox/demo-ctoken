@@ -1,6 +1,6 @@
 "use client";
 
-import { useFaucetModal } from "@/components/faucet-modal-provider";
+import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
 
 export function Topbar() {
   const { setOpen } = useFaucetModal();

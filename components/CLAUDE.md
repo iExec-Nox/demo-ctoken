@@ -4,7 +4,7 @@
 
 - **File naming**: kebab-case for all component files (e.g. `hero-section.tsx`, `feature-card.tsx`). No camelCase or snake_case.
 - **Named exports** only (no default exports): `export function MyComponent() {}`
-- **Flat structure**: all components live directly in `/components`, no nesting
+- **Folder structure**: components are organized by theme in subfolders: `layout/`, `landing/`, `dashboard/`, `explorer/`, `modals/`, `shared/`. `ui/` is reserved for shadcn primitives. `providers.tsx` stays at root.
 - **Single responsibility**: each component does one thing. Extract sub-components when a section contains repeated patterns (e.g. `FeatureCard` extracted from `FeaturesSection`)
 - **Props interface**: define a dedicated `interface` for components with 2+ props
 - **No inline data**: extract data arrays as `const` at module level (e.g. `FEATURES` array in `features-section.tsx`)

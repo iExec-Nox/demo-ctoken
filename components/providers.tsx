@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
-import { ThemeProvider } from "@/components/theme-provider";
-import { FaucetModalProvider } from "@/components/faucet-modal-provider";
-import { WrapModalProvider } from "@/components/wrap-modal-provider";
-import { TransferModalProvider } from "@/components/transfer-modal-provider";
-import { SelectiveDisclosureModalProvider } from "@/components/selective-disclosure-modal-provider";
+import { ThemeProvider } from "@/components/layout/theme-provider";
+import { FaucetModalProvider } from "@/components/modals/faucet-modal-provider";
+import { WrapModalProvider } from "@/components/modals/wrap-modal-provider";
+import { TransferModalProvider } from "@/components/modals/transfer-modal-provider";
+import { SelectiveDisclosureModalProvider } from "@/components/modals/selective-disclosure-modal-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit, useAppKitTheme } from "@reown/appkit/react";

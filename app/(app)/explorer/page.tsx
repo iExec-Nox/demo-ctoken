@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExplorerContent } from "@/components/explorer-content";
+import { ExplorerContent } from "@/components/explorer/explorer-content";
 
 export const metadata: Metadata = {
   title: "Activity | Nox",

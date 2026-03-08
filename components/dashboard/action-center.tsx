@@ -2,9 +2,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ActionButton } from "./action-button";
-import { useWrapModal } from "./wrap-modal-provider";
-import { useTransferModal } from "./transfer-modal-provider";
-import { useSelectiveDisclosureModal } from "./selective-disclosure-modal-provider";
+import { useWrapModal } from "@/components/modals/wrap-modal-provider";
+import { useTransferModal } from "@/components/modals/transfer-modal-provider";
+import { useSelectiveDisclosureModal } from "@/components/modals/selective-disclosure-modal-provider";
 
 interface ActionCenterProps {
   hasBalance: boolean;

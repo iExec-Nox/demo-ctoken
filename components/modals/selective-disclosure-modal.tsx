@@ -13,10 +13,10 @@ import { confidentialTokens } from "@/lib/tokens";
 import { useAddViewer } from "@/hooks/use-add-viewer";
 import { NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 import { isAddress } from "viem";
-import { ProgressTracker, type ProgressStep } from "./step-indicator";
-import { CodeSection } from "./code-section";
-import { InfoCard } from "./info-card";
-import { TxSuccessStatus } from "./tx-success-status";
+import { ProgressTracker, type ProgressStep } from "@/components/shared/step-indicator";
+import { CodeSection } from "@/components/shared/code-section";
+import { InfoCard } from "@/components/shared/info-card";
+import { TxSuccessStatus } from "@/components/shared/tx-success-status";
 
 type ScopeType = "full" | "specific";
 
