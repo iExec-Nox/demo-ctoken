@@ -5,9 +5,7 @@ import { useAccount, useChainId, useReadContracts } from "wagmi";
 import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { confidentialTokens } from "@/lib/tokens";
-
-const ZERO_HANDLE = ("0x" + "0".repeat(64)) as `0x${string}`;
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
+import { ZERO_ADDRESS, ZERO_HANDLE } from "@/lib/contracts";
 
 export interface ConfidentialBalance {
   symbol: string;

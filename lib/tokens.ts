@@ -1,3 +1,5 @@
+import { CONTRACTS } from "./contracts";
+
 export interface TokenConfig {
   symbol: string;
   name: string;
@@ -23,21 +25,21 @@ export const tokens: TokenConfig[] = [
     symbol: "USDC",
     name: "USD Coin",
     decimals: 6,
-    address: "0xf3C3351D6Bd0098EEb33ca8f830FAf2a141Ea2E1",
+    address: CONTRACTS.USDC,
     icon: "/icon-usdc.svg",
     coingeckoId: "usd-coin",
     wrappable: true,
-    confidentialAddress: "0x...", // TODO: replace with deployed cUSDC address
+    confidentialAddress: CONTRACTS.cUSDC,
   },
   {
     symbol: "RLC",
     name: "iExec RLC",
     decimals: 9,
-    address: "0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963",
+    address: CONTRACTS.RLC,
     icon: "/icon-rlc.svg",
     coingeckoId: "iexec-rlc",
     wrappable: true,
-    confidentialAddress: "0x271f46e78f2fe59817854dabde47729ac4935765",
+    confidentialAddress: CONTRACTS.cRLC,
   },
 ];
 

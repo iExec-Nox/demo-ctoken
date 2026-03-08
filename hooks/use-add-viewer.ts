@@ -11,8 +11,7 @@ import {
   NOX_COMPUTE_ADDRESS,
 } from "@/lib/nox-compute-abi";
 import type { TokenConfig } from "@/lib/tokens";
-
-const ZERO_HANDLE = ("0x" + "0".repeat(64)) as `0x${string}`;
+import { ZERO_HANDLE } from "@/lib/contracts";
 
 export type AddViewerStep =
   | "idle"

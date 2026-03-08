@@ -5,6 +5,7 @@ import { useBalance, useReadContracts, useAccount, useChainId } from "wagmi";
 import { erc20Abi } from "viem";
 import { erc20Tokens, nativeToken } from "@/lib/tokens";
 import { formatBalance } from "@/lib/format";
+import { ZERO_ADDRESS } from "@/lib/contracts";
 
 export interface TokenBalance {
   symbol: string;
@@ -14,8 +15,6 @@ export interface TokenBalance {
   balance: bigint;
   formatted: string;
 }
-
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
 export function useTokenBalances() {
   const { address, isConnected, status } = useAccount();
