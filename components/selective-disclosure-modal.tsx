@@ -13,6 +13,7 @@ import { ArbiscanLink } from "./arbiscan-link";
 import { confidentialTokens } from "@/lib/tokens";
 import { useAddViewer, type AddViewerStep } from "@/hooks/use-add-viewer";
 import { NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
+import { isAddress } from "viem";
 
 type ScopeType = "full" | "specific";
 
@@ -272,7 +273,7 @@ export function SelectiveDisclosureModal() {
     await grant(viewerAddress, tokensToGrant);
   }, [viewerAddress, selectedTokens, grant]);
 
-  const isValidAddress = /^0x[a-fA-F0-9]{40}$/.test(viewerAddress);
+  const isValidAddress = isAddress(viewerAddress);
   const hasTokenSelected = selectedTokens.size > 0;
   const canGrant = isValidAddress && hasTokenSelected && !isProcessing;
 
@@ -328,15 +329,27 @@ export function SelectiveDisclosureModal() {
               >
                 Viewer Address
               </label>
-              <input
-                id="viewer-address"
-                type="text"
-                placeholder="0x..."
-                value={viewerAddress}
-                onChange={(e) => setViewerAddress(e.target.value)}
-                disabled={isProcessing || step === "confirmed"}
-                className="h-[50px] w-full rounded-xl border border-surface-border bg-surface px-4 font-mulish text-base text-text-heading outline-none transition-colors placeholder:text-text-heading/60 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50"
-              />
+              <div className="flex h-[50px] w-full items-center gap-2 rounded-xl border border-surface-border bg-surface px-4 transition-colors focus-within:ring-2 focus-within:ring-primary/50">
+                <input
+                  id="viewer-address"
+                  type="text"
+                  placeholder="0x..."
+                  value={viewerAddress}
+                  onChange={(e) => setViewerAddress(e.target.value)}
+                  disabled={isProcessing || step === "confirmed"}
+                  className="min-w-0 flex-1 bg-transparent font-mulish text-base text-text-heading outline-none placeholder:text-text-heading/60 disabled:opacity-50"
+                />
+                {viewerAddress.length > 0 && (
+                  <span
+                    aria-label={isValidAddress ? "Valid address" : "Invalid address"}
+                    className={`material-icons text-[24px]! ${
+                      isValidAddress ? "text-tx-success-text" : "text-tx-error-text"
+                    }`}
+                  >
+                    {isValidAddress ? "check_circle" : "cancel"}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Scope of Access */}

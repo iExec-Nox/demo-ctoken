@@ -16,7 +16,8 @@ import { useHandleClient } from "@/hooks/use-handle-client";
 import { ArbiscanLink } from "./arbiscan-link";
 import { useEstimatedFee } from "@/hooks/use-estimated-fee";
 import { confidentialTokens, wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
-import { formatUnits } from "viem";
+import { formatUnits, isAddress } from "viem";
+import { truncateAddress } from "@/lib/utils";
 
 const TRANSFER_CODE = `function confidentialTransfer(
   address to,
@@ -27,15 +28,6 @@ const TRANSFER_CODE = `function confidentialTransfer(
     return _transfer(msg.sender, to,
       Nox.fromExternal(encryptedAmount, inputProof));
 }`;
-
-function isValidAddress(address: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
-
-function truncateAddress(address: string): string {
-  if (address.length < 12) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
 
 function TransferProgressTracker({ step }: { step: TransferStep }) {
   function stateFor(target: "encrypting" | "transferring" | "confirmed"): "pending" | "active" | "done" {
@@ -253,7 +245,7 @@ export function TransferModal() {
   const maxAmount = parseFloat(maxAmountStr) || 0;
   const isOverBalance = hasDecryptedBalance && parsedAmount > maxAmount;
   const isValidAmount = parsedAmount > 0 && !isOverBalance;
-  const addressValid = isValidAddress(recipient);
+  const addressValid = isAddress(recipient);
   const canTransfer = isValidAmount && addressValid && !isProcessing;
 
   return (
