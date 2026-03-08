@@ -52,6 +52,13 @@ export function useWrap(): UseWrapResult {
       }
 
       const parsedAmount = parseUnits(amount, token.decimals);
+
+      if (parsedAmount === 0n) {
+        setError("Amount must be greater than zero");
+        setStep("error");
+        return;
+      }
+
       const erc20Address = token.address as `0x${string}`;
       const cTokenAddress = token.confidentialAddress as `0x${string}`;
 
@@ -89,6 +96,10 @@ export function useWrap(): UseWrapResult {
         });
 
         setWrapTxHash(wrapTx);
+
+        // Wait for wrap tx to be mined before marking confirmed
+        await publicClient!.waitForTransactionReceipt({ hash: wrapTx });
+
         setStep("confirmed");
         invalidateBalances();
       } catch (err) {

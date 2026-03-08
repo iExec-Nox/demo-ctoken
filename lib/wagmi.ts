@@ -5,6 +5,13 @@ import { arbitrumSepolia } from "@reown/appkit/networks";
 export const projectId =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "demo";
 
+if (projectId === "demo") {
+  console.warn(
+    "[wagmi] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set — WalletConnect will not work. " +
+    "Get a project ID at https://cloud.reown.com"
+  );
+}
+
 export const networks = [arbitrumSepolia];
 
 const rpcUrl =

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useAccount, useChainId, useReadContracts } from "wagmi";
+import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { confidentialTokens } from "@/lib/tokens";
 
@@ -29,7 +30,7 @@ export function useConfidentialBalances() {
 
   // Filter tokens that have a real confidential address (not placeholder "0x...")
   const activeTokens = useMemo(
-    () => confidentialTokens.filter((t) => t.address && t.address.length === 42),
+    () => confidentialTokens.filter((t) => t.address && isAddress(t.address)),
     [],
   );
 

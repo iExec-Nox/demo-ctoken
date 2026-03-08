@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { parseUnits } from "viem";
+import { parseUnits, isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
 import { useHandleClient } from "@/hooks/use-handle-client";
@@ -61,7 +61,20 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
         return;
       }
 
+      if (!isAddress(recipient)) {
+        setError("Invalid recipient address");
+        setStep("error");
+        return;
+      }
+
       const parsedAmount = parseUnits(amount, token.decimals);
+
+      if (parsedAmount === 0n) {
+        setError("Amount must be greater than zero");
+        setStep("error");
+        return;
+      }
+
       const cTokenAddress = token.confidentialAddress as `0x${string}`;
       const recipientAddress = recipient as `0x${string}`;
 
@@ -90,6 +103,10 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
         });
 
         setTxHash(transferTx);
+
+        // Wait for transfer tx to be mined before marking confirmed
+        await publicClient!.waitForTransactionReceipt({ hash: transferTx });
+
         setStep("confirmed");
         invalidateBalances();
       } catch (err) {

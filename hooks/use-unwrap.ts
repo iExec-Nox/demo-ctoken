@@ -47,7 +47,7 @@ export function useUnwrap(): UseUnwrapResult {
     parsedAmount: bigint;
   } | null>(null);
 
-  const { writeContractAsync } = useWriteContract();
+  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
   const publicClient = usePublicClient();
   const invalidateBalances = useInvalidateBalances();
 
@@ -97,6 +97,12 @@ export function useUnwrap(): UseUnwrapResult {
     }
 
     try {
+      // Reset wagmi's internal mutation state so writeContractAsync can be called again
+      resetWriteContract();
+
+      // Small cooldown before retry to avoid NoxCompute rate-limiting
+      await new Promise((r) => setTimeout(r, 2000));
+
       await executeFinalize(params.cTokenAddress, params.handle, params.parsedAmount);
     } catch (err) {
       const message =
@@ -115,7 +121,7 @@ export function useUnwrap(): UseUnwrapResult {
       setStep("error");
       setIsFinalizeError(true);
     }
-  }, [executeFinalize]);
+  }, [executeFinalize, resetWriteContract]);
 
   const unwrap = useCallback(
     async (token: TokenConfig, amount: string) => {
@@ -206,6 +212,9 @@ export function useUnwrap(): UseUnwrapResult {
 
         // Store finalize params in case it fails and needs retry
         finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle, parsedAmount };
+
+        // Cooldown — NoxCompute rate-limits rapid successive calls
+        await new Promise((r) => setTimeout(r, 2000));
 
         // Step 3: Finalize unwrap
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);

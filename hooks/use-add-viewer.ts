@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
 import {
@@ -55,6 +56,12 @@ export function useAddViewer(): UseAddViewerResult {
 
       if (!publicClient) {
         setError("Public client not available");
+        setStep("error");
+        return;
+      }
+
+      if (!isAddress(viewerAddress)) {
+        setError("Invalid viewer address");
         setStep("error");
         return;
       }
@@ -115,6 +122,9 @@ export function useAddViewer(): UseAddViewerResult {
           // Wait for tx to be mined before sending the next one
           await publicClient.waitForTransactionReceipt({ hash: tx });
           lastTxHash = tx;
+
+          // Cooldown — NoxCompute rate-limits rapid successive calls
+          await new Promise((r) => setTimeout(r, 2000));
         }
 
         setTxHash(lastTxHash);
