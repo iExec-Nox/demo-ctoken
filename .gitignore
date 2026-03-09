@@ -43,6 +43,7 @@ yarn-error.log*
 CLAUDE.md
 components/CLAUDE.md
 skills-lock.json
+docs/
 
 # typescript
 *.tsbuildinfo
