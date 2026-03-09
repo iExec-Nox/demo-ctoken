@@ -17,7 +17,7 @@ import { useState } from "react";
 
 const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Activity", href: "/explorer" },
+  { label: "Activity", href: "/activity" },
 ] as const;
 
 export function MobileMenu() {

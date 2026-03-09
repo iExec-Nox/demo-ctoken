@@ -13,7 +13,7 @@ import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
 
 const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Activity", href: "/explorer" },
+  { label: "Activity", href: "/activity" },
 ] as const;
 
 export function DashboardHeader() {
