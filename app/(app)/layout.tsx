@@ -11,7 +11,7 @@ export default function AppLayout({
     <WalletGuard>
       <div className="flex min-h-screen flex-col">
         <DashboardHeader />
-        <main className="flex-1">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
         <Footer />
       </div>
     </WalletGuard>
