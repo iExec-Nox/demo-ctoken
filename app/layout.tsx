@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Mulish, Anybody, Inter } from "next/font/google";
-import { Agentation } from "agentation";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -85,7 +84,6 @@ export default async function RootLayout({
         <Providers cookies={cookieString}>
           {children}
         </Providers>
-        {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>
   );
