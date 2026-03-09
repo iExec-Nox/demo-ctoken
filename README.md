@@ -53,8 +53,8 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 ### Setup
 
 ```bash
-git clone https://github.com/akugone/demo-nox.git
-cd demo-nox
+git clone https://github.com/iExec-Nox/demo-ctoken.git
+cd demo-ctoken
 npm install
 ```
 
