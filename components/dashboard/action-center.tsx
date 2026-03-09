@@ -43,7 +43,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
   ] as const;
 
   return (
-    <Card className="w-full max-w-[300px] gap-7 rounded-3xl border-surface-border bg-surface p-[25px] backdrop-blur-sm md:w-[300px] md:max-w-none md:shrink-0">
+    <Card className="w-full max-w-[300px] gap-7 rounded-3xl border-[rgba(255,255,255,0.08)] bg-[#e3ecff] p-[25px] shadow-none backdrop-blur-sm dark:border-surface-border dark:bg-surface md:w-[300px] md:max-w-none md:shrink-0">
       {/* Warning banner */}
       {!hasBalance && (
         <div className="flex items-center gap-2 rounded-xl border border-info-banner-border bg-info-banner-bg p-[13px]">
@@ -55,7 +55,7 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       )}
 
       {/* Title */}
-      <p className="font-mulish text-sm font-bold text-text-muted">
+      <p className="font-mulish text-sm font-bold tracking-[1.4px] text-text-body">
         Action Center
       </p>
 
@@ -74,16 +74,16 @@ export function ActionCenter({ hasBalance }: ActionCenterProps) {
       </CardContent>
 
       {/* Privacy Status */}
-      <div className="flex flex-col gap-2 rounded-2xl border border-surface-border bg-surface p-2.5 md:p-[17px]">
+      <div className="flex flex-col gap-2 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.56)] p-2.5 dark:border-surface-border dark:bg-surface md:p-[17px]">
         <div className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="material-icons text-[14px]! text-text-muted">
+          <span aria-hidden="true" className="material-icons text-[14px]! text-text-body">
             verified_user
           </span>
-          <p className="font-mulish text-xs font-bold tracking-[0.3px] text-text-muted">
+          <p className="font-mulish text-xs font-bold tracking-[0.3px] text-text-body">
             Privacy Status
           </p>
         </div>
-        <p className={`text-xs leading-[19.5px] ${hasBalance ? "font-inter text-asset-text-secondary" : "font-mulish text-asset-text-tertiary"}`}>
+        <p className={`text-xs leading-[19.5px] ${hasBalance ? "font-inter text-text-body" : "font-mulish text-asset-text-tertiary"}`}>
           {hasBalance
             ? "Your confidential assets are shielded using TEE. Metadata is obfuscated on the public ledger."
             : "No confidential assets detected. Shielded transactions require an initial balance."}
