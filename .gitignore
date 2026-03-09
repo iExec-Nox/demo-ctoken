@@ -37,10 +37,12 @@ yarn-error.log*
 # vercel
 .vercel
 
-# claude code
+# claude code & agents
 .claude/
+.agents/
 CLAUDE.md
 components/CLAUDE.md
+skills-lock.json
 
 # typescript
 *.tsbuildinfo
