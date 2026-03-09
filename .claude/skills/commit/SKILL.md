@@ -1,11 +1,42 @@
 ---
 name: commit
 description: Commit, push and create PR following atomic commits and conventional commits standards
-argument-hint: "[optional commit hint]"
-allowed-tools: Bash(gh pr *), Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git add*), Bash(git commit*), Bash(git push*)
+argument-hint: "[optional commit hint or 'enterprise' to push to enterprise repo]"
+allowed-tools: Bash(gh pr *), Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git add*), Bash(git commit*), Bash(git push*), Bash(git checkout*), Bash(git merge*), Bash(git branch*)
 ---
 
 # Commit — Commit atomique + Push + PR
+
+## Destination du push
+
+Le projet a deux remotes. Détermine la destination selon le contexte :
+
+- **Par défaut / "push" / "push en perso"** → push sur `origin` (GitHub perso `akugone/demo-nox`)
+- **"enterprise" / "push enterprise" / "push sur l'entreprise" / "push sur la boîte"** → push sur le remote `enterprise` (GitHub `iExec-Nox/demo-ctoken`)
+
+### Si destination = enterprise
+
+Après les commits sur `main`, exécuter :
+
+```bash
+git checkout enterprise
+git merge main
+git push enterprise enterprise:main
+git checkout main
+```
+
+Puis afficher :
+```
+✅ Push sur enterprise (iExec-Nox/demo-ctoken) — branche main
+```
+
+**Ne pas créer de PR sur le remote enterprise.** Passer directement au résumé.
+
+### Si destination = origin (défaut)
+
+Suivre le flow normal ci-dessous (push + PR si branche ≠ main).
+
+---
 
 ## Étape 1 — Analyse des changements
 
