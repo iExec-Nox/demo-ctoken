@@ -9,14 +9,20 @@ import {
   type ConfidentialBalance,
 } from "@/hooks/use-confidential-balances";
 import { useHandleClient } from "@/hooks/use-handle-client";
+import type { TokenPrices } from "@/hooks/use-token-prices";
+import { formatUsd } from "@/lib/format";
 
-export function ConfidentialAssets() {
+interface ConfidentialAssetsProps {
+  prices: TokenPrices;
+}
+
+export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
   const { balances, isLoading } = useConfidentialBalances();
   const { handleClient } = useHandleClient();
   const initializedTokens = balances.filter((b) => b.isInitialized);
 
   return (
-    <Card className="gap-0 rounded-3xl border-surface-border bg-asset-card-bg py-0">
+    <Card className="gap-0 rounded-3xl border-[rgba(255,255,255,0.76)] bg-[rgba(255,255,255,0.08)] py-0 shadow-none dark:border-surface-border dark:bg-asset-card-bg">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
@@ -26,18 +32,18 @@ export function ConfidentialAssets() {
           >
             visibility_off
           </span>
-          <p className="font-mulish text-sm font-bold text-asset-text-secondary">
+          <p className="font-mulish text-sm font-bold tracking-[1.4px] text-text-heading">
             Confidential Assets
           </p>
         </div>
-        <p className="font-mulish text-xs text-text-muted">
+        <p className="font-mulish text-xs text-text-body">
           Encrypted on-chain
         </p>
       </div>
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center border-t border-surface-border px-6 py-10">
+        <div className="flex items-center justify-center border-t border-white dark:border-surface-border px-6 py-10">
           <span
             aria-hidden="true"
             className="material-icons animate-spin text-[24px]! text-text-muted"
@@ -51,10 +57,11 @@ export function ConfidentialAssets() {
             key={token.symbol}
             token={token}
             handleClient={handleClient}
+            prices={prices}
           />
         ))
       ) : (
-        <div className="flex flex-col items-center gap-3 border-t border-surface-border px-6 py-10">
+        <div className="flex flex-col items-center gap-3 border-t border-white dark:border-surface-border px-6 py-10">
           <span
             aria-hidden="true"
             className="material-icons text-[32px]! text-asset-text-tertiary"
@@ -79,9 +86,11 @@ type DecryptState = "hidden" | "decrypting" | "revealed";
 function ConfidentialTokenRow({
   token,
   handleClient,
+  prices,
 }: {
   token: ConfidentialBalance;
   handleClient: ReturnType<typeof useHandleClient>["handleClient"];
+  prices: TokenPrices;
 }) {
   const [decryptState, setDecryptState] = useState<DecryptState>("hidden");
   const [decryptedAmount, setDecryptedAmount] = useState<string | null>(null);
@@ -114,7 +123,7 @@ function ConfidentialTokenRow({
   const isDecrypting = decryptState === "decrypting";
 
   return (
-    <div className="flex items-center justify-between border-t border-surface-border px-6 py-5">
+    <div className="flex items-center justify-between border-t border-white dark:border-surface-border px-6 py-5">
       {/* Left: icon + name with eye toggle */}
       <div className="flex items-center gap-4 md:gap-6">
         <div className="flex size-8 items-center justify-center rounded-full bg-primary">
@@ -145,7 +154,7 @@ function ConfidentialTokenRow({
               </span>
             </button>
           </div>
-          <p className="font-mulish text-xs font-medium leading-4 text-text-muted">
+          <p className="font-mulish text-xs font-medium leading-4 text-text-body">
             {token.symbol}
           </p>
         </div>
@@ -161,9 +170,23 @@ function ConfidentialTokenRow({
             <p className="font-mulish text-sm text-text-muted">Decrypting...</p>
           </div>
         ) : isRevealed ? (
-          <p className="font-mulish text-lg font-bold leading-7 tracking-[0.45px] text-text-heading">
-            {decryptedAmount} {token.symbol}
-          </p>
+          <>
+            <p className="font-mulish text-lg font-bold leading-7 tracking-[0.45px] text-text-heading">
+              {decryptedAmount} {token.symbol}
+            </p>
+            {(() => {
+              const baseSymbol = token.symbol.replace(/^c/, "");
+              const price = prices[baseSymbol];
+              if (price && decryptedAmount) {
+                return (
+                  <p className="font-mulish text-sm leading-5 text-text-body">
+                    {formatUsd(parseFloat(decryptedAmount) * price)}
+                  </p>
+                );
+              }
+              return null;
+            })()}
+          </>
         ) : (
           <>
             <div className="flex items-center justify-end gap-1">

@@ -11,12 +11,12 @@ export function PortfolioHeader({ totalValue = "$0.00" }: PortfolioHeaderProps) 
         </h1>
       </div>
 
-      <div className="shrink-0 rounded-xl border border-surface-border bg-surface px-4 py-2 backdrop-blur-sm md:px-[17px] md:py-[9px]">
-        <p className="font-mulish text-[10px] font-bold tracking-[0.5px] text-text-muted md:text-right">
+      <div className="shrink-0 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#e3ecff] px-4 py-2 backdrop-blur-sm dark:border-surface-border dark:bg-surface md:px-[17px] md:py-[9px]">
+        <p className="font-mulish text-[10px] font-bold tracking-[0.5px] text-text-body md:text-right">
           Total Value
         </p>
         <p
-          className="font-mulish text-sm font-bold text-text-heading md:text-right md:text-text-muted"
+          className="font-mulish text-sm font-bold text-text-heading md:text-right"
           aria-live="polite"
         >
           {totalValue}

@@ -39,7 +39,7 @@ export function DashboardContent() {
         {hasAnyBalance ? (
           <div className="flex w-full max-w-[342px] flex-col gap-5 md:max-w-none md:flex-1 md:gap-10">
             <PublicAssets balances={balances} prices={prices} address={address} />
-            <ConfidentialAssets />
+            <ConfidentialAssets prices={prices} />
           </div>
         ) : (
           <EmptyPortfolio />

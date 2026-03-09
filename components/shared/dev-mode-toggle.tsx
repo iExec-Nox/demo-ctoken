@@ -15,7 +15,7 @@ export function DevModeToggle({ label = "Developer Mode" }: DevModeToggleProps) 
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="flex items-center gap-1.5">
-          <span className="font-inter text-sm font-medium text-text-body">
+          <span className="font-inter text-sm font-medium text-text-heading">
             {label}
           </span>
           <Switch

@@ -14,14 +14,14 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
   const tokensWithBalance = balances.filter((b) => b.balance > 0n);
 
   return (
-    <Card className="gap-0 rounded-3xl border-surface-border bg-asset-card-bg py-0">
+    <Card className="gap-0 rounded-3xl border-[rgba(255,255,255,0.76)] bg-[rgba(255,255,255,0.08)] py-0 shadow-none dark:border-surface-border dark:bg-asset-card-bg">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <span aria-hidden="true" className="material-icons text-[18px]! text-primary">
             public
           </span>
-          <p className="font-mulish text-sm font-bold text-asset-text-secondary">
+          <p className="font-mulish text-sm font-bold tracking-[1.4px] text-text-heading">
             Public Assets
           </p>
         </div>
@@ -30,13 +30,13 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
             href={`https://sepolia.arbiscan.io/address/${address}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-mulish text-xs text-text-muted transition-colors hover:text-primary"
+            className="inline-flex items-center gap-1 font-mulish text-xs text-text-body transition-colors hover:text-primary"
           >
             Visible to explorers
             <span aria-hidden="true" className="material-icons text-[12px]!">open_in_new</span>
           </a>
         ) : (
-          <p className="font-mulish text-xs text-text-muted">
+          <p className="font-mulish text-xs text-text-body">
             Visible to explorers
           </p>
         )}
@@ -61,7 +61,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
           );
         })
       ) : (
-        <div className="border-t border-surface-border px-6 py-8 text-center">
+        <div className="border-t border-white px-6 py-8 text-center dark:border-surface-border">
           <p className="font-mulish text-sm text-text-muted">
             No public assets detected.
           </p>
