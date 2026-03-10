@@ -267,7 +267,7 @@ export function WrapModal() {
                     ref={triggerRef}
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-surface-border bg-surface px-3 py-1.5 transition-opacity hover:opacity-80"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-[rgba(255,255,255,0.05)] bg-[rgba(30,41,59,0.5)] px-3 py-1.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
                   >

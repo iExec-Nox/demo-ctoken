@@ -187,7 +187,7 @@ export function TransferModal() {
                     ref={triggerRef}
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-surface-border bg-surface px-3 py-2.5 transition-opacity hover:opacity-80"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(30,41,59,0.5)] px-3 py-2.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
                   >
@@ -373,13 +373,6 @@ export function TransferModal() {
               </div>
             </div>
 
-            {/* How it works */}
-            <InfoCard className="md:!p-3">
-              Amounts are encrypted.
-              <br />
-              The transfer is verified on-chain without revealing values.
-            </InfoCard>
-
             {/* Error message */}
             {error && <ErrorMessage error={error} onRetry={reset} />}
 
@@ -411,23 +404,30 @@ export function TransferModal() {
                   </>
                 ) : (
                   <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
-                    Transfer
+                    Confirm &amp; Sign
                   </span>
                 )}
               </button>
             </div>
+
+            {/* Progress tracker */}
+            <ProgressTracker currentStep={step} steps={TRANSFER_STEPS} />
+
+            {/* How it works */}
+            <InfoCard className="md:!p-3">
+              Amounts are encrypted.
+              <br />
+              The transfer is verified on-chain without revealing values.
+            </InfoCard>
+
+            {/* Function called */}
+            {devMode && <CodeSection code={TRANSFER_CODE} />}
+
+            {/* Arbiscan link on success */}
+            {step === "confirmed" && txHash && (
+              <TxSuccessStatus message="Confidential Transfer Complete" txHash={txHash} />
+            )}
           </div>
-
-          {/* Progress tracker */}
-          <ProgressTracker currentStep={step} steps={TRANSFER_STEPS} />
-
-          {/* Arbiscan link on success */}
-          {step === "confirmed" && txHash && (
-            <TxSuccessStatus message="Confidential Transfer Complete" txHash={txHash} />
-          )}
-
-          {/* Function called */}
-          {devMode && <CodeSection code={TRANSFER_CODE} />}
         </div>
 
         {/* Cancel */}
