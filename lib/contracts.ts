@@ -7,9 +7,9 @@
 
 export const CONTRACTS = {
   /** Testnet USDC (ERC-20, decimals: 6) */
-  USDC: "0xf3C3351D6Bd0098EEb33ca8f830FAf2a141Ea2E1",
-  /** Confidential USDC — TODO: replace with deployed cUSDC address */
-  cUSDC: "0x...",
+  USDC: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+  /** Confidential USDC (ERC-7984, decimals: 6) */
+  cUSDC: "0x305df62f6903fad716cc45abcc0e5c180979c169",
   /** iExec RLC (ERC-20, decimals: 9) */
   RLC: "0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963",
   /** Confidential RLC (ERC-7984, decimals: 9) */
