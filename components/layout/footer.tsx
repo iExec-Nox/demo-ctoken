@@ -7,7 +7,7 @@ export function Footer() {
       <Logo iconSize="sm" font="inter" />
       <nav className="flex items-center gap-4 font-mulish text-sm font-medium text-footer-text md:text-base">
         <Link
-          href="https://docs.nox.iex.ec"
+          href="https://docs.iex.ec"
           target="_blank"
           rel="noopener noreferrer"
           className="transition-colors hover:text-text-body"
@@ -15,7 +15,7 @@ export function Footer() {
           Documentation
         </Link>
         <Link
-          href="https://github.com/iExecBlockchainComputing"
+          href="https://github.com/iExec-Nox"
           target="_blank"
           rel="noopener noreferrer"
           className="transition-colors hover:text-text-body"
