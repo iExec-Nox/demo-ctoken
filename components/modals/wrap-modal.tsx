@@ -21,6 +21,8 @@ import { useDropdown } from "@/hooks/use-dropdown";
 import { ProgressTracker, type ProgressStep } from "@/components/shared/step-indicator";
 import { CodeSection } from "@/components/shared/code-section";
 import { InfoCard } from "@/components/shared/info-card";
+import { ErrorMessage } from "@/components/shared/error-message";
+import { EncryptedBalance } from "@/components/shared/encrypted-balance";
 
 const WRAP_CODE = `function wrap(address to, uint256 amount) public virtual override returns (euint256) {
     // take ownership of the underlying tokens
@@ -230,29 +232,12 @@ export function WrapModal() {
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-text-heading">
-                    {(() => {
-                      const display = getConfidentialDisplay(cSelectedSymbol);
-                      if (display === null) {
-                        return (
-                          <>
-                            <span>****** {cTokenSymbol}</span>
-                            {decryptingSymbol === cSelectedSymbol ? (
-                              <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleDecryptBalance(cSelectedSymbol)}
-                                className="cursor-pointer transition-opacity hover:opacity-70"
-                                aria-label="Reveal balance"
-                              >
-                                <span className="material-icons text-[12px]! text-primary">visibility</span>
-                              </button>
-                            )}
-                          </>
-                        );
-                      }
-                      return `${display} ${cTokenSymbol}`;
-                    })()}
+                    <EncryptedBalance
+                      symbol={cSelectedSymbol}
+                      display={getConfidentialDisplay(cSelectedSymbol)}
+                      decryptingSymbol={decryptingSymbol}
+                      onDecrypt={handleDecryptBalance}
+                    />
                   </span>
                 )}
               </div>
@@ -326,36 +311,14 @@ export function WrapModal() {
                               </span>
                             ) : (
                               <span className="ml-auto flex items-center gap-1.5 font-mulish text-xs text-text-body">
-                                {confidentialDisplay === null ? (
-                                  <>
-                                    <span>******</span>
-                                    {decryptingSymbol === cSymbol ? (
-                                      <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
-                                    ) : (
-                                      <span
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDecryptBalance(cSymbol);
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter" || e.key === " ") {
-                                            e.stopPropagation();
-                                            e.preventDefault();
-                                            handleDecryptBalance(cSymbol);
-                                          }
-                                        }}
-                                        className="cursor-pointer transition-opacity hover:opacity-70"
-                                        aria-label={`Reveal ${token.symbol} balance`}
-                                      >
-                                        <span className="material-icons text-[14px]! text-primary">visibility</span>
-                                      </span>
-                                    )}
-                                  </>
-                                ) : (
-                                  <span>{confidentialDisplay}</span>
-                                )}
+                                <EncryptedBalance
+                                  symbol={cSymbol}
+                                  display={confidentialDisplay}
+                                  decryptingSymbol={decryptingSymbol}
+                                  onDecrypt={handleDecryptBalance}
+                                  showSymbol={false}
+                                  iconSize="text-[14px]!"
+                                />
                               </span>
                             )}
                           </button>
@@ -419,35 +382,26 @@ export function WrapModal() {
             </div>
 
             {/* Error message */}
-            {currentError && (
+            {currentError && !isFinalizeError && (
+              <ErrorMessage error={currentError} onRetry={isWrap ? resetWrap : resetUnwrap} />
+            )}
+            {currentError && isFinalizeError && (
               <div className="flex flex-col gap-2 rounded-xl border border-tx-error-text/30 bg-tx-error-bg px-4 py-3">
                 <div className="flex items-start gap-2">
                   <span aria-hidden="true" className="material-icons text-[18px]! text-tx-error-text">
-                    {isFinalizeError ? "warning" : "error"}
+                    warning
                   </span>
                   <p className="min-w-0 flex-1 font-mulish text-xs text-tx-error-text">
-                    {isFinalizeError
-                      ? "Your tokens have been unwrapped but the finalization failed. Your tokens are in transit — click below to retry and recover them."
-                      : currentError}
+                    Your tokens have been unwrapped but the finalization failed. Your tokens are in transit — click below to retry and recover them.
                   </p>
                 </div>
-                {isFinalizeError ? (
-                  <button
-                    type="button"
-                    onClick={retryFinalize}
-                    className="cursor-pointer self-end rounded-lg bg-tx-error-text px-4 py-1.5 font-mulish text-xs font-bold text-primary-foreground transition-opacity hover:opacity-80"
-                  >
-                    Retry Finalize
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={isWrap ? resetWrap : resetUnwrap}
-                    className="cursor-pointer self-end font-mulish text-xs font-bold text-tx-error-text underline"
-                  >
-                    Retry
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={retryFinalize}
+                  className="cursor-pointer self-end rounded-lg bg-tx-error-text px-4 py-1.5 font-mulish text-xs font-bold text-primary-foreground transition-opacity hover:opacity-80"
+                >
+                  Retry Finalize
+                </button>
               </div>
             )}
 

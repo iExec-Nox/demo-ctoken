@@ -19,6 +19,7 @@ import { CodeSection } from "@/components/shared/code-section";
 import { InfoCard } from "@/components/shared/info-card";
 import { ErrorMessage } from "@/components/shared/error-message";
 import { TxSuccessStatus } from "@/components/shared/tx-success-status";
+import { EncryptedBalance } from "@/components/shared/encrypted-balance";
 import { confidentialTokens, wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
 import { isAddress } from "viem";
 import { truncateAddress } from "@/lib/utils";
@@ -151,29 +152,12 @@ export function TransferModal() {
                 <div className="flex items-center gap-1.5 pl-1 font-mulish">
                   <span className="text-text-body">Balance :</span>
                   <span className="flex items-center gap-1 text-text-heading">
-                    {(() => {
-                      const display = getConfidentialDisplay(selectedSymbol);
-                      if (display === null) {
-                        return (
-                          <>
-                            <span>****** {selectedSymbol}</span>
-                            {decryptingSymbol === selectedSymbol ? (
-                              <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleDecryptBalance(selectedSymbol)}
-                                className="cursor-pointer transition-opacity hover:opacity-70"
-                                aria-label="Reveal balance"
-                              >
-                                <span className="material-icons text-[12px]! text-primary">visibility</span>
-                              </button>
-                            )}
-                          </>
-                        );
-                      }
-                      return `${display} ${selectedSymbol}`;
-                    })()}
+                    <EncryptedBalance
+                      symbol={selectedSymbol}
+                      display={getConfidentialDisplay(selectedSymbol)}
+                      decryptingSymbol={decryptingSymbol}
+                      onDecrypt={handleDecryptBalance}
+                    />
                   </span>
                 </div>
               </div>
@@ -238,36 +222,14 @@ export function TransferModal() {
                               {token.symbol}
                             </span>
                             <span className="ml-auto flex items-center gap-1.5 font-mulish text-xs text-text-body">
-                              {confidentialDisplay === null ? (
-                                <>
-                                  <span>******</span>
-                                  {decryptingSymbol === token.symbol ? (
-                                    <span className="material-icons animate-spin motion-reduce:animate-none text-[12px]! text-text-muted">sync</span>
-                                  ) : (
-                                    <span
-                                      role="button"
-                                      tabIndex={0}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDecryptBalance(token.symbol);
-                                      }}
-                                      onKeyDown={(e) => {
-                                        if (e.key === "Enter" || e.key === " ") {
-                                          e.stopPropagation();
-                                          e.preventDefault();
-                                          handleDecryptBalance(token.symbol);
-                                        }
-                                      }}
-                                      className="cursor-pointer transition-opacity hover:opacity-70"
-                                      aria-label={`Reveal ${token.symbol} balance`}
-                                    >
-                                      <span className="material-icons text-[14px]! text-primary">visibility</span>
-                                    </span>
-                                  )}
-                                </>
-                              ) : (
-                                <span>{confidentialDisplay}</span>
-                              )}
+                              <EncryptedBalance
+                                symbol={token.symbol}
+                                display={confidentialDisplay}
+                                decryptingSymbol={decryptingSymbol}
+                                onDecrypt={handleDecryptBalance}
+                                showSymbol={false}
+                                iconSize="text-[14px]!"
+                              />
                             </span>
                           </button>
                         );
