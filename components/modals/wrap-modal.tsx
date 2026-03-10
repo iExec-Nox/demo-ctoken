@@ -151,7 +151,9 @@ export function WrapModal() {
   const maxAmount = parseFloat(maxAmountStr) || 0;
   // Only check over-balance if we know the balance (wrap always, unwrap only if decrypted)
   const isOverBalance = (isWrap || hasDecryptedBalance) && parsedAmount > maxAmount;
-  const isValidAmount = parsedAmount > 0 && !isOverBalance;
+  // For unwrap: require decrypted balance before allowing submission
+  const needsDecrypt = !isWrap && !hasDecryptedBalance && parsedAmount > 0;
+  const isValidAmount = parsedAmount > 0 && !isOverBalance && !needsDecrypt;
 
   const cTokenSymbol = `c${selectedToken?.symbol ?? "USDC"}`;
 
@@ -374,13 +376,18 @@ export function WrapModal() {
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
-                  aria-invalid={isOverBalance}
-                  aria-describedby={isOverBalance ? "wrap-balance-error" : undefined}
+                  aria-invalid={isOverBalance || needsDecrypt}
+                  aria-describedby={isOverBalance ? "wrap-balance-error" : needsDecrypt ? "wrap-decrypt-hint" : undefined}
                 />
               </div>
               {isOverBalance && (
                 <p id="wrap-balance-error" className="pl-1 font-mulish text-xs text-tx-error-text">
                   Insufficient balance
+                </p>
+              )}
+              {needsDecrypt && (
+                <p id="wrap-decrypt-hint" className="pl-1 font-mulish text-xs text-primary">
+                  Decrypt your balance first to continue
                 </p>
               )}
 

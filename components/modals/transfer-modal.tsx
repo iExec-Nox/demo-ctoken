@@ -103,7 +103,9 @@ export function TransferModal() {
   const maxAmountStr = decryptedAmounts[selectedSymbol] ?? "0";
   const maxAmount = parseFloat(maxAmountStr) || 0;
   const isOverBalance = hasDecryptedBalance && parsedAmount > maxAmount;
-  const isValidAmount = parsedAmount > 0 && !isOverBalance;
+  // Require decrypted balance before allowing submission
+  const needsDecrypt = !hasDecryptedBalance && parsedAmount > 0;
+  const isValidAmount = parsedAmount > 0 && !isOverBalance && !needsDecrypt;
   const addressValid = isAddress(recipient);
   const canTransfer = isValidAmount && addressValid && !isProcessing;
 
@@ -285,8 +287,8 @@ export function TransferModal() {
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
-                  aria-invalid={isOverBalance}
-                  aria-describedby={isOverBalance ? "transfer-balance-error" : undefined}
+                  aria-invalid={isOverBalance || needsDecrypt}
+                  aria-describedby={isOverBalance ? "transfer-balance-error" : needsDecrypt ? "transfer-decrypt-hint" : undefined}
                 />
                 </div>
 
@@ -301,12 +303,17 @@ export function TransferModal() {
                     MAX
                   </button>
                 </div>
-              </div>
               {isOverBalance && (
                 <p id="transfer-balance-error" className="pl-1 font-mulish text-xs text-tx-error-text">
                   Insufficient balance
                 </p>
               )}
+              {needsDecrypt && (
+                <p id="transfer-decrypt-hint" className="pl-1 font-mulish text-xs text-primary">
+                  Decrypt your balance first to continue
+                </p>
+              )}
+              </div>
             </div>
 
             {/* Recipient address section */}

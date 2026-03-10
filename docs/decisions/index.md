@@ -12,3 +12,4 @@
 | 0008 | [Largeur dropdown WalletButton alignee sur le trigger](./0008-wallet-dropdown-match-trigger-width.md) | 2026-03-05 | Accepté |
 | 0011 | [Developer mode enabled by default, toggle removed from modals](./0011-default-devmode-dashboard.md) | 2026-03-07 | Accepté |
 | 0012 | [Réorganisation des composants par dossiers thématiques](./0012-reorganize-components-folders.md) | 2026-03-08 | Accepté |
+| 0013 | [Validation de balance dans les modales Unwrap et Transfer](./0013-balance-validation-modals.md) | 2026-03-10 | Accepté |
