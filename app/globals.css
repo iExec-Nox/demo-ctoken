@@ -59,7 +59,7 @@
    ════════════════════════════════════════ */
 :root {
   /* Nox custom tokens */
-  --background: #dde2ee;
+  --background: #e5eaf4;
   --foreground: #111827;
   --surface: #edf0f8;
   --surface-border: #c0c6d8;
@@ -82,7 +82,7 @@
   --footer-muted: #9ca3af;
   --card-icon-bg: #748eff;
   --toggle-track: #b8bdd0;
-  --toggle-thumb: #dde2ee;
+  --toggle-thumb: #e5eaf4;
   --asset-card-bg: #edf0f8;
   --asset-card-border: #c0c6d8;
   --asset-icon-bg: #e2e6f0;
