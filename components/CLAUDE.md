@@ -137,7 +137,7 @@ Components extracted from modals to avoid duplication (2+ usages = extract) :
 | `ThemeToggle` | `theme-toggle.tsx` | Bouton sun/moon |
 | `WalletButton` | `wallet-button.tsx` | Bouton wallet (connect/connected) |
 | `DevModeToggle` | `dev-mode-toggle.tsx` | Toggle dev mode global |
-| `TxStatus` | `tx-status.tsx` | Badge lifecycle tx (idle, pending, success, error) |
+| `EncryptedBalance` | `encrypted-balance.tsx` | Affichage balance chiffrée avec bouton decrypt (eye icon) |
 | `TxSuccessStatus` | `tx-success-status.tsx` | Badge succes + lien Arbiscan |
 | `ArbiscanLink` | `arbiscan-link.tsx` | Lien Arbiscan (new tab) |
 | `CodeSection` | `code-section.tsx` | Section dev mode : titre + copier + `<pre>` Solidity |
