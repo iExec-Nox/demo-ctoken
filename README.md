@@ -19,17 +19,15 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 
 ## Features
 
-| Feature | Status |
-|---------|--------|
-| Wallet connection (MetaMask, Rabby, Coinbase, WalletConnect) | Done |
-| Dashboard (portfolio, public & confidential balances) | Done |
-| Faucet (external links via modal) | Done |
-| Wrap / Unwrap (RLC ↔ cRLC) | Done |
-| Confidential Transfer | Done |
-| Selective Disclosure (ACL / add viewer) | Done |
-| Activity Explorer | Done (UI, subgraph TBD) |
-| Developer Mode (function calls, code snippets) | Done |
-| Light / Dark theme | Done |
+- **Wallet connection** — MetaMask, Rabby, Coinbase Wallet, WalletConnect
+- **Dashboard** — Portfolio overview with public & confidential balances
+- **Faucet** — Quick access to testnet token faucets
+- **Wrap / Unwrap** — Convert public tokens (USDC, RLC) into confidential tokens (cUSDC, cRLC) at 1:1 ratio
+- **Confidential Transfer** — Send cTokens with encrypted amounts
+- **Selective Disclosure** — Grant auditors read access to your confidential balance
+- **Activity Explorer** — Transaction history with filtering
+- **Developer Mode** — Inspect smart contract calls and Nox SDK methods
+- **Light / Dark theme** — Full theme support
 
 ---
 
@@ -37,6 +35,8 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 
 | Contract | Address |
 |----------|---------|
+| USDC (ERC-20) | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` |
+| cUSDC (ERC-7984) | `0x305df62f6903fad716cc45abcc0e5c180979c169` |
 | RLC (ERC-20) | `0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963` |
 | cRLC (ERC-7984) | `0x271f46e78f2fe59817854dabde47729ac4935765` |
 | NoxCompute | `0x5633472D35E18464CA24Ab974954fB3b1B122eA6` |
@@ -100,7 +100,7 @@ lib/                    # Contracts, tokens, wagmi config, gas, ABIs
 
 ### Wrap / Unwrap
 
-Convert public tokens (RLC) into confidential tokens (cRLC) at 1:1 ratio. Unwrap burns cTokens to recover the underlying ERC-20.
+Convert public tokens (USDC, RLC) into confidential tokens (cUSDC, cRLC) at 1:1 ratio. Unwrap burns cTokens to recover the underlying ERC-20.
 
 ### Confidential Transfer
 
