@@ -17,6 +17,7 @@ import { ProgressTracker, type ProgressStep } from "@/components/shared/step-ind
 import { CodeSection } from "@/components/shared/code-section";
 import { InfoCard } from "@/components/shared/info-card";
 import { TxSuccessStatus } from "@/components/shared/tx-success-status";
+import { ErrorMessage } from "@/components/shared/error-message";
 
 type ScopeType = "full" | "specific";
 
@@ -441,12 +442,7 @@ export function SelectiveDisclosureModal() {
 
             {/* Error message */}
             {step === "error" && error && (
-              <p
-                className="w-full text-center font-mulish text-sm text-tx-error-text"
-                role="alert"
-              >
-                {error}
-              </p>
+              <ErrorMessage error={error} onRetry={reset} />
             )}
           </div>
 
