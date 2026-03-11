@@ -28,9 +28,9 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="material-icons text-[18px]! text-text-heading"
+            className="material-icons text-[18px]! text-primary"
           >
-            visibility_off
+            lock
           </span>
           <p className="font-mulish text-sm font-bold tracking-[1.4px] text-text-heading">
             Confidential Assets
@@ -136,24 +136,9 @@ function ConfidentialTokenRow({
           />
         </div>
         <div>
-          <div className="flex items-center gap-1">
-            <p className="font-mulish text-base font-bold leading-6 text-text-heading">
-              {token.name}
-            </p>
-            <button
-              type="button"
-              onClick={handleToggle}
-              disabled={isDecrypting || !handleClient}
-              className="cursor-pointer transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40"
-              aria-label={isRevealed ? "Hide balance" : "Reveal balance"}
-            >
-              <span
-                className={`material-icons text-[14px]! text-text-heading ${isDecrypting ? "animate-pulse motion-reduce:animate-none" : ""}`}
-              >
-                {isRevealed ? "visibility" : "visibility_off"}
-              </span>
-            </button>
-          </div>
+          <p className="font-mulish text-base font-bold leading-6 text-text-heading">
+            {token.name}
+          </p>
           <p className="font-mulish text-xs font-medium leading-4 text-text-body">
             {token.symbol}
           </p>
@@ -193,12 +178,17 @@ function ConfidentialTokenRow({
               <p className="font-mulish text-lg font-bold tracking-[0.45px] text-text-heading">
                 ******{token.symbol}
               </p>
-              <span
-                aria-hidden="true"
-                className="material-icons text-[14px]! text-text-muted"
+              <button
+                type="button"
+                onClick={handleToggle}
+                disabled={isDecrypting || !handleClient}
+                className="cursor-pointer transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Reveal balance"
               >
-                enhanced_encryption
-              </span>
+                <span className="material-icons text-[14px]! text-text-muted">
+                  visibility_off
+                </span>
+              </button>
             </div>
             <p className="font-mulish text-sm leading-5 text-text-muted">
               $*******
