@@ -1,15 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useAppKitAccount } from '@reown/appkit/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 interface UseWalletRedirectOptions {
   onConnect?: string;
   onDisconnect?: string;
 }
 
-export function useWalletRedirect({ onConnect, onDisconnect }: UseWalletRedirectOptions) {
+export function useWalletRedirect({
+  onConnect,
+  onDisconnect,
+}: UseWalletRedirectOptions) {
   const router = useRouter();
   const { isConnected } = useAppKitAccount();
   const wasConnected = useRef(isConnected);

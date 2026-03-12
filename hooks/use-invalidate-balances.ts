@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 /**
  * Returns a function that invalidates all wagmi balance queries
@@ -12,7 +12,7 @@ export function useInvalidateBalances() {
   const queryClient = useQueryClient();
 
   return useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["balance"] });
-    queryClient.invalidateQueries({ queryKey: ["readContracts"] });
+    queryClient.invalidateQueries({ queryKey: ['balance'] });
+    queryClient.invalidateQueries({ queryKey: ['readContracts'] });
   }, [queryClient]);
 }

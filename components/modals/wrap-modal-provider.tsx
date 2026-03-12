@@ -1,9 +1,15 @@
-"use client";
+'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { WrapModal } from "./wrap-modal";
+import { WrapModal } from './wrap-modal';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
-type WrapTab = "wrap" | "unwrap";
+type WrapTab = 'wrap' | 'unwrap';
 
 interface WrapModalContextType {
   open: boolean;
@@ -18,15 +24,15 @@ const WrapModalContext = createContext<WrapModalContextType | null>(null);
 
 export function WrapModalProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<WrapTab>("wrap");
+  const [activeTab, setActiveTab] = useState<WrapTab>('wrap');
 
   const openWrap = useCallback(() => {
-    setActiveTab("wrap");
+    setActiveTab('wrap');
     setOpen(true);
   }, []);
 
   const openUnwrap = useCallback(() => {
-    setActiveTab("unwrap");
+    setActiveTab('unwrap');
     setOpen(true);
   }, []);
 
@@ -46,7 +52,7 @@ export function WrapModalProvider({ children }: { children: React.ReactNode }) {
 export function useWrapModal() {
   const context = useContext(WrapModalContext);
   if (!context) {
-    throw new Error("useWrapModal must be used within a WrapModalProvider");
+    throw new Error('useWrapModal must be used within a WrapModalProvider');
   }
   return context;
 }

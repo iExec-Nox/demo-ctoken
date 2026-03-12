@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useMemo, useState } from "react";
-import { FaucetModal } from "./faucet-modal";
+import { FaucetModal } from './faucet-modal';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 interface FaucetModalContextType {
   open: boolean;
@@ -29,7 +29,7 @@ export function FaucetModalProvider({
 export function useFaucetModal() {
   const context = useContext(FaucetModalContext);
   if (!context) {
-    throw new Error("useFaucetModal must be used within a FaucetModalProvider");
+    throw new Error('useFaucetModal must be used within a FaucetModalProvider');
   }
   return context;
 }

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 const REFRESH_INTERVAL = 60_000;
 
@@ -15,14 +15,14 @@ export function useTokenPrices() {
 
     async function fetchPrices() {
       try {
-        const res = await fetch("/api/prices", {
+        const res = await fetch('/api/prices', {
           signal: controller.signal,
         });
         if (!res.ok) return;
         const data: TokenPrices = await res.json();
         setPrices(data);
       } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError")
+        if (error instanceof DOMException && error.name === 'AbortError')
           return;
       } finally {
         setIsLoading(false);

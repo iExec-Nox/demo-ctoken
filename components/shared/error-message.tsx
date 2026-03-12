@@ -4,21 +4,28 @@ interface ErrorMessageProps {
   icon?: string;
 }
 
-export function ErrorMessage({ error, onRetry, icon = "error" }: ErrorMessageProps) {
+export function ErrorMessage({
+  error,
+  onRetry,
+  icon = 'error',
+}: ErrorMessageProps) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-tx-error-text/30 bg-tx-error-bg px-4 py-3">
+    <div className="border-tx-error-text/30 bg-tx-error-bg flex flex-col gap-2 rounded-xl border px-4 py-3">
       <div className="flex items-start gap-2">
-        <span aria-hidden="true" className="material-icons text-[18px]! text-tx-error-text">
+        <span
+          aria-hidden="true"
+          className="material-icons text-tx-error-text text-[18px]!"
+        >
           {icon}
         </span>
-        <p className="min-w-0 flex-1 font-mulish text-xs text-tx-error-text">
+        <p className="font-mulish text-tx-error-text min-w-0 flex-1 text-xs">
           {error}
         </p>
       </div>
       <button
         type="button"
         onClick={onRetry}
-        className="cursor-pointer self-end font-mulish text-xs font-bold text-tx-error-text underline"
+        className="font-mulish text-tx-error-text cursor-pointer self-end text-xs font-bold underline"
       >
         Retry
       </button>

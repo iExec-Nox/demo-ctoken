@@ -1,28 +1,36 @@
-"use client";
+'use client';
 
-import { Switch } from "@/components/ui/switch";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useDevMode } from "@/hooks/use-dev-mode";
+import { Switch } from '@/components/ui/switch';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useDevMode } from '@/hooks/use-dev-mode';
 
 interface DevModeToggleProps {
   label?: string;
 }
 
-export function DevModeToggle({ label = "Developer Mode" }: DevModeToggleProps) {
+export function DevModeToggle({
+  label = 'Developer Mode',
+}: DevModeToggleProps) {
   const { enabled, toggle } = useDevMode();
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="flex items-center gap-1.5">
-          <span className="font-inter text-sm font-medium text-text-heading">
+          <span className="font-inter text-text-heading text-sm font-medium">
             {label}
           </span>
           <Switch
             size="sm"
             checked={enabled}
             onCheckedChange={toggle}
-            aria-label={enabled ? "Disable developer mode" : "Enable developer mode"}
+            aria-label={
+              enabled ? 'Disable developer mode' : 'Enable developer mode'
+            }
           />
         </div>
       </TooltipTrigger>

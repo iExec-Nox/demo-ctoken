@@ -1,14 +1,14 @@
-import { cookieStorage, createStorage, http } from "@wagmi/core";
-import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { arbitrumSepolia } from "@reown/appkit/networks";
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+import { arbitrumSepolia } from '@reown/appkit/networks';
+import { cookieStorage, createStorage, http } from '@wagmi/core';
 
 export const projectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "demo";
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? 'demo';
 
-if (projectId === "demo") {
+if (projectId === 'demo') {
   console.warn(
-    "[wagmi] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set — WalletConnect will not work. " +
-    "Get a project ID at https://cloud.reown.com"
+    '[wagmi] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set — WalletConnect will not work. ' +
+      'Get a project ID at https://cloud.reown.com'
   );
 }
 
@@ -16,7 +16,7 @@ export const networks = [arbitrumSepolia];
 
 const rpcUrl =
   process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC ||
-  "https://sepolia-rollup.arbitrum.io/rpc";
+  'https://sepolia-rollup.arbitrum.io/rpc';
 
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({ storage: cookieStorage }),

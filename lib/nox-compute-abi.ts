@@ -1,4 +1,4 @@
-import { CONTRACTS } from "./contracts";
+import { CONTRACTS } from './contracts';
 
 /**
  * ABI fragments for the NoxCompute contract (proxy at NOX_COMPUTE_ADDRESS).
@@ -13,22 +13,22 @@ export const NOX_COMPUTE_ADDRESS = CONTRACTS.NOX_COMPUTE;
 export const noxComputeAbi = [
   {
     inputs: [
-      { name: "handle", type: "bytes32" },
-      { name: "viewer", type: "address" },
+      { name: 'handle', type: 'bytes32' },
+      { name: 'viewer', type: 'address' },
     ],
-    name: "addViewer",
+    name: 'addViewer',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
-      { name: "handle", type: "bytes32" },
-      { name: "viewer", type: "address" },
+      { name: 'handle', type: 'bytes32' },
+      { name: 'viewer', type: 'address' },
     ],
-    name: "isViewer",
-    outputs: [{ name: "", type: "bool" }],
-    stateMutability: "view",
-    type: "function",
+    name: 'isViewer',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
   },
 ] as const;

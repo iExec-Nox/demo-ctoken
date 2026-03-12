@@ -1,24 +1,24 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Terms of Use | Nox Confidential Token",
+  title: 'Terms of Use | Nox Confidential Token',
   description:
-    "Terms of use for the Nox Confidential Token demo application on Arbitrum Sepolia testnet.",
+    'Terms of use for the Nox Confidential Token demo application on Arbitrum Sepolia testnet.',
 };
 
-const LAST_UPDATED = "March 7, 2026";
+const LAST_UPDATED = 'March 7, 2026';
 
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 md:px-20 lg:px-40">
-      <h1 className="font-anybody text-4xl font-bold text-text-heading">
+      <h1 className="font-anybody text-text-heading text-4xl font-bold">
         Terms of Use
       </h1>
-      <p className="mt-2 font-mulish text-sm text-text-muted">
+      <p className="font-mulish text-text-muted mt-2 text-sm">
         Last updated: {LAST_UPDATED}
       </p>
 
-      <div className="mt-10 space-y-8 font-mulish text-text-body">
+      <div className="font-mulish text-text-body mt-10 space-y-8">
         <Section title="1. Acceptance of Terms">
           <p>
             By accessing or using the Nox Confidential Token application (the
@@ -30,12 +30,12 @@ export default function TermsPage() {
 
         <Section title="2. Testnet Disclaimer">
           <p>
-            The App operates exclusively on the <strong>Arbitrum Sepolia
-            testnet</strong>. All tokens displayed, minted, wrapped, or
-            transferred within the App have <strong>no real monetary
-            value</strong>. This is a demonstration and testing environment
-            only. Do not send real assets to any address generated or displayed
-            by the App.
+            The App operates exclusively on the{' '}
+            <strong>Arbitrum Sepolia testnet</strong>. All tokens displayed,
+            minted, wrapped, or transferred within the App have{' '}
+            <strong>no real monetary value</strong>. This is a demonstration and
+            testing environment only. Do not send real assets to any address
+            generated or displayed by the App.
           </p>
         </Section>
 
@@ -44,9 +44,10 @@ export default function TermsPage() {
             The App showcases confidential tokens (cTokens) built on the
             ERC-7984 standard. While the protocol is designed to provide
             on-chain confidentiality through encrypted balances and selective
-            disclosure, <strong>no guarantee of absolute privacy or
-            confidentiality</strong> is made. The technology is experimental and
-            under active development.
+            disclosure,{' '}
+            <strong>no guarantee of absolute privacy or confidentiality</strong>{' '}
+            is made. The technology is experimental and under active
+            development.
           </p>
         </Section>
 
@@ -113,7 +114,7 @@ export default function TermsPage() {
         <Section title="10. Contact">
           <p>
             For questions about these Terms of Use, please contact the iExec
-            team at{" "}
+            team at{' '}
             <a
               href="https://iex.ec"
               target="_blank"
@@ -139,7 +140,7 @@ function Section({
 }) {
   return (
     <section>
-      <h2 className="font-inter text-lg font-bold text-text-heading">
+      <h2 className="font-inter text-text-heading text-lg font-bold">
         {title}
       </h2>
       <div className="mt-2 leading-relaxed">{children}</div>

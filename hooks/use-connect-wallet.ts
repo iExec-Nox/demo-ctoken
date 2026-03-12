@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useAppKit } from "@reown/appkit/react";
+import { useAppKit } from '@reown/appkit/react';
 
 export function useConnectWallet() {
   const { open } = useAppKit();

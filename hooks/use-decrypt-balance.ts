@@ -1,14 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { formatUnits } from "viem";
-import { useHandleClient } from "@/hooks/use-handle-client";
-import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
+import { useConfidentialBalances } from '@/hooks/use-confidential-balances';
+import { useHandleClient } from '@/hooks/use-handle-client';
+import { useState, useCallback } from 'react';
+import { formatUnits } from 'viem';
 
 export function useDecryptBalance() {
   const { handleClient } = useHandleClient();
   const { balances: confidentialBalances } = useConfidentialBalances();
-  const [decryptedAmounts, setDecryptedAmounts] = useState<Record<string, string>>({});
+  const [decryptedAmounts, setDecryptedAmounts] = useState<
+    Record<string, string>
+  >({});
   const [decryptingSymbol, setDecryptingSymbol] = useState<string | null>(null);
 
   const decrypt = useCallback(
@@ -21,8 +23,8 @@ export function useDecryptBalance() {
       try {
         const { value } = await handleClient.decrypt(cBalance.handle);
         const formatted = formatUnits(
-          typeof value === "bigint" ? value : BigInt(String(value)),
-          cBalance.decimals,
+          typeof value === 'bigint' ? value : BigInt(String(value)),
+          cBalance.decimals
         );
         setDecryptedAmounts((prev) => ({ ...prev, [symbol]: formatted }));
       } catch {
@@ -31,7 +33,7 @@ export function useDecryptBalance() {
         setDecryptingSymbol(null);
       }
     },
-    [handleClient, decryptingSymbol, confidentialBalances],
+    [handleClient, decryptingSymbol, confidentialBalances]
   );
 
   const getConfidentialDisplay = useCallback(
@@ -39,11 +41,16 @@ export function useDecryptBalance() {
       const decrypted = decryptedAmounts[symbol];
       if (decrypted !== undefined) return decrypted;
       const cBalance = confidentialBalances.find((b) => b.symbol === symbol);
-      if (!cBalance?.isInitialized) return "0";
+      if (!cBalance?.isInitialized) return '0';
       return null; // null = encrypted, needs decrypt
     },
-    [decryptedAmounts, confidentialBalances],
+    [decryptedAmounts, confidentialBalances]
   );
 
-  return { decryptedAmounts, decryptingSymbol, decrypt, getConfidentialDisplay };
+  return {
+    decryptedAmounts,
+    decryptingSymbol,
+    decrypt,
+    getConfidentialDisplay,
+  };
 }

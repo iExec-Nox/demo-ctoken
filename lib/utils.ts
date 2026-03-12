@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function truncateAddress(address: string): string {
@@ -11,16 +11,16 @@ export function truncateAddress(address: string): string {
 }
 
 export function formatTransactionError(err: unknown): string {
-  const message = err instanceof Error ? err.message : "Transaction failed";
+  const message = err instanceof Error ? err.message : 'Transaction failed';
 
   const isUserRejection =
-    message.includes("User rejected") ||
-    message.includes("user rejected") ||
-    message.includes("denied");
+    message.includes('User rejected') ||
+    message.includes('user rejected') ||
+    message.includes('denied');
 
   return isUserRejection
-    ? "Transaction rejected by user"
+    ? 'Transaction rejected by user'
     : message.length > 200
-      ? message.slice(0, 200) + "..."
+      ? message.slice(0, 200) + '...'
       : message;
 }

@@ -16,13 +16,13 @@ export function ActionButton({
   const content = (
     <>
       <div
-        className={`flex shrink-0 items-center justify-center size-[30px] rounded-[10px] md:size-10 md:rounded-xl ${
-          disabled ? "bg-asset-icon-bg" : "bg-primary"
+        className={`flex size-[30px] shrink-0 items-center justify-center rounded-[10px] md:size-10 md:rounded-xl ${
+          disabled ? 'bg-asset-icon-bg' : 'bg-primary'
         }`}
       >
         <span
           className={`material-icons text-[20px]! md:text-[24px]! ${
-            disabled ? "text-text-muted" : "text-primary-foreground"
+            disabled ? 'text-text-muted' : 'text-primary-foreground'
           }`}
         >
           {icon}
@@ -30,15 +30,15 @@ export function ActionButton({
       </div>
       <div className="text-left">
         <p
-          className={`font-mulish text-sm font-bold leading-6 md:text-base ${
-            disabled ? "text-text-muted" : "text-white dark:text-text-heading"
+          className={`font-mulish text-sm leading-6 font-bold md:text-base ${
+            disabled ? 'text-text-muted' : 'dark:text-text-heading text-white'
           }`}
         >
           {label}
         </p>
         <p
           className={`font-mulish text-[10px] leading-[15px] ${
-            disabled ? "text-text-muted" : "text-white dark:text-text-heading"
+            disabled ? 'text-text-muted' : 'dark:text-text-heading text-white'
           }`}
         >
           {description}
@@ -50,7 +50,7 @@ export function ActionButton({
   if (disabled) {
     return (
       <div
-        className="flex w-full items-center gap-4 rounded-2xl border border-surface-border bg-surface p-4 cursor-not-allowed opacity-30"
+        className="border-surface-border bg-surface flex w-full cursor-not-allowed items-center gap-4 rounded-2xl border p-4 opacity-30"
         role="button"
         tabIndex={-1}
         aria-disabled="true"
@@ -65,7 +65,7 @@ export function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-4 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(116,142,255,0.68)] p-4 cursor-pointer transition-opacity hover:opacity-80 dark:border-action-btn-active-border dark:bg-action-btn-active-bg"
+      className="dark:border-action-btn-active-border dark:bg-action-btn-active-bg flex w-full cursor-pointer items-center gap-4 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(116,142,255,0.68)] p-4 transition-opacity hover:opacity-80"
       aria-label={`${label} — ${description}`}
     >
       {content}

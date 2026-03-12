@@ -1,7 +1,13 @@
-"use client";
+'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { SelectiveDisclosureModal } from "./selective-disclosure-modal";
+import { SelectiveDisclosureModal } from './selective-disclosure-modal';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 interface SelectiveDisclosureModalContextType {
   open: boolean;
@@ -40,7 +46,7 @@ export function useSelectiveDisclosureModal() {
   const context = useContext(SelectiveDisclosureModalContext);
   if (!context) {
     throw new Error(
-      "useSelectiveDisclosureModal must be used within a SelectiveDisclosureModalProvider"
+      'useSelectiveDisclosureModal must be used within a SelectiveDisclosureModalProvider'
     );
   }
   return context;

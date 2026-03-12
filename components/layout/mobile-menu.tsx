@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useFaucetModal } from '@/components/modals/faucet-modal-provider';
+import { DevModeToggle } from '@/components/shared/dev-mode-toggle';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { DevModeToggle } from "@/components/shared/dev-mode-toggle";
-import { Button } from "@/components/ui/button";
-import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
-import { useState } from "react";
+} from '@/components/ui/sheet';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 const NAV_LINKS = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Activity", href: "/activity" },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Activity', href: '/activity' },
 ] as const;
 
 export function MobileMenu() {
@@ -33,15 +33,18 @@ export function MobileMenu() {
           className="flex cursor-pointer items-center justify-center md:hidden"
           aria-label="Open menu"
         >
-          <span className="material-icons text-[22px]! text-text-heading">
+          <span className="material-icons text-text-heading text-[22px]!">
             menu
           </span>
         </button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="border-surface-border bg-background p-0">
-        <SheetHeader className="border-b border-surface-border px-5 py-4">
-          <SheetTitle className="font-mulish text-sm font-bold text-text-heading">
+      <SheetContent
+        side="right"
+        className="border-surface-border bg-background p-0"
+      >
+        <SheetHeader className="border-surface-border border-b px-5 py-4">
+          <SheetTitle className="font-mulish text-text-heading text-sm font-bold">
             Menu
           </SheetTitle>
         </SheetHeader>
@@ -54,10 +57,10 @@ export function MobileMenu() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`rounded-lg px-3 py-2.5 font-mulish text-sm font-medium transition-colors ${
+                className={`font-mulish rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-surface text-text-heading"
-                    : "text-text-body hover:bg-surface hover:text-text-heading"
+                    ? 'bg-surface text-text-heading'
+                    : 'text-text-body hover:bg-surface hover:text-text-heading'
                 }`}
               >
                 {item.label}
@@ -71,34 +74,34 @@ export function MobileMenu() {
               setOpen(false);
               setFaucetOpen(true);
             }}
-            className="cursor-pointer rounded-lg px-3 py-2.5 text-left font-mulish text-sm font-medium text-text-body transition-colors hover:bg-surface hover:text-text-heading"
+            className="font-mulish text-text-body hover:bg-surface hover:text-text-heading cursor-pointer rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors"
           >
             Faucet
           </button>
         </nav>
 
-        <div className="border-t border-surface-border px-4 py-4">
+        <div className="border-surface-border border-t px-4 py-4">
           <div className="flex items-center justify-between">
-            <span className="font-mulish text-xs font-medium text-text-muted">
+            <span className="font-mulish text-text-muted text-xs font-medium">
               Theme
             </span>
             <ThemeToggle />
           </div>
         </div>
 
-        <div className="border-t border-surface-border px-4 py-4">
+        <div className="border-surface-border border-t px-4 py-4">
           <div className="flex items-center justify-between">
-            <span className="font-mulish text-xs font-medium text-text-muted">
+            <span className="font-mulish text-text-muted text-xs font-medium">
               Developer Mode
             </span>
             <DevModeToggle />
           </div>
         </div>
 
-        <div className="mt-auto border-t border-surface-border px-4 py-4">
+        <div className="border-surface-border mt-auto border-t px-4 py-4">
           <Button
             asChild
-            className="w-full rounded-xl bg-primary px-3 py-2 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
+            className="bg-primary font-mulish text-primary-foreground hover:bg-primary-hover w-full rounded-xl px-3 py-2 text-sm font-bold shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)]"
           >
             <Link href="#" onClick={() => setOpen(false)}>
               Contact us

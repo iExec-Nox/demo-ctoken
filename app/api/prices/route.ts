@@ -1,6 +1,6 @@
-import { coingeckoIds, tokens } from "@/lib/tokens";
+import { coingeckoIds, tokens } from '@/lib/tokens';
 
-const COINGECKO_API = "https://api.coingecko.com/api/v3/simple/price";
+const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price';
 
 export async function GET() {
   try {
@@ -11,7 +11,7 @@ export async function GET() {
 
     if (!res.ok) {
       return Response.json(
-        { error: "Failed to fetch prices" },
+        { error: 'Failed to fetch prices' },
         { status: 502 }
       );
     }
@@ -28,7 +28,7 @@ export async function GET() {
     return Response.json(prices);
   } catch {
     return Response.json(
-      { error: "Price service unavailable" },
+      { error: 'Price service unavailable' },
       { status: 503 }
     );
   }

@@ -13,7 +13,7 @@ export function EncryptedBalance({
   decryptingSymbol,
   onDecrypt,
   showSymbol = true,
-  iconSize = "text-[12px]!",
+  iconSize = 'text-[12px]!',
 }: EncryptedBalanceProps) {
   if (display !== null) {
     return <>{showSymbol ? `${display} ${symbol}` : display}</>;
@@ -21,10 +21,10 @@ export function EncryptedBalance({
 
   return (
     <>
-      <span>{showSymbol ? `****** ${symbol}` : "******"}</span>
+      <span>{showSymbol ? `****** ${symbol}` : '******'}</span>
       {decryptingSymbol === symbol ? (
         <span
-          className={`material-icons animate-spin text-text-muted motion-reduce:animate-none ${iconSize}`}
+          className={`material-icons text-text-muted animate-spin motion-reduce:animate-none ${iconSize}`}
         >
           sync
         </span>
@@ -36,7 +36,7 @@ export function EncryptedBalance({
             onDecrypt(symbol);
           }}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.stopPropagation();
               e.preventDefault();
               onDecrypt(symbol);

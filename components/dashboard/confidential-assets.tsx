@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import Image from "next/image";
-import { formatUnits } from "viem";
-import { Card } from "@/components/ui/card";
+import { Card } from '@/components/ui/card';
 import {
   useConfidentialBalances,
   type ConfidentialBalance,
-} from "@/hooks/use-confidential-balances";
-import { useHandleClient } from "@/hooks/use-handle-client";
-import type { TokenPrices } from "@/hooks/use-token-prices";
-import { formatUsd } from "@/lib/format";
+} from '@/hooks/use-confidential-balances';
+import { useHandleClient } from '@/hooks/use-handle-client';
+import type { TokenPrices } from '@/hooks/use-token-prices';
+import { formatUsd } from '@/lib/format';
+import Image from 'next/image';
+import { useState, useCallback } from 'react';
+import { formatUnits } from 'viem';
 
 interface ConfidentialAssetsProps {
   prices: TokenPrices;
@@ -22,31 +22,29 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
   const initializedTokens = balances.filter((b) => b.isInitialized);
 
   return (
-    <Card className="gap-0 rounded-3xl border-[rgba(255,255,255,0.76)] bg-[rgba(255,255,255,0.08)] py-0 shadow-none dark:border-surface-border dark:bg-asset-card-bg">
+    <Card className="dark:border-surface-border dark:bg-asset-card-bg gap-0 rounded-3xl border-[rgba(255,255,255,0.76)] bg-[rgba(255,255,255,0.08)] py-0 shadow-none">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="material-icons text-[18px]! text-primary"
+            className="material-icons text-primary text-[18px]!"
           >
             lock
           </span>
-          <p className="font-mulish text-sm font-bold tracking-[1.4px] text-text-heading">
+          <p className="font-mulish text-text-heading text-sm font-bold tracking-[1.4px]">
             Confidential Assets
           </p>
         </div>
-        <p className="font-mulish text-xs text-text-body">
-          Encrypted on-chain
-        </p>
+        <p className="font-mulish text-text-body text-xs">Encrypted on-chain</p>
       </div>
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center border-t border-white dark:border-surface-border px-6 py-10">
+        <div className="dark:border-surface-border flex items-center justify-center border-t border-white px-6 py-10">
           <span
             aria-hidden="true"
-            className="material-icons animate-spin text-[24px]! text-text-muted"
+            className="material-icons text-text-muted animate-spin text-[24px]!"
           >
             sync
           </span>
@@ -61,17 +59,17 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
           />
         ))
       ) : (
-        <div className="flex flex-col items-center gap-3 border-t border-white dark:border-surface-border px-6 py-10">
+        <div className="dark:border-surface-border flex flex-col items-center gap-3 border-t border-white px-6 py-10">
           <span
             aria-hidden="true"
-            className="material-icons text-[32px]! text-asset-text-tertiary"
+            className="material-icons text-asset-text-tertiary text-[32px]!"
           >
             enhanced_encryption
           </span>
-          <p className="font-mulish text-sm text-text-muted">
+          <p className="font-mulish text-text-muted text-sm">
             No confidential assets yet.
           </p>
-          <p className="max-w-md text-center font-mulish text-xs leading-5 text-asset-text-tertiary">
+          <p className="font-mulish text-asset-text-tertiary max-w-md text-center text-xs leading-5">
             Wrap your public tokens to create confidential assets. Your balances
             will be encrypted on-chain and hidden from block explorers.
           </p>
@@ -81,7 +79,7 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
   );
 }
 
-type DecryptState = "hidden" | "decrypting" | "revealed";
+type DecryptState = 'hidden' | 'decrypting' | 'revealed';
 
 function ConfidentialTokenRow({
   token,
@@ -89,44 +87,47 @@ function ConfidentialTokenRow({
   prices,
 }: {
   token: ConfidentialBalance;
-  handleClient: ReturnType<typeof useHandleClient>["handleClient"];
+  handleClient: ReturnType<typeof useHandleClient>['handleClient'];
   prices: TokenPrices;
 }) {
-  const [decryptState, setDecryptState] = useState<DecryptState>("hidden");
+  const [decryptState, setDecryptState] = useState<DecryptState>('hidden');
   const [decryptedAmount, setDecryptedAmount] = useState<string | null>(null);
 
   const handleDecrypt = useCallback(async () => {
-    if (!handleClient || decryptState !== "hidden") return;
+    if (!handleClient || decryptState !== 'hidden') return;
 
-    setDecryptState("decrypting");
+    setDecryptState('decrypting');
 
     try {
       const { value } = await handleClient.decrypt(token.handle);
 
-      const formatted = formatUnits(typeof value === "bigint" ? value : BigInt(String(value)), token.decimals);
+      const formatted = formatUnits(
+        typeof value === 'bigint' ? value : BigInt(String(value)),
+        token.decimals
+      );
       setDecryptedAmount(formatted);
-      setDecryptState("revealed");
+      setDecryptState('revealed');
     } catch {
-      setDecryptState("hidden");
+      setDecryptState('hidden');
     }
   }, [handleClient, decryptState, token]);
 
   const handleToggle = useCallback(() => {
-    if (decryptState === "revealed") {
-      setDecryptState("hidden");
-    } else if (decryptState === "hidden") {
+    if (decryptState === 'revealed') {
+      setDecryptState('hidden');
+    } else if (decryptState === 'hidden') {
       handleDecrypt();
     }
   }, [decryptState, handleDecrypt]);
 
-  const isRevealed = decryptState === "revealed" && decryptedAmount !== null;
-  const isDecrypting = decryptState === "decrypting";
+  const isRevealed = decryptState === 'revealed' && decryptedAmount !== null;
+  const isDecrypting = decryptState === 'decrypting';
 
   return (
-    <div className="flex items-center justify-between border-t border-white dark:border-surface-border px-6 py-5">
+    <div className="dark:border-surface-border flex items-center justify-between border-t border-white px-6 py-5">
       {/* Left: icon + name with eye toggle */}
       <div className="flex items-center gap-4 md:gap-6">
-        <div className="flex size-8 items-center justify-center rounded-full bg-primary">
+        <div className="bg-primary flex size-8 items-center justify-center rounded-full">
           <Image
             src={token.icon}
             alt={`${token.name} icon`}
@@ -136,10 +137,10 @@ function ConfidentialTokenRow({
           />
         </div>
         <div>
-          <p className="font-mulish text-base font-bold leading-6 text-text-heading">
+          <p className="font-mulish text-text-heading text-base leading-6 font-bold">
             {token.name}
           </p>
-          <p className="font-mulish text-xs font-medium leading-4 text-text-body">
+          <p className="font-mulish text-text-body text-xs leading-4 font-medium">
             {token.symbol}
           </p>
         </div>
@@ -149,22 +150,22 @@ function ConfidentialTokenRow({
       <div className="text-right">
         {isDecrypting ? (
           <div className="flex items-center justify-end gap-2">
-            <span className="material-icons animate-spin motion-reduce:animate-none text-[16px]! text-text-muted">
+            <span className="material-icons text-text-muted animate-spin text-[16px]! motion-reduce:animate-none">
               sync
             </span>
-            <p className="font-mulish text-sm text-text-muted">Decrypting...</p>
+            <p className="font-mulish text-text-muted text-sm">Decrypting...</p>
           </div>
         ) : isRevealed ? (
           <>
-            <p className="font-mulish text-lg font-bold leading-7 tracking-[0.45px] text-text-heading">
+            <p className="font-mulish text-text-heading text-lg leading-7 font-bold tracking-[0.45px]">
               {decryptedAmount} {token.symbol}
             </p>
             {(() => {
-              const baseSymbol = token.symbol.replace(/^c/, "");
+              const baseSymbol = token.symbol.replace(/^c/, '');
               const price = prices[baseSymbol];
               if (price && decryptedAmount) {
                 return (
-                  <p className="font-mulish text-sm leading-5 text-text-body">
+                  <p className="font-mulish text-text-body text-sm leading-5">
                     {formatUsd(parseFloat(decryptedAmount) * price)}
                   </p>
                 );
@@ -175,7 +176,7 @@ function ConfidentialTokenRow({
         ) : (
           <>
             <div className="flex items-center justify-end gap-1">
-              <p className="font-mulish text-lg font-bold tracking-[0.45px] text-text-heading">
+              <p className="font-mulish text-text-heading text-lg font-bold tracking-[0.45px]">
                 ******{token.symbol}
               </p>
               <button
@@ -185,12 +186,12 @@ function ConfidentialTokenRow({
                 className="cursor-pointer transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Reveal balance"
               >
-                <span className="material-icons text-[14px]! text-text-muted">
+                <span className="material-icons text-text-muted text-[14px]!">
                   visibility_off
                 </span>
               </button>
             </div>
-            <p className="font-mulish text-sm leading-5 text-text-muted">
+            <p className="font-mulish text-text-muted text-sm leading-5">
               $*******
             </p>
           </>
