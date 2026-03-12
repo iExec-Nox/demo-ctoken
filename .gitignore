@@ -48,11 +48,3 @@ docs/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# claude code
-.claude/
-CLAUDE.md
-components/CLAUDE.md
-
-# docs (decisions, workflows, handover)
-/docs/
