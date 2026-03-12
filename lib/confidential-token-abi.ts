@@ -93,6 +93,17 @@ export const confidentialTokenAbi = [
     type: "function",
   },
 
+  // Events: confidential transfer (amount is always an encrypted handle)
+  {
+    inputs: [
+      { name: "from", type: "address", indexed: true },
+      { name: "to", type: "address", indexed: true },
+      { name: "amount", type: "bytes32", indexed: true },
+    ],
+    name: "ConfidentialTransfer",
+    type: "event",
+  },
+
   // Events: unwrap lifecycle
   {
     inputs: [
