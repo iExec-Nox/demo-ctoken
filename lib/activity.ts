@@ -49,38 +49,3 @@ export const ACTIVITY_TYPES: ActivityType[] = [
   "transfer",
   "delegation",
 ];
-
-export const MOCK_ACTIVITIES: ActivityEntry[] = [
-  {
-    id: "1",
-    type: "wrap",
-    asset: "cUSDC",
-    amount: "1,250.00",
-    timestamp: "12/02/2026 10:02",
-    txHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-  },
-  {
-    id: "2",
-    type: "transfer",
-    asset: "ETH",
-    amount: "0.45",
-    timestamp: "12/02/2026 10:02",
-    txHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-  },
-  {
-    id: "3",
-    type: "unwrap",
-    asset: "cUSDT",
-    amount: "500.00",
-    timestamp: "12/02/2026 10:02",
-    txHash: "0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
-  },
-  {
-    id: "4",
-    type: "delegation",
-    asset: "cRLC",
-    amount: "10,000",
-    timestamp: "12/02/2026 10:02",
-    txHash: "0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
-  },
-];
