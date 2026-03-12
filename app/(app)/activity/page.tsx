@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { ExplorerContent } from "@/components/explorer/explorer-content";
+import { ExplorerContent } from '@/components/explorer/explorer-content';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Activity | Nox",
-  description: "Monitor your confidential transactions on Arbitrum",
+  title: 'Activity | Nox',
+  description: 'Monitor your confidential transactions on Arbitrum',
 };
 
 export default function ExplorerPage() {

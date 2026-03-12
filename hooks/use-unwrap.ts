@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useRef } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { parseUnits, decodeEventLog } from "viem";
-import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
-import { estimateGasOverrides } from "@/lib/gas";
-import { formatTransactionError } from "@/lib/utils";
-import { useHandleClient } from "@/hooks/use-handle-client";
-import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
-import type { TokenConfig } from "@/lib/tokens";
+import { useHandleClient } from '@/hooks/use-handle-client';
+import { useInvalidateBalances } from '@/hooks/use-invalidate-balances';
+import { confidentialTokenAbi } from '@/lib/confidential-token-abi';
+import { estimateGasOverrides } from '@/lib/gas';
+import type { TokenConfig } from '@/lib/tokens';
+import { formatTransactionError } from '@/lib/utils';
+import { useState, useCallback, useRef } from 'react';
+import { parseUnits, decodeEventLog } from 'viem';
+import { useAccount, useWriteContract, usePublicClient } from 'wagmi';
 
 export type UnwrapStep =
-  | "idle"
-  | "encrypting"
-  | "unwrapping"
-  | "finalizing"
-  | "confirmed"
-  | "error";
+  | 'idle'
+  | 'encrypting'
+  | 'unwrapping'
+  | 'finalizing'
+  | 'confirmed'
+  | 'error';
 
 interface UseUnwrapResult {
   step: UnwrapStep;
@@ -33,7 +33,7 @@ interface UseUnwrapResult {
 export function useUnwrap(): UseUnwrapResult {
   const { address } = useAccount();
   const { handleClient } = useHandleClient();
-  const [step, setStep] = useState<UnwrapStep>("idle");
+  const [step, setStep] = useState<UnwrapStep>('idle');
   const [error, setError] = useState<string | null>(null);
   const [isFinalizeError, setIsFinalizeError] = useState(false);
   const [unwrapTxHash, setUnwrapTxHash] = useState<`0x${string}` | undefined>();
@@ -53,7 +53,7 @@ export function useUnwrap(): UseUnwrapResult {
   const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
-    setStep("idle");
+    setStep('idle');
     setError(null);
     setIsFinalizeError(false);
     setUnwrapTxHash(undefined);
@@ -65,9 +65,9 @@ export function useUnwrap(): UseUnwrapResult {
     async (
       cTokenAddress: `0x${string}`,
       handle: `0x${string}`,
-      parsedAmount: bigint,
+      parsedAmount: bigint
     ) => {
-      setStep("finalizing");
+      setStep('finalizing');
       setError(null);
       setIsFinalizeError(false);
 
@@ -76,24 +76,24 @@ export function useUnwrap(): UseUnwrapResult {
       const finalizeTx = await writeContractAsync({
         address: cTokenAddress,
         abi: confidentialTokenAbi,
-        functionName: "finalizeUnwrap",
+        functionName: 'finalizeUnwrap',
         // TODO: replace mock proof with real decryption proof from NoxCompute
-        args: [handle, parsedAmount, "0x00"],
+        args: [handle, parsedAmount, '0x00'],
         ...gasOverrides,
       });
 
       setFinalizeTxHash(finalizeTx);
-      setStep("confirmed");
+      setStep('confirmed');
       invalidateBalances();
       finalizeParamsRef.current = null;
     },
-    [writeContractAsync, publicClient, invalidateBalances],
+    [writeContractAsync, publicClient, invalidateBalances]
   );
 
   const retryFinalize = useCallback(async () => {
     const params = finalizeParamsRef.current;
     if (!params) {
-      setError("No pending finalization to retry");
+      setError('No pending finalization to retry');
       return;
     }
 
@@ -104,10 +104,14 @@ export function useUnwrap(): UseUnwrapResult {
       // Small cooldown before retry to avoid NoxCompute rate-limiting
       await new Promise((r) => setTimeout(r, 2000));
 
-      await executeFinalize(params.cTokenAddress, params.handle, params.parsedAmount);
+      await executeFinalize(
+        params.cTokenAddress,
+        params.handle,
+        params.parsedAmount
+      );
     } catch (err) {
       setError(formatTransactionError(err));
-      setStep("error");
+      setStep('error');
       setIsFinalizeError(true);
     }
   }, [executeFinalize, resetWriteContract]);
@@ -115,20 +119,22 @@ export function useUnwrap(): UseUnwrapResult {
   const unwrap = useCallback(
     async (token: TokenConfig, amount: string) => {
       if (!address) {
-        setError("Wallet not connected");
-        setStep("error");
+        setError('Wallet not connected');
+        setStep('error');
         return;
       }
 
       if (!token.confidentialAddress) {
-        setError("Confidential token address not configured");
-        setStep("error");
+        setError('Confidential token address not configured');
+        setStep('error');
         return;
       }
 
       if (!handleClient) {
-        setError("Handle client not initialized — please reconnect your wallet");
-        setStep("error");
+        setError(
+          'Handle client not initialized — please reconnect your wallet'
+        );
+        setStep('error');
         return;
       }
 
@@ -139,23 +145,23 @@ export function useUnwrap(): UseUnwrapResult {
         const gasOverrides = await estimateGasOverrides(publicClient);
 
         // Step 1: Encrypt the amount via Handle Gateway
-        setStep("encrypting");
+        setStep('encrypting');
         setError(null);
         setIsFinalizeError(false);
 
         const { handle, handleProof } = await handleClient.encryptInput(
           parsedAmount,
-          "uint256",
-          cTokenAddress,
+          'uint256',
+          cTokenAddress
         );
 
         // Step 2: Initiate unwrap (from and to = msg.sender)
-        setStep("unwrapping");
+        setStep('unwrapping');
 
         const unwrapTx = await writeContractAsync({
           address: cTokenAddress,
           abi: confidentialTokenAbi,
-          functionName: "unwrap",
+          functionName: 'unwrap',
           args: [address, address, handle, handleProof],
           ...gasOverrides,
         });
@@ -166,7 +172,7 @@ export function useUnwrap(): UseUnwrapResult {
         // The contract creates a NEW handle via _burn() — it is NOT the encryptInput handle.
         // See ERC7984ERC20Wrapper._unwrap(): `euint256 unwrapAmount = _burn(from, amount)`
         if (!publicClient) {
-          throw new Error("Public client not available");
+          throw new Error('Public client not available');
         }
 
         const receipt = await publicClient.waitForTransactionReceipt({
@@ -177,15 +183,17 @@ export function useUnwrap(): UseUnwrapResult {
         let finalizeHandle: `0x${string}` | null = null;
 
         for (const log of receipt.logs) {
-          if (log.address.toLowerCase() !== cTokenAddress.toLowerCase()) continue;
+          if (log.address.toLowerCase() !== cTokenAddress.toLowerCase())
+            continue;
           try {
             const decoded = decodeEventLog({
               abi: confidentialTokenAbi,
               data: log.data,
               topics: log.topics,
             });
-            if (decoded.eventName === "UnwrapRequested") {
-              finalizeHandle = (decoded.args as { amount: `0x${string}` }).amount;
+            if (decoded.eventName === 'UnwrapRequested') {
+              finalizeHandle = (decoded.args as { amount: `0x${string}` })
+                .amount;
               break;
             }
           } catch {
@@ -195,12 +203,16 @@ export function useUnwrap(): UseUnwrapResult {
 
         if (!finalizeHandle) {
           throw new Error(
-            "Could not find UnwrapRequested event in transaction logs — unwrap may have failed silently"
+            'Could not find UnwrapRequested event in transaction logs — unwrap may have failed silently'
           );
         }
 
         // Store finalize params in case it fails and needs retry
-        finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle, parsedAmount };
+        finalizeParamsRef.current = {
+          cTokenAddress,
+          handle: finalizeHandle,
+          parsedAmount,
+        };
 
         // Cooldown — NoxCompute rate-limits rapid successive calls
         await new Promise((r) => setTimeout(r, 2000));
@@ -209,12 +221,12 @@ export function useUnwrap(): UseUnwrapResult {
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);
       } catch (err) {
         setError(formatTransactionError(err));
-        setStep("error");
+        setStep('error');
         // If unwrap tx was sent but finalize failed, flag it
         setIsFinalizeError(finalizeParamsRef.current !== null);
       }
     },
-    [address, handleClient, writeContractAsync, publicClient, executeFinalize],
+    [address, handleClient, writeContractAsync, publicClient, executeFinalize]
   );
 
   return {

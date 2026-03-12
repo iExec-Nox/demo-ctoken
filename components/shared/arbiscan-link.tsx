@@ -1,4 +1,4 @@
-const BASE_URL = "https://sepolia.arbiscan.io/tx";
+const BASE_URL = 'https://sepolia.arbiscan.io/tx';
 
 interface ArbiscanLinkProps {
   txHash: string;
@@ -8,7 +8,7 @@ interface ArbiscanLinkProps {
 
 export function ArbiscanLink({
   txHash,
-  label = "View on Arbiscan",
+  label = 'View on Arbiscan',
   className,
 }: ArbiscanLinkProps) {
   return (
@@ -16,7 +16,7 @@ export function ArbiscanLink({
       href={`${BASE_URL}/${txHash}`}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1 font-mulish text-sm font-medium text-primary hover:underline ${className ?? ""}`}
+      className={`font-mulish text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline ${className ?? ''}`}
     >
       {label}
       <span className="material-icons text-[14px]!">open_in_new</span>

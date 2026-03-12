@@ -1,15 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { erc20Abi, parseUnits } from "viem";
-import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
-import { estimateGasOverrides } from "@/lib/gas";
-import { formatTransactionError } from "@/lib/utils";
-import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
-import type { TokenConfig } from "@/lib/tokens";
+import { useInvalidateBalances } from '@/hooks/use-invalidate-balances';
+import { confidentialTokenAbi } from '@/lib/confidential-token-abi';
+import { estimateGasOverrides } from '@/lib/gas';
+import type { TokenConfig } from '@/lib/tokens';
+import { formatTransactionError } from '@/lib/utils';
+import { useState, useCallback } from 'react';
+import { erc20Abi, parseUnits } from 'viem';
+import { useAccount, useWriteContract, usePublicClient } from 'wagmi';
 
-export type WrapStep = "idle" | "approving" | "wrapping" | "confirmed" | "error";
+export type WrapStep =
+  | 'idle'
+  | 'approving'
+  | 'wrapping'
+  | 'confirmed'
+  | 'error';
 
 interface UseWrapResult {
   step: WrapStep;
@@ -22,9 +27,11 @@ interface UseWrapResult {
 
 export function useWrap(): UseWrapResult {
   const { address } = useAccount();
-  const [step, setStep] = useState<WrapStep>("idle");
+  const [step, setStep] = useState<WrapStep>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [approveTxHash, setApproveTxHash] = useState<`0x${string}` | undefined>();
+  const [approveTxHash, setApproveTxHash] = useState<
+    `0x${string}` | undefined
+  >();
   const [wrapTxHash, setWrapTxHash] = useState<`0x${string}` | undefined>();
 
   const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
@@ -32,7 +39,7 @@ export function useWrap(): UseWrapResult {
   const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
-    setStep("idle");
+    setStep('idle');
     setError(null);
     setApproveTxHash(undefined);
     setWrapTxHash(undefined);
@@ -42,22 +49,22 @@ export function useWrap(): UseWrapResult {
   const wrap = useCallback(
     async (token: TokenConfig, amount: string) => {
       if (!address) {
-        setError("Wallet not connected");
-        setStep("error");
+        setError('Wallet not connected');
+        setStep('error');
         return;
       }
 
       if (!token.address || !token.confidentialAddress) {
-        setError("Token addresses not configured");
-        setStep("error");
+        setError('Token addresses not configured');
+        setStep('error');
         return;
       }
 
       const parsedAmount = parseUnits(amount, token.decimals);
 
       if (parsedAmount === 0n) {
-        setError("Amount must be greater than zero");
-        setStep("error");
+        setError('Amount must be greater than zero');
+        setStep('error');
         return;
       }
 
@@ -66,13 +73,13 @@ export function useWrap(): UseWrapResult {
 
       try {
         // Step 1: Approve exact amount on ERC-20
-        setStep("approving");
+        setStep('approving');
         setError(null);
 
         const approveTx = await writeContractAsync({
           address: erc20Address,
           abi: erc20Abi,
-          functionName: "approve",
+          functionName: 'approve',
           args: [cTokenAddress, parsedAmount],
           ...(await estimateGasOverrides(publicClient)),
         });
@@ -87,12 +94,12 @@ export function useWrap(): UseWrapResult {
         await new Promise((r) => setTimeout(r, 2000));
 
         // Step 2: Wrap on cToken contract (re-estimate gas fresh)
-        setStep("wrapping");
+        setStep('wrapping');
 
         const wrapTx = await writeContractAsync({
           address: cTokenAddress,
           abi: confidentialTokenAbi,
-          functionName: "wrap",
+          functionName: 'wrap',
           args: [address, parsedAmount],
           ...(await estimateGasOverrides(publicClient)),
         });
@@ -102,14 +109,14 @@ export function useWrap(): UseWrapResult {
         // Wait for wrap tx to be mined before marking confirmed
         await publicClient!.waitForTransactionReceipt({ hash: wrapTx });
 
-        setStep("confirmed");
+        setStep('confirmed');
         invalidateBalances();
       } catch (err) {
         setError(formatTransactionError(err));
-        setStep("error");
+        setStep('error');
       }
     },
-    [address, writeContractAsync, publicClient, invalidateBalances],
+    [address, writeContractAsync, publicClient, invalidateBalances]
   );
 
   return { step, error, approveTxHash, wrapTxHash, wrap, reset };

@@ -6,14 +6,14 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Styling | Tailwind CSS v4 + shadcn/ui (New York) |
-| Web3 | wagmi v2 + viem + Reown AppKit |
-| Confidential | Nox SDK (`@iexec-nox/handle`) |
-| Chain | Arbitrum Sepolia (421614) |
-| Prices | CoinGecko API (via Next.js API route) |
+| Layer        | Technology                             |
+| ------------ | -------------------------------------- |
+| Framework    | Next.js 16 (App Router, Turbopack)     |
+| Styling      | Tailwind CSS v4 + shadcn/ui (New York) |
+| Web3         | wagmi v2 + viem + Reown AppKit         |
+| Confidential | Nox SDK (`@iexec-nox/handle`)          |
+| Chain        | Arbitrum Sepolia (421614)              |
+| Prices       | CoinGecko API (via Next.js API route)  |
 
 ---
 
@@ -33,13 +33,13 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 
 ## Deployed Contracts (Arbitrum Sepolia)
 
-| Contract | Address |
-|----------|---------|
-| USDC (ERC-20) | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` |
+| Contract         | Address                                      |
+| ---------------- | -------------------------------------------- |
+| USDC (ERC-20)    | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` |
 | cUSDC (ERC-7984) | `0x305df62f6903fad716cc45abcc0e5c180979c169` |
-| RLC (ERC-20) | `0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963` |
-| cRLC (ERC-7984) | `0x271f46e78f2fe59817854dabde47729ac4935765` |
-| NoxCompute | `0x5633472D35E18464CA24Ab974954fB3b1B122eA6` |
+| RLC (ERC-20)     | `0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963` |
+| cRLC (ERC-7984)  | `0x271f46e78f2fe59817854dabde47729ac4935765` |
+| NoxCompute       | `0x5633472D35E18464CA24Ab974954fB3b1B122eA6` |
 
 ---
 

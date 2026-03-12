@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { useTheme } from "next-themes";
-import { ThemeProvider } from "@/components/layout/theme-provider";
-import { FaucetModalProvider } from "@/components/modals/faucet-modal-provider";
-import { WrapModalProvider } from "@/components/modals/wrap-modal-provider";
-import { TransferModalProvider } from "@/components/modals/transfer-modal-provider";
-import { SelectiveDisclosureModalProvider } from "@/components/modals/selective-disclosure-modal-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createAppKit, useAppKitTheme } from "@reown/appkit/react";
-import { arbitrumSepolia } from "@reown/appkit/networks";
-import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
-import { wagmiAdapter, projectId } from "@/lib/wagmi";
+import { ThemeProvider } from '@/components/layout/theme-provider';
+import { FaucetModalProvider } from '@/components/modals/faucet-modal-provider';
+import { SelectiveDisclosureModalProvider } from '@/components/modals/selective-disclosure-modal-provider';
+import { TransferModalProvider } from '@/components/modals/transfer-modal-provider';
+import { WrapModalProvider } from '@/components/modals/wrap-modal-provider';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { wagmiAdapter, projectId } from '@/lib/wagmi';
+import { arbitrumSepolia } from '@reown/appkit/networks';
+import { createAppKit, useAppKitTheme } from '@reown/appkit/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useTheme } from 'next-themes';
+import { useState, useEffect, useRef } from 'react';
+import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 
 let appKitInitialized = false;
 
@@ -26,16 +26,16 @@ function initAppKit() {
     networks: [arbitrumSepolia],
     defaultNetwork: arbitrumSepolia,
     metadata: {
-      name: "Confidential Token | Nox",
-      description: "Manage your confidential assets privately",
-      url: "https://nox.iex.ec",
-      icons: ["/nox-icon.png"],
+      name: 'Confidential Token | Nox',
+      description: 'Manage your confidential assets privately',
+      url: 'https://nox.iex.ec',
+      icons: ['/nox-icon.png'],
     },
     allowUnsupportedChain: false,
-    themeMode: "dark",
+    themeMode: 'dark',
     themeVariables: {
-      "--w3m-accent": "#748eff",
-      "--w3m-border-radius-master": "2px",
+      '--w3m-accent': '#748eff',
+      '--w3m-border-radius-master': '2px',
     },
   });
 }
@@ -49,21 +49,21 @@ function AppKitThemeSync() {
     if (!resolvedTheme || resolvedTheme === prevThemeRef.current) return;
     prevThemeRef.current = resolvedTheme;
 
-    const mode = resolvedTheme as "light" | "dark";
+    const mode = resolvedTheme as 'light' | 'dark';
     appKitTheme.setThemeMode(mode);
     appKitTheme.setThemeVariables(
-      mode === "light"
+      mode === 'light'
         ? {
-            "--w3m-accent": "#748eff",
-            "--w3m-border-radius-master": "2px",
-            "--w3m-color-mix": "#e3ecff",
-            "--w3m-color-mix-strength": 25,
+            '--w3m-accent': '#748eff',
+            '--w3m-border-radius-master': '2px',
+            '--w3m-color-mix': '#e3ecff',
+            '--w3m-color-mix-strength': 25,
           }
         : {
-            "--w3m-accent": "#748eff",
-            "--w3m-border-radius-master": "2px",
-            "--w3m-color-mix": "#0f1119",
-            "--w3m-color-mix-strength": 10,
+            '--w3m-accent': '#748eff',
+            '--w3m-border-radius-master': '2px',
+            '--w3m-color-mix': '#0f1119',
+            '--w3m-color-mix-strength': 10,
           }
     );
   }, [resolvedTheme, appKitTheme]);
@@ -87,7 +87,12 @@ export function Providers({ children, cookies }: ProvidersProps) {
   );
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem
+      disableTransitionOnChange
+    >
       <WagmiProvider
         config={wagmiAdapter.wagmiConfig as Config}
         initialState={initialState}

@@ -1,7 +1,13 @@
-"use client";
+'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { TransferModal } from "./transfer-modal";
+import { TransferModal } from './transfer-modal';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 interface TransferModalContextType {
   open: boolean;
@@ -9,9 +15,15 @@ interface TransferModalContextType {
   openTransfer: () => void;
 }
 
-const TransferModalContext = createContext<TransferModalContextType | null>(null);
+const TransferModalContext = createContext<TransferModalContextType | null>(
+  null
+);
 
-export function TransferModalProvider({ children }: { children: React.ReactNode }) {
+export function TransferModalProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   const openTransfer = useCallback(() => {
@@ -34,7 +46,9 @@ export function TransferModalProvider({ children }: { children: React.ReactNode 
 export function useTransferModal() {
   const context = useContext(TransferModalContext);
   if (!context) {
-    throw new Error("useTransferModal must be used within a TransferModalProvider");
+    throw new Error(
+      'useTransferModal must be used within a TransferModalProvider'
+    );
   }
   return context;
 }

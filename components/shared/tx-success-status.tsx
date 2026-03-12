@@ -1,4 +1,4 @@
-import { ArbiscanLink } from "./arbiscan-link";
+import { ArbiscanLink } from './arbiscan-link';
 
 interface TxSuccessStatusProps {
   message: string;
@@ -7,14 +7,22 @@ interface TxSuccessStatusProps {
 
 export function TxSuccessStatus({ message, txHash }: TxSuccessStatusProps) {
   return (
-    <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
+    <div
+      className="flex flex-col items-center gap-1 py-2"
+      role="status"
+      aria-live="polite"
+    >
       <div className="flex items-center gap-3">
-        <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
-        <span className="font-mulish text-sm font-medium text-text-body">
+        <div className="bg-tx-success-text size-3 rounded-full opacity-70" />
+        <span className="font-mulish text-text-body text-sm font-medium">
           {message}
         </span>
       </div>
-      <ArbiscanLink txHash={txHash} label="View on Arbiscan" className="text-xs" />
+      <ArbiscanLink
+        txHash={txHash}
+        label="View on Arbiscan"
+        className="text-xs"
+      />
     </div>
   );
 }

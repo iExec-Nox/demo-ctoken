@@ -1,33 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { isAddress } from "viem";
-import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
-import { estimateGasOverrides } from "@/lib/gas";
-import { formatTransactionError } from "@/lib/utils";
-import {
-  noxComputeAbi,
-  NOX_COMPUTE_ADDRESS,
-} from "@/lib/nox-compute-abi";
-import type { TokenConfig } from "@/lib/tokens";
-import { ZERO_HANDLE } from "@/lib/contracts";
+import { confidentialTokenAbi } from '@/lib/confidential-token-abi';
+import { ZERO_HANDLE } from '@/lib/contracts';
+import { estimateGasOverrides } from '@/lib/gas';
+import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from '@/lib/nox-compute-abi';
+import type { TokenConfig } from '@/lib/tokens';
+import { formatTransactionError } from '@/lib/utils';
+import { useState, useCallback } from 'react';
+import { isAddress } from 'viem';
+import { useAccount, useWriteContract, usePublicClient } from 'wagmi';
 
 export type AddViewerStep =
-  | "idle"
-  | "reading-handle"
-  | "granting"
-  | "confirmed"
-  | "error";
+  | 'idle'
+  | 'reading-handle'
+  | 'granting'
+  | 'confirmed'
+  | 'error';
 
 interface UseAddViewerResult {
   step: AddViewerStep;
   error: string | null;
   txHash: `0x${string}` | undefined;
-  grant: (
-    viewerAddress: string,
-    tokens: TokenConfig[],
-  ) => Promise<void>;
+  grant: (viewerAddress: string, tokens: TokenConfig[]) => Promise<void>;
   reset: () => void;
 }
 
@@ -36,12 +30,12 @@ export function useAddViewer(): UseAddViewerResult {
   const publicClient = usePublicClient();
   const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
 
-  const [step, setStep] = useState<AddViewerStep>("idle");
+  const [step, setStep] = useState<AddViewerStep>('idle');
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
 
   const reset = useCallback(() => {
-    setStep("idle");
+    setStep('idle');
     setError(null);
     setTxHash(undefined);
     resetWriteContract();
@@ -50,20 +44,20 @@ export function useAddViewer(): UseAddViewerResult {
   const grant = useCallback(
     async (viewerAddress: string, tokens: TokenConfig[]) => {
       if (!address) {
-        setError("Wallet not connected");
-        setStep("error");
+        setError('Wallet not connected');
+        setStep('error');
         return;
       }
 
       if (!publicClient) {
-        setError("Public client not available");
-        setStep("error");
+        setError('Public client not available');
+        setStep('error');
         return;
       }
 
       if (!isAddress(viewerAddress)) {
-        setError("Invalid viewer address");
-        setStep("error");
+        setError('Invalid viewer address');
+        setStep('error');
         return;
       }
 
@@ -73,7 +67,7 @@ export function useAddViewer(): UseAddViewerResult {
         const gasOverrides = await estimateGasOverrides(publicClient);
 
         // Step 1: Read balance handles for each selected token
-        setStep("reading-handle");
+        setStep('reading-handle');
         setError(null);
 
         const handleEntries: { token: TokenConfig; handle: `0x${string}` }[] =
@@ -84,12 +78,12 @@ export function useAddViewer(): UseAddViewerResult {
             | `0x${string}`
             | undefined;
 
-          if (!cTokenAddress || cTokenAddress === "0x...") continue;
+          if (!cTokenAddress || cTokenAddress === '0x...') continue;
 
           const balanceHandle = await publicClient.readContract({
             address: cTokenAddress,
             abi: confidentialTokenAbi,
-            functionName: "confidentialBalanceOf",
+            functionName: 'confidentialBalanceOf',
             args: [address],
           });
 
@@ -100,14 +94,14 @@ export function useAddViewer(): UseAddViewerResult {
 
         if (handleEntries.length === 0) {
           setError(
-            "No confidential balance found for the selected token(s). Wrap tokens first.",
+            'No confidential balance found for the selected token(s). Wrap tokens first.'
           );
-          setStep("error");
+          setStep('error');
           return;
         }
 
         // Step 2: Call addViewer for each handle
-        setStep("granting");
+        setStep('granting');
 
         let lastTxHash: `0x${string}` | undefined;
 
@@ -115,7 +109,7 @@ export function useAddViewer(): UseAddViewerResult {
           const tx = await writeContractAsync({
             address: NOX_COMPUTE_ADDRESS,
             abi: noxComputeAbi,
-            functionName: "addViewer",
+            functionName: 'addViewer',
             args: [handle, viewer],
             ...gasOverrides,
           });
@@ -129,13 +123,13 @@ export function useAddViewer(): UseAddViewerResult {
         }
 
         setTxHash(lastTxHash);
-        setStep("confirmed");
+        setStep('confirmed');
       } catch (err) {
         setError(formatTransactionError(err));
-        setStep("error");
+        setStep('error');
       }
     },
-    [address, publicClient, writeContractAsync],
+    [address, publicClient, writeContractAsync]
   );
 
   return { step, error, txHash, grant, reset };

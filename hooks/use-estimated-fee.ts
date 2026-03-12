@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { useGasPrice } from "wagmi";
-import { formatEther } from "viem";
+import { useMemo } from 'react';
+import { formatEther } from 'viem';
+import { useGasPrice } from 'wagmi';
 
 interface UseEstimatedFeeResult {
   /** Formatted fee string (e.g. "0.0003") or null if not yet available */
@@ -22,8 +22,8 @@ export function useEstimatedFee(gasLimit: bigint): UseEstimatedFeeResult {
     const raw = formatEther(gasPrice * gasLimit);
     // Show up to 6 significant decimals, trim trailing zeros
     const trimmed = parseFloat(raw);
-    if (trimmed === 0) return "< 0.000001";
-    return `~${trimmed.toFixed(6).replace(/0+$/, "").replace(/\.$/, "")}`;
+    if (trimmed === 0) return '< 0.000001';
+    return `~${trimmed.toFixed(6).replace(/0+$/, '').replace(/\.$/, '')}`;
   }, [gasPrice, gasLimit]);
 
   return { fee, isLoading };

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 export default function GlobalError({
   error,
@@ -11,16 +11,16 @@ export default function GlobalError({
     <html lang="en">
       <body className="bg-background text-foreground antialiased">
         <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-          <h1 className="text-3xl font-bold text-text-heading">
+          <h1 className="text-text-heading text-3xl font-bold">
             Something went wrong
           </h1>
-          <p className="max-w-md text-base text-text-muted">
-            {error.message || "A critical error occurred."}
+          <p className="text-text-muted max-w-md text-base">
+            {error.message || 'A critical error occurred.'}
           </p>
           <button
             type="button"
             onClick={reset}
-            className="rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground transition-colors hover:bg-primary-hover"
+            className="bg-primary text-primary-foreground hover:bg-primary-hover rounded-xl px-5 py-4 font-bold transition-colors"
           >
             Try again
           </button>

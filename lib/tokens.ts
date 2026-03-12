@@ -1,4 +1,4 @@
-import { CONTRACTS } from "./contracts";
+import { CONTRACTS } from './contracts';
 
 export interface TokenConfig {
   symbol: string;
@@ -14,44 +14,44 @@ export interface TokenConfig {
 
 export const tokens: TokenConfig[] = [
   {
-    symbol: "ETH",
-    name: "Ethereum",
+    symbol: 'ETH',
+    name: 'Ethereum',
     decimals: 18,
     isNative: true,
-    icon: "/icon-eth.svg",
-    coingeckoId: "ethereum",
+    icon: '/icon-eth.svg',
+    coingeckoId: 'ethereum',
   },
   {
-    symbol: "USDC",
-    name: "USD Coin",
+    symbol: 'USDC',
+    name: 'USD Coin',
     decimals: 6,
     address: CONTRACTS.USDC,
-    icon: "/icon-usdc.svg",
-    coingeckoId: "usd-coin",
+    icon: '/icon-usdc.svg',
+    coingeckoId: 'usd-coin',
     wrappable: true,
     confidentialAddress: CONTRACTS.cUSDC,
   },
   {
-    symbol: "RLC",
-    name: "iExec RLC",
+    symbol: 'RLC',
+    name: 'iExec RLC',
     decimals: 9,
     address: CONTRACTS.RLC,
-    icon: "/icon-rlc.svg",
-    coingeckoId: "iexec-rlc",
+    icon: '/icon-rlc.svg',
+    coingeckoId: 'iexec-rlc',
     wrappable: true,
     confidentialAddress: CONTRACTS.cRLC,
   },
 ];
 
 export const erc20Tokens = tokens.filter(
-  (t): t is TokenConfig & { address: string } => !t.isNative && !!t.address,
+  (t): t is TokenConfig & { address: string } => !t.isNative && !!t.address
 );
 
-export const nativeToken = tokens.find(t => t.isNative);
+export const nativeToken = tokens.find((t) => t.isNative);
 
-export const wrappableTokens = erc20Tokens.filter(t => t.wrappable);
+export const wrappableTokens = erc20Tokens.filter((t) => t.wrappable);
 
-export const confidentialTokens = wrappableTokens.map(t => ({
+export const confidentialTokens = wrappableTokens.map((t) => ({
   ...t,
   symbol: `c${t.symbol}`,
   name: `Confidential ${t.name}`,
@@ -59,6 +59,6 @@ export const confidentialTokens = wrappableTokens.map(t => ({
 }));
 
 export const coingeckoIds = tokens
-  .map(t => t.coingeckoId)
+  .map((t) => t.coingeckoId)
   .filter(Boolean)
-  .join(",");
+  .join(',');
