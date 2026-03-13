@@ -10,7 +10,7 @@ export function useCopyToClipboard(delay = 2000) {
       navigator.clipboard.writeText(text).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), delay);
-      });
+      }).catch(() => {});
     },
     [delay],
   );

@@ -26,8 +26,6 @@ const TOKEN_PAIRS = [
 
 const POLL_INTERVAL = 30_000;
 
-type Erc20TransferLog = GetContractEventsReturnType<typeof erc20Abi, "Transfer">[number];
-type UnwrapLog = GetContractEventsReturnType<typeof confidentialTokenAbi, "UnwrapFinalized">[number];
 type ConfTransferLog = GetContractEventsReturnType<typeof confidentialTokenAbi, "ConfidentialTransfer">[number];
 
 function formatTimestamp(seconds: number): string {
@@ -140,32 +138,32 @@ export function useActivityHistory(): UseActivityHistoryResult {
 
         // Build entries
         for (const { pair, wrapLogs, unwrapLogs, confFromLogs, confToLogs } of pairResults) {
-          for (const log of wrapLogs as Erc20TransferLog[]) {
-            const value = (log.args as { value: bigint }).value;
+          for (const log of wrapLogs) {
+            if (log.args.value == null) continue;
             allEntries.push({
               id: `${log.transactionHash}-${log.logIndex}`,
               type: "wrap",
               asset: pair.asset,
-              amount: formatBalance(value, pair.decimals),
+              amount: formatBalance(log.args.value, pair.decimals),
               timestamp: getTs(log.blockNumber),
               txHash: log.transactionHash!,
             });
           }
 
-          for (const log of unwrapLogs as UnwrapLog[]) {
-            const args = log.args as unknown as { cleartextAmount: bigint };
+          for (const log of unwrapLogs) {
+            if (log.args.cleartextAmount == null) continue;
             allEntries.push({
               id: `${log.transactionHash}-${log.logIndex}`,
               type: "unwrap",
               asset: pair.asset,
-              amount: formatBalance(args.cleartextAmount, pair.decimals),
+              amount: formatBalance(log.args.cleartextAmount, pair.decimals),
               timestamp: getTs(log.blockNumber),
               txHash: log.transactionHash!,
             });
           }
 
           const confMap = new Map<string, ConfTransferLog>();
-          for (const log of [...confFromLogs, ...confToLogs] as ConfTransferLog[]) {
+          for (const log of confFromLogs.concat(confToLogs)) {
             confMap.set(`${log.transactionHash}-${log.logIndex}`, log);
           }
           for (const log of confMap.values()) {
