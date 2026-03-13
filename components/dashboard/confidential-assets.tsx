@@ -71,7 +71,7 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
           <p className="font-mulish text-sm text-text-muted">
             No confidential assets yet.
           </p>
-          <p className="max-w-md text-center font-mulish text-xs leading-5 text-asset-text-tertiary">
+          <p className="max-w-md text-center font-mulish text-xs leading-5 text-text-muted">
             Wrap your public tokens to create confidential assets. Your balances
             will be encrypted on-chain and hidden from block explorers.
           </p>
