@@ -104,6 +104,7 @@ export function WrapModal() {
   }, [open, activeTab, resetWrap, resetUnwrap, setDropdownOpen]);
 
 
+
   const handleAmountChange = useCallback(
     (value: string) => {
       // Allow empty, or valid decimal numbers
@@ -137,11 +138,13 @@ export function WrapModal() {
   const handleWrap = useCallback(async () => {
     if (!selectedTokenConfig || !amount) return;
     await wrap(selectedTokenConfig, amount);
+    setAmount("");
   }, [selectedTokenConfig, amount, wrap]);
 
   const handleUnwrap = useCallback(async () => {
     if (!selectedTokenConfig || !amount) return;
     await unwrap(selectedTokenConfig, amount);
+    setAmount("");
   }, [selectedTokenConfig, amount, unwrap]);
 
   // Validation
@@ -421,15 +424,6 @@ export function WrapModal() {
                     {isWrap
                       ? (wrapStep === "approving" ? "Approving..." : "Wrapping...")
                       : (unwrapStep === "encrypting" ? "Encrypting..." : unwrapStep === "unwrapping" ? "Unwrapping..." : "Finalizing...")}
-                  </span>
-                </>
-              ) : (isWrap ? wrapStep : unwrapStep) === "confirmed" ? (
-                <>
-                  <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
-                    check_circle
-                  </span>
-                  <span className="font-mulish text-sm font-bold text-primary-foreground md:text-lg">
-                    {isWrap ? "Wrapped!" : "Unwrapped!"}
                   </span>
                 </>
               ) : (

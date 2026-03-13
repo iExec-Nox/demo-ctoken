@@ -154,6 +154,7 @@ export function SelectiveDisclosureModal() {
     [setOpen, reset],
   );
 
+
   const handleScopeChange = useCallback((newScope: ScopeType) => {
     setScope(newScope);
     if (newScope === "full") {
@@ -184,6 +185,8 @@ export function SelectiveDisclosureModal() {
       selectedTokens.has(t.symbol),
     );
     await grant(viewerAddress, tokensToGrant);
+    setViewerAddress("");
+    setSelectedTokens(new Set());
   }, [viewerAddress, selectedTokens, grant]);
 
   const isValidAddress = isAddress(viewerAddress);
@@ -419,18 +422,6 @@ export function SelectiveDisclosureModal() {
                     {step === "reading-handle"
                       ? "Reading..."
                       : "Granting..."}
-                  </span>
-                </>
-              ) : step === "confirmed" ? (
-                <>
-                  <span
-                    aria-hidden="true"
-                    className="material-icons text-[16px]! text-primary-foreground"
-                  >
-                    check_circle
-                  </span>
-                  <span className="font-mulish text-base font-bold text-primary-foreground">
-                    Granted!
                   </span>
                 </>
               ) : (
