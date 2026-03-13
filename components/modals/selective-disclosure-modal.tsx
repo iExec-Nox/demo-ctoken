@@ -143,6 +143,7 @@ export function SelectiveDisclosureModal() {
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
+      if (!isOpen && isProcessing) return;
       setOpen(isOpen);
       if (isOpen) {
         setViewerAddress("");
@@ -151,7 +152,7 @@ export function SelectiveDisclosureModal() {
         reset();
       }
     },
-    [setOpen, reset],
+    [setOpen, reset, isProcessing],
   );
 
   const handleScopeChange = useCallback((newScope: ScopeType) => {
@@ -199,6 +200,8 @@ export function SelectiveDisclosureModal() {
       <DialogContent
         className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-[18px] overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[34px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[850px]"
         showCloseButton={false}
+        onEscapeKeyDown={(e) => { if (isProcessing) e.preventDefault(); }}
+        onInteractOutside={(e) => { if (isProcessing) e.preventDefault(); }}
       >
         {/* Header + Close */}
         <div className="relative w-full text-center">
@@ -212,7 +215,8 @@ export function SelectiveDisclosureModal() {
           <button
             type="button"
             onClick={() => handleOpenChange(false)}
-            className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
+            disabled={isProcessing}
+            className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
             aria-label="Close"
           >
             X
