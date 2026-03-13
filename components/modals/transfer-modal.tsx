@@ -171,7 +171,7 @@ export function TransferModal() {
                     ref={triggerRef}
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(30,41,59,0.5)] px-3 py-2.5 transition-opacity hover:opacity-80"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-token-selector-border bg-token-selector-bg px-3 py-2.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
                   >
@@ -376,7 +376,7 @@ export function TransferModal() {
             <ProgressTracker currentStep={step} steps={TRANSFER_STEPS} />
 
             {/* How it works */}
-            <InfoCard className="md:!p-3">
+            <InfoCard className="md:p-3!">
               Amounts are encrypted.
               <br />
               The transfer is verified on-chain without revealing values.

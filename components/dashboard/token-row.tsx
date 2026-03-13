@@ -16,7 +16,7 @@ export function TokenRow({
   usdValue,
 }: TokenRowProps) {
   return (
-    <div className="flex items-center justify-between border-t border-white px-6 py-5 dark:border-surface-border">
+    <div className="flex items-center justify-between border-t border-row-divider px-6 py-5">
       <div className="flex items-center gap-4 md:gap-6">
         <div className="flex size-8 items-center justify-center rounded-full bg-primary">
           <Image

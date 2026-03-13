@@ -14,7 +14,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
   const tokensWithBalance = balances.filter((b) => b.balance > 0n);
 
   return (
-    <Card className="gap-0 rounded-3xl border-[rgba(255,255,255,0.76)] bg-[rgba(255,255,255,0.08)] py-0 shadow-none dark:border-surface-border dark:bg-asset-card-bg">
+    <Card className="gap-0 rounded-3xl border-asset-list-border bg-asset-list-bg py-0 shadow-none">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
           );
         })
       ) : (
-        <div className="border-t border-white px-6 py-8 text-center dark:border-surface-border">
+        <div className="border-t border-row-divider px-6 py-8 text-center">
           <p className="font-mulish text-sm text-text-muted">
             No public assets detected.
           </p>

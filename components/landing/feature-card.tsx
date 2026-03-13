@@ -9,7 +9,7 @@ interface FeatureCardProps {
 
 export function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <Card className="flex-1 gap-2 rounded-2xl border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.25)] px-5 py-4 shadow-none backdrop-blur-sm dark:border-surface-border dark:bg-surface md:gap-3 md:px-10 md:py-5 lg:gap-4 lg:py-8">
+    <Card className="flex-1 gap-2 rounded-2xl border-feature-card-border bg-feature-card-bg px-5 py-4 shadow-none backdrop-blur-sm md:gap-3 md:px-10 md:py-5 lg:gap-4 lg:py-8">
       <CardHeader className="p-0">
         <div className="flex size-10 items-center justify-center rounded-xl bg-card-icon-bg md:size-[42px] lg:size-12">
           <Image src={icon} alt="" width={28} height={28} className="size-[26px] md:size-[30px] lg:size-7" />

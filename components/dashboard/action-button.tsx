@@ -31,14 +31,14 @@ export function ActionButton({
       <div className="text-left">
         <p
           className={`font-mulish text-sm font-bold leading-6 md:text-base ${
-            disabled ? "text-text-muted" : "text-white dark:text-text-heading"
+            disabled ? "text-text-muted" : "text-primary-foreground"
           }`}
         >
           {label}
         </p>
         <p
           className={`font-mulish text-[10px] leading-[15px] ${
-            disabled ? "text-text-muted" : "text-white dark:text-text-heading"
+            disabled ? "text-text-muted" : "text-primary-foreground"
           }`}
         >
           {description}
@@ -49,15 +49,14 @@ export function ActionButton({
 
   if (disabled) {
     return (
-      <div
+      <button
+        type="button"
+        disabled
         className="flex w-full items-center gap-4 rounded-2xl border border-surface-border bg-surface p-4 cursor-not-allowed opacity-30"
-        role="button"
-        tabIndex={-1}
-        aria-disabled="true"
         aria-label={`${label} — ${description}`}
       >
         {content}
-      </div>
+      </button>
     );
   }
 
@@ -65,7 +64,7 @@ export function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-4 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(116,142,255,0.68)] p-4 cursor-pointer transition-opacity hover:opacity-80 dark:border-action-btn-active-border dark:bg-action-btn-active-bg"
+      className="flex w-full items-center gap-4 rounded-2xl border border-action-btn-active-border bg-action-btn-active-bg p-4 cursor-pointer transition-opacity hover:opacity-80"
       aria-label={`${label} — ${description}`}
     >
       {content}

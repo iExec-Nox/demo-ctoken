@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -80,7 +80,7 @@ export function WrapModal() {
   const currentError = isWrap ? wrapError : unwrapError;
 
   // Map wrappable tokens with balances
-  const wrappableTokens = wrappableTokenConfigs.map((t) => {
+  const wrappableTokens = useMemo(() => wrappableTokenConfigs.map((t) => {
     const bal = balances.find((b) => b.symbol === t.symbol);
     return {
       symbol: t.symbol,
@@ -89,7 +89,7 @@ export function WrapModal() {
       balance: bal?.balance ?? 0n,
       formatted: bal?.formatted ?? "0",
     };
-  });
+  }), [balances]);
 
   const selectedToken = wrappableTokens.find((t) => t.symbol === selectedSymbol) ?? wrappableTokens[0];
 
@@ -252,7 +252,7 @@ export function WrapModal() {
                     ref={triggerRef}
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-[rgba(255,255,255,0.05)] bg-[rgba(30,41,59,0.5)] px-3 py-1.5 transition-opacity hover:opacity-80"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-token-selector-border bg-token-selector-bg px-3 py-1.5 transition-opacity hover:opacity-80"
                     aria-label="Select token"
                     aria-expanded={dropdownOpen}
                   >

@@ -22,7 +22,7 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
   const initializedTokens = balances.filter((b) => b.isInitialized);
 
   return (
-    <Card className="gap-0 rounded-3xl border-[rgba(255,255,255,0.76)] bg-[rgba(255,255,255,0.08)] py-0 shadow-none dark:border-surface-border dark:bg-asset-card-bg">
+    <Card className="gap-0 rounded-3xl border-asset-list-border bg-asset-list-bg py-0 shadow-none">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
@@ -43,7 +43,7 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center border-t border-white dark:border-surface-border px-6 py-10">
+        <div className="flex items-center justify-center border-t border-row-divider px-6 py-10">
           <span
             aria-hidden="true"
             className="material-icons animate-spin text-[24px]! text-text-muted"
@@ -61,7 +61,7 @@ export function ConfidentialAssets({ prices }: ConfidentialAssetsProps) {
           />
         ))
       ) : (
-        <div className="flex flex-col items-center gap-3 border-t border-white dark:border-surface-border px-6 py-10">
+        <div className="flex flex-col items-center gap-3 border-t border-row-divider px-6 py-10">
           <span
             aria-hidden="true"
             className="material-icons text-[32px]! text-asset-text-tertiary"
@@ -123,7 +123,7 @@ function ConfidentialTokenRow({
   const isDecrypting = decryptState === "decrypting";
 
   return (
-    <div className="flex items-center justify-between border-t border-white dark:border-surface-border px-6 py-5">
+    <div className="flex items-center justify-between border-t border-row-divider px-6 py-5">
       {/* Left: icon + name with eye toggle */}
       <div className="flex items-center gap-4 md:gap-6">
         <div className="flex size-8 items-center justify-center rounded-full bg-primary">

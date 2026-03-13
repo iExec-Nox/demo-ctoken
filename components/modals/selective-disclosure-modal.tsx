@@ -447,7 +447,7 @@ export function SelectiveDisclosureModal() {
           </div>
 
           {/* How it works — inside glass card on mobile */}
-          <InfoCard className="backdrop-blur-lg md:!p-3">
+          <InfoCard className="backdrop-blur-lg md:p-3!">
             Selective disclosure shares a handle or balance at a given
             moment. The recipient can access data tied to that specific
             state only.
