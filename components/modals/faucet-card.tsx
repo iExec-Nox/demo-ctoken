@@ -39,7 +39,7 @@ export function FaucetCard({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full cursor-pointer rounded-xl bg-primary px-[10px] py-2 text-center font-mulish text-sm font-bold leading-7 text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover sm:px-5 sm:py-2.5 sm:text-[15px]"
+        className="w-full cursor-pointer rounded-xl bg-primary px-[10px] py-2 text-center font-mulish text-sm font-bold leading-7 text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] hover:bg-primary-hover sm:px-5 sm:py-2.5 sm:text-[15px]"
       >
         {mintLabel}
       </a>

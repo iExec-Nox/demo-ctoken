@@ -48,12 +48,12 @@ export function FaucetModal() {
       >
         {/* Header */}
         <div className="flex flex-col items-center gap-2.5">
-          <div className="relative size-[35px] overflow-hidden rounded-[10px] bg-primary sm:size-16 sm:rounded-xl">
+          <div className="relative size-[35px] overflow-hidden rounded-[10px] sm:size-16 sm:rounded-xl">
             <Image
               src="/nox-icon.png"
               alt=""
               fill
-              className="object-cover brightness-0 invert"
+              className="object-cover"
             />
           </div>
 

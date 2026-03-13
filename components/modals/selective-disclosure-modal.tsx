@@ -197,23 +197,11 @@ export function SelectiveDisclosureModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-[18px] overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[34px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[784px]"
+        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-[18px] overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[34px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[850px]"
         showCloseButton={false}
       >
-        {/* Close button */}
-        <div className="flex w-full items-center justify-end">
-          <button
-            type="button"
-            onClick={() => handleOpenChange(false)}
-            className="cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
-            aria-label="Close"
-          >
-            X
-          </button>
-        </div>
-
-        {/* Header */}
-        <div className="w-full text-center">
+        {/* Header + Close */}
+        <div className="relative w-full text-center">
           <DialogTitle className="font-mulish text-[32px] font-bold leading-10 tracking-[-0.9px] text-text-heading md:text-[36px]">
             Selective Disclosure
           </DialogTitle>
@@ -221,6 +209,14 @@ export function SelectiveDisclosureModal() {
             Grant third parties the ability to audit your confidential
             transactions without giving up control of your assets.
           </DialogDescription>
+          <button
+            type="button"
+            onClick={() => handleOpenChange(false)}
+            className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
+            aria-label="Close"
+          >
+            X
+          </button>
         </div>
 
         {/* Add a New Viewer — glass card */}
@@ -409,7 +405,7 @@ export function SelectiveDisclosureModal() {
               type="button"
               disabled={!canGrant}
               onClick={handleGrant}
-              className="flex w-[181px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-[18px] py-3 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex w-[181px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-[18px] py-3 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isProcessing ? (
                 <>
@@ -436,6 +432,9 @@ export function SelectiveDisclosureModal() {
             {step === "error" && error && (
               <ErrorMessage error={error} onRetry={reset} />
             )}
+
+            {/* Progress tracker */}
+            <ProgressTracker currentStep={step} steps={DISCLOSURE_STEPS} />
           </div>
 
           {/* How it works — inside glass card on mobile */}
@@ -445,9 +444,6 @@ export function SelectiveDisclosureModal() {
             state only.
           </InfoCard>
         </div>
-
-        {/* Progress tracker */}
-        <ProgressTracker currentStep={step} steps={DISCLOSURE_STEPS} />
 
         {/* Arbiscan link on success */}
         {step === "confirmed" && txHash && (

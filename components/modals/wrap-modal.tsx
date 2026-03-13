@@ -163,31 +163,27 @@ export function WrapModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[40px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[552px]"
+        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[40px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[620px]"
         showCloseButton={false}
       >
-        {/* Close button */}
-        <div className="flex w-full items-center justify-end">
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
-            aria-label="Close"
-          >
-            X
-          </button>
-        </div>
-
         {/* Content */}
         <div className="flex min-w-0 w-full flex-col items-center gap-[26px]">
-          {/* Header */}
-          <div className="text-center">
+          {/* Header + Close */}
+          <div className="relative w-full text-center">
             <DialogTitle className="font-mulish text-[26px] font-bold leading-10 text-text-heading md:text-[34px]">
               Convert Assets
             </DialogTitle>
             <DialogDescription className="mt-2 font-mulish text-sm leading-6 text-text-body md:text-base">
               {isWrap ? "Make your assets confidential" : "Return your assets to public"}
             </DialogDescription>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
+              aria-label="Close"
+            >
+              X
+            </button>
           </div>
 
           {/* Glass card */}
@@ -411,7 +407,7 @@ export function WrapModal() {
               type="button"
               disabled={!isValidAmount || isProcessing}
               onClick={isWrap ? handleWrap : handleUnwrap}
-              className="mx-auto flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[215px] md:px-5 md:py-3"
+              className="mx-auto flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[215px] md:px-5 md:py-3"
             >
               {isProcessing ? (
                 <>
@@ -436,6 +432,12 @@ export function WrapModal() {
               )}
             </button>
 
+            {/* Progress tracker */}
+            <ProgressTracker
+              currentStep={isWrap ? wrapStep : unwrapStep}
+              steps={isWrap ? WRAP_STEPS : UNWRAP_STEPS}
+            />
+
             {/* How it works */}
             <InfoCard>
               {isWrap
@@ -443,12 +445,6 @@ export function WrapModal() {
                 : "Unwrapping moves your confidential tokens back to the public Arbitrum ledger. Once unwrapped, your balance and transfers are visible on-chain."}
             </InfoCard>
           </div>
-
-          {/* Progress tracker */}
-          <ProgressTracker
-            currentStep={isWrap ? wrapStep : unwrapStep}
-            steps={isWrap ? WRAP_STEPS : UNWRAP_STEPS}
-          />
 
           {/* Arbiscan link on success */}
           {isWrap && wrapStep === "confirmed" && wrapTxHash && (

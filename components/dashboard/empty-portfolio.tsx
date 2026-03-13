@@ -27,7 +27,7 @@ export function EmptyPortfolio() {
 
         <Button
           onClick={() => setOpen(true)}
-          className="h-auto cursor-pointer rounded-xl bg-primary px-5 py-3 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
+          className="h-auto cursor-pointer rounded-xl bg-primary px-5 py-3 font-mulish text-lg font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] hover:bg-primary-hover"
         >
           <span aria-hidden="true" className="material-icons text-[20px]!">
             account_balance_wallet

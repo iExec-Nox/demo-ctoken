@@ -116,31 +116,27 @@ export function TransferModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[552px]"
+        className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[32px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[620px]"
         showCloseButton={false}
       >
-        {/* Close button */}
-        <div className="flex w-full items-center justify-end">
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
-            aria-label="Close"
-          >
-            X
-          </button>
-        </div>
-
         {/* Content */}
         <div className="flex min-w-0 w-full flex-col items-center gap-[26px]">
-          {/* Header */}
-          <div className="text-center">
+          {/* Header + Close */}
+          <div className="relative w-full text-center">
             <DialogTitle className="font-mulish text-2xl font-bold leading-10 tracking-[-0.9px] text-text-heading md:text-[36px]">
               Confidential Transfer
             </DialogTitle>
             <DialogDescription className="mt-3 font-mulish text-base leading-6 text-text-body">
               Transactions are encrypted and private by default.
             </DialogDescription>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
+              aria-label="Close"
+            >
+              X
+            </button>
           </div>
 
           {/* Glass card */}
@@ -347,7 +343,7 @@ export function TransferModal() {
                 type="button"
                 disabled={!canTransfer}
                 onClick={handleTransfer}
-                className="flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[181px] md:px-[18px] md:py-3"
+                className="flex w-[150px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 md:w-[181px] md:px-[18px] md:py-3"
               >
                 {isProcessing ? (
                   <>

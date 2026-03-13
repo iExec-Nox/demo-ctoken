@@ -4,7 +4,7 @@ import { Logo } from "@/components/shared/logo";
 export function Footer() {
   return (
     <footer className="flex w-full flex-col items-center gap-5 p-10 md:flex-row md:justify-between">
-      <Logo iconSize="sm" font="inter" />
+      <Logo iconSize="xs" font="inter" />
       <nav className="flex items-center gap-4 font-mulish text-sm font-medium text-footer-text md:text-base">
         <Link
           href="https://docs.iex.ec"
