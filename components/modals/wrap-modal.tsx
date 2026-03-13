@@ -332,7 +332,7 @@ export function WrapModal() {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className={`min-w-0 flex-1 bg-transparent text-right font-mulish text-2xl font-bold leading-9 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:rounded placeholder:text-text-muted md:text-[30px] ${
+                  className={`ml-6 min-w-0 flex-1 bg-transparent text-right font-mulish text-2xl font-bold leading-9 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:rounded placeholder:text-text-muted md:text-[30px] ${
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
@@ -346,7 +346,7 @@ export function WrapModal() {
                 </p>
               )}
               {needsDecrypt && (
-                <p id="wrap-decrypt-hint" className="pl-1 font-mulish text-xs text-primary">
+                <p id="wrap-decrypt-hint" className="pl-1 font-mulish text-xs text-decrypt-warning">
                   Decrypt your balance first to continue
                 </p>
               )}

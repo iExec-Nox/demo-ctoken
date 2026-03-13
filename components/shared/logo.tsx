@@ -4,6 +4,7 @@ import Link from "next/link";
 interface LogoProps {
   iconSize?: "xs" | "sm" | "md";
   font?: "mulish" | "inter";
+  textColorClass?: string;
 }
 
 const sizeClasses = {
@@ -21,6 +22,7 @@ const textClasses = {
 export function Logo({
   iconSize = "md",
   font = "mulish",
+  textColorClass,
 }: LogoProps) {
   const sizeClass = sizeClasses[iconSize];
   const textClass = textClasses[iconSize];
@@ -36,7 +38,7 @@ export function Logo({
         <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover" />
       </div>
       <span
-        className={`${fontClass} ${textClass} tracking-tight text-logo-text`}
+        className={`${fontClass} ${textClass} tracking-tight ${textColorClass ?? "text-logo-text"}`}
       >
         Confidential Token
       </span>

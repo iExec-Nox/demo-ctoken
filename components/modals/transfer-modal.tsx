@@ -244,7 +244,7 @@ export function TransferModal() {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className={`min-w-0 flex-1 bg-transparent text-right font-mulish text-2xl font-bold leading-8 outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary/50 placeholder:text-text-muted/60 ${
+                  className={`ml-6 min-w-0 flex-1 bg-transparent text-right font-mulish text-2xl font-bold leading-8 outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary/50 placeholder:text-text-muted/60 ${
                     isOverBalance ? "text-tx-error-text" : "text-text-heading"
                   }`}
                   aria-label="Amount"
@@ -270,7 +270,7 @@ export function TransferModal() {
                 </p>
               )}
               {needsDecrypt && (
-                <p id="transfer-decrypt-hint" className="pl-1 font-mulish text-xs text-primary">
+                <p id="transfer-decrypt-hint" className="pl-1 font-mulish text-xs text-decrypt-warning">
                   Decrypt your balance first to continue
                 </p>
               )}
@@ -372,15 +372,15 @@ export function TransferModal() {
               The transfer is verified on-chain without revealing values.
             </InfoCard>
 
-            {/* Function called */}
-            {devMode && <CodeSection code={TRANSFER_CODE} />}
-
             {/* Arbiscan link on success */}
             {step === "confirmed" && txHash && (
               <TxSuccessStatus message="Confidential Transfer Complete" txHash={txHash} />
             )}
           </div>
         </div>
+
+        {/* Function called */}
+        {devMode && <CodeSection code={TRANSFER_CODE} />}
 
         {/* Cancel */}
         <button
