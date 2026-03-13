@@ -16,7 +16,7 @@ interface UseWrapResult {
   error: string | null;
   approveTxHash: `0x${string}` | undefined;
   wrapTxHash: `0x${string}` | undefined;
-  wrap: (token: TokenConfig, amount: string) => Promise<void>;
+  wrap: (token: TokenConfig, amount: string) => Promise<boolean>;
   reset: () => void;
 }
 
@@ -44,13 +44,13 @@ export function useWrap(): UseWrapResult {
       if (!address) {
         setError("Wallet not connected");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!token.address || !token.confidentialAddress) {
         setError("Token addresses not configured");
         setStep("error");
-        return;
+        return false;
       }
 
       const parsedAmount = parseUnits(amount, token.decimals);
@@ -58,7 +58,7 @@ export function useWrap(): UseWrapResult {
       if (parsedAmount === 0n) {
         setError("Amount must be greater than zero");
         setStep("error");
-        return;
+        return false;
       }
 
       const erc20Address = token.address as `0x${string}`;
@@ -104,9 +104,11 @@ export function useWrap(): UseWrapResult {
 
         setStep("confirmed");
         invalidateBalances();
+        return true;
       } catch (err) {
         setError(formatTransactionError(err));
         setStep("error");
+        return false;
       }
     },
     [address, writeContractAsync, publicClient, invalidateBalances],

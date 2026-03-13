@@ -25,7 +25,7 @@ interface UseUnwrapResult {
   isFinalizeError: boolean;
   unwrapTxHash: `0x${string}` | undefined;
   finalizeTxHash: `0x${string}` | undefined;
-  unwrap: (token: TokenConfig, amount: string) => Promise<void>;
+  unwrap: (token: TokenConfig, amount: string) => Promise<boolean>;
   retryFinalize: () => Promise<void>;
   reset: () => void;
 }
@@ -117,19 +117,19 @@ export function useUnwrap(): UseUnwrapResult {
       if (!address) {
         setError("Wallet not connected");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!token.confidentialAddress) {
         setError("Confidential token address not configured");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!handleClient) {
         setError("Handle client not initialized — please reconnect your wallet");
         setStep("error");
-        return;
+        return false;
       }
 
       const parsedAmount = parseUnits(amount, token.decimals);
@@ -207,11 +207,13 @@ export function useUnwrap(): UseUnwrapResult {
 
         // Step 3: Finalize unwrap
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);
+        return true;
       } catch (err) {
         setError(formatTransactionError(err));
         setStep("error");
         // If unwrap tx was sent but finalize failed, flag it
         setIsFinalizeError(finalizeParamsRef.current !== null);
+        return false;
       }
     },
     [address, handleClient, writeContractAsync, publicClient, executeFinalize],
