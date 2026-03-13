@@ -70,7 +70,7 @@ export function ProgressTracker({ currentStep, steps }: ProgressTrackerProps) {
 
   return (
     <div
-      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-0"
+      className="flex w-full flex-col items-center gap-3 md:flex-row md:items-start md:gap-3"
       role="status"
       aria-live="polite"
     >
