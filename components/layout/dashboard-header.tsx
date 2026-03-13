@@ -22,7 +22,7 @@ export function DashboardHeader() {
   useWalletRedirect({ onDisconnect: "/" });
 
   return (
-    <header className="flex w-full items-center justify-between bg-background px-5 py-[9px] md:px-10">
+    <header className="flex w-full items-center justify-between bg-background px-5 py-3.5 md:px-10 md:py-4">
       {/* Left: Logo + Nav */}
       <div className="flex items-center gap-4 md:gap-10">
         <Logo font="inter" />
@@ -63,7 +63,7 @@ export function DashboardHeader() {
           <DevModeToggle />
           <Button
             asChild
-            className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.4)] hover:bg-primary-hover"
+            className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] hover:bg-primary-hover"
           >
             <Link href="#">Contact us</Link>
           </Button>
