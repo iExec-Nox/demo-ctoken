@@ -21,7 +21,7 @@ interface UseConfidentialTransferResult {
   step: TransferStep;
   error: string | null;
   txHash: `0x${string}` | undefined;
-  transfer: (token: TokenConfig, amount: string, recipient: string) => Promise<void>;
+  transfer: (token: TokenConfig, amount: string, recipient: string) => Promise<boolean>;
   reset: () => void;
 }
 
@@ -48,25 +48,25 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
       if (!address) {
         setError("Wallet not connected");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!token.confidentialAddress) {
         setError("Confidential token address not configured");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!handleClient) {
         setError("Handle client not initialized — please reconnect your wallet");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!isAddress(recipient)) {
         setError("Invalid recipient address");
         setStep("error");
-        return;
+        return false;
       }
 
       const parsedAmount = parseUnits(amount, token.decimals);
@@ -74,7 +74,7 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
       if (parsedAmount === 0n) {
         setError("Amount must be greater than zero");
         setStep("error");
-        return;
+        return false;
       }
 
       const cTokenAddress = token.confidentialAddress as `0x${string}`;
@@ -111,9 +111,11 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
 
         setStep("confirmed");
         invalidateBalances();
+        return true;
       } catch (err) {
         setError(formatTransactionError(err));
         setStep("error");
+        return false;
       }
     },
     [address, handleClient, writeContractAsync, publicClient, invalidateBalances],

@@ -27,7 +27,7 @@ interface UseAddViewerResult {
   grant: (
     viewerAddress: string,
     tokens: TokenConfig[],
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   reset: () => void;
 }
 
@@ -52,19 +52,19 @@ export function useAddViewer(): UseAddViewerResult {
       if (!address) {
         setError("Wallet not connected");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!publicClient) {
         setError("Public client not available");
         setStep("error");
-        return;
+        return false;
       }
 
       if (!isAddress(viewerAddress)) {
         setError("Invalid viewer address");
         setStep("error");
-        return;
+        return false;
       }
 
       const viewer = viewerAddress as `0x${string}`;
@@ -103,7 +103,7 @@ export function useAddViewer(): UseAddViewerResult {
             "No confidential balance found for the selected token(s). Wrap tokens first.",
           );
           setStep("error");
-          return;
+          return false;
         }
 
         // Step 2: Call addViewer for each handle
@@ -130,9 +130,11 @@ export function useAddViewer(): UseAddViewerResult {
 
         setTxHash(lastTxHash);
         setStep("confirmed");
+        return true;
       } catch (err) {
         setError(formatTransactionError(err));
         setStep("error");
+        return false;
       }
     },
     [address, publicClient, writeContractAsync],

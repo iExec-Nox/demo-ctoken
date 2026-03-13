@@ -67,7 +67,6 @@ export function TransferModal() {
     }
   }, [open, reset, setDropdownOpen]);
 
-
   const handleAmountChange = useCallback((value: string) => {
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
       setAmount(value);
@@ -95,7 +94,11 @@ export function TransferModal() {
 
   const handleTransfer = useCallback(async () => {
     if (!selectedTokenConfig || !amount || !recipient) return;
-    await transfer(selectedTokenConfig, amount, recipient);
+    const success = await transfer(selectedTokenConfig, amount, recipient);
+    if (success) {
+      setAmount("");
+      setRecipient("");
+    }
   }, [selectedTokenConfig, amount, recipient, transfer]);
 
   // Validation
@@ -353,15 +356,6 @@ export function TransferModal() {
                     </span>
                     <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
                       {step === "encrypting" ? "Encrypting..." : "Transferring..."}
-                    </span>
-                  </>
-                ) : step === "confirmed" ? (
-                  <>
-                    <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground md:text-[20px]!">
-                      check_circle
-                    </span>
-                    <span className="font-mulish text-sm font-bold text-primary-foreground md:text-base">
-                      Transferred!
                     </span>
                   </>
                 ) : (

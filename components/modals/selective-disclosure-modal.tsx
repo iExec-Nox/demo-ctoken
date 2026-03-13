@@ -183,7 +183,11 @@ export function SelectiveDisclosureModal() {
     const tokensToGrant = confidentialTokens.filter((t) =>
       selectedTokens.has(t.symbol),
     );
-    await grant(viewerAddress, tokensToGrant);
+    const success = await grant(viewerAddress, tokensToGrant);
+    if (success) {
+      setViewerAddress("");
+      setSelectedTokens(new Set());
+    }
   }, [viewerAddress, selectedTokens, grant]);
 
   const isValidAddress = isAddress(viewerAddress);
@@ -419,18 +423,6 @@ export function SelectiveDisclosureModal() {
                     {step === "reading-handle"
                       ? "Reading..."
                       : "Granting..."}
-                  </span>
-                </>
-              ) : step === "confirmed" ? (
-                <>
-                  <span
-                    aria-hidden="true"
-                    className="material-icons text-[16px]! text-primary-foreground"
-                  >
-                    check_circle
-                  </span>
-                  <span className="font-mulish text-base font-bold text-primary-foreground">
-                    Granted!
                   </span>
                 </>
               ) : (
