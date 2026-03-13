@@ -16,9 +16,9 @@ export function Logo({
   return (
     <Link href="/" className="flex items-center gap-3 md:gap-[18px]">
       <div
-        className={`relative ${sizeClass} overflow-hidden rounded-[10px] bg-primary md:rounded-xl`}
+        className={`relative ${sizeClass} overflow-hidden rounded-[10px] md:rounded-xl`}
       >
-        <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover brightness-0 invert" />
+        <Image src="/nox-icon.png" alt="Nox logo" fill sizes="32px" className="object-cover" />
       </div>
       <span
         className={`${fontClass} text-sm font-bold tracking-tight text-logo-text md:text-xl`}
