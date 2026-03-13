@@ -80,6 +80,8 @@
   --logo-text: #111827;
   --footer-text: #64748b;
   --footer-muted: #9ca3af;
+  --footer-logo-text: #6b7280;
+  --decrypt-warning: #bf3131;
   --card-icon-bg: #748eff;
   --toggle-track: #b8bdd0;
   --toggle-thumb: #e5eaf4;
@@ -173,7 +175,9 @@
   --topbar-border: rgba(255, 255, 255, 0.05);
   --logo-text: #f1f5f9;
   --footer-text: #64748b;
-  --footer-muted: #475569;
+  --footer-muted: #64748b;
+  --footer-logo-text: #94a3b8;
+  --decrypt-warning: #bf3131;
   --card-icon-bg: #748eff;
   --toggle-track: #2a2a35;
   --toggle-thumb: #1a1a24;
@@ -269,6 +273,8 @@
   --color-logo-text: var(--logo-text);
   --color-footer-text: var(--footer-text);
   --color-footer-muted: var(--footer-muted);
+  --color-footer-logo-text: var(--footer-logo-text);
+  --color-decrypt-warning: var(--decrypt-warning);
   --color-card-icon-bg: var(--card-icon-bg);
   --color-toggle-track: var(--toggle-track);
   --color-toggle-thumb: var(--toggle-thumb);
