@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import { useSelectiveDisclosureModal } from "./selective-disclosure-modal-provid
 import { useDevMode } from "@/hooks/use-dev-mode";
 import { confidentialTokens } from "@/lib/tokens";
 import { useAddViewer } from "@/hooks/use-add-viewer";
+import { useViewACL } from "@/hooks/use-view-acl";
 import { NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 import { isAddress } from "viem";
 import { ProgressTracker, type ProgressStep } from "@/components/shared/step-indicator";
@@ -37,109 +38,50 @@ await walletClient.writeContract({
   args: [handle, viewerAddress],
 });`;
 
-interface MockViewer {
-  address: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  scope: "full" | "token";
-  tokenLabel?: string;
-  date: string;
-}
-
-const CURRENT_VIEWERS: MockViewer[] = [
-  {
-    address: "0x3fA...E901",
-    icon: "account_balance",
-    iconColor: "text-primary",
-    iconBg: "bg-primary-alpha-18",
-    scope: "full",
-    date: "12/02/2026 10:30 CET",
-  },
-  {
-    address: "0x882...19a4",
-    icon: "person",
-    iconColor: "text-primary",
-    iconBg: "bg-primary-alpha-18",
-    scope: "token",
-    tokenLabel: "USDC Only",
-    date: "12/02/2026 10:30 CET",
-  },
-  {
-    address: "0x91d...77b2",
-    icon: "verified_user",
-    iconColor: "text-text-body",
-    iconBg: "bg-surface",
-    scope: "full",
-    date: "12/02/2026 10:30 CET",
-  },
-];
-
-const PAST_VIEWERS: MockViewer[] = [
-  {
-    address: "0x3fA...E901",
-    icon: "account_balance",
-    iconColor: "text-primary",
-    iconBg: "bg-primary-alpha-18",
-    scope: "full",
-    date: "12/02/2026 10:30 CET",
-  },
-];
-
-function ViewerCard({ viewer }: { viewer: MockViewer }) {
-  return (
-    <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-surface p-[21px] backdrop-blur-sm">
-      <div className="flex items-center gap-2.5 md:gap-4">
-        <div
-          className={`flex size-[29px] shrink-0 items-center justify-center rounded-full md:size-10 ${viewer.iconBg}`}
-        >
-          <span
-            aria-hidden="true"
-            className={`material-icons text-[14px]! md:text-[20px]! ${viewer.iconColor}`}
-          >
-            {viewer.icon}
-          </span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="font-mulish text-xs text-text-heading md:text-sm">
-            {viewer.address}
-          </span>
-          {viewer.scope === "full" ? (
-            <span className="inline-flex w-fit items-center rounded-full border border-tx-success-text/20 bg-tx-success-bg px-2 py-0.5 font-mulish text-[10px] font-bold text-tx-success-text">
-              Full Portfolio
-            </span>
-          ) : (
-            <span className="inline-flex w-fit items-center rounded-full border border-primary bg-primary px-2 py-0.5 font-mulish text-[10px] font-bold text-primary-foreground">
-              {viewer.tokenLabel}
-            </span>
-          )}
-        </div>
-      </div>
-      <span className="flex-1 text-right font-mulish text-[11px] text-text-muted md:flex-none md:text-sm">
-        {viewer.date}
-      </span>
-    </div>
-  );
-}
-
 const DISCLOSURE_STEPS: ProgressStep[] = [
   { key: "reading-handle", icon: "search", label: "Read Handle" },
   { key: "granting", icon: "sync", label: "Grant Access" },
   { key: "confirmed", icon: "verified", label: "Confirmed" },
 ];
 
+function ViewerCard({ address }: { address: string }) {
+  const display = `${address.slice(0, 6)}...${address.slice(-4)}`;
+  return (
+    <div className="flex items-center gap-2.5 rounded-2xl border border-surface-border bg-surface p-[21px] backdrop-blur-sm">
+      <div className="flex size-[29px] shrink-0 items-center justify-center rounded-full bg-primary-alpha-18 md:size-10">
+        <span aria-hidden="true" className="material-icons text-[14px]! text-primary md:text-[20px]!">
+          visibility
+        </span>
+      </div>
+      <span className="font-mulish text-xs text-text-heading md:text-sm">
+        {display}
+      </span>
+    </div>
+  );
+}
+
 export function SelectiveDisclosureModal() {
   const { open, setOpen } = useSelectiveDisclosureModal();
   const { enabled: devMode } = useDevMode();
   const { step, error, txHash, grant, reset } = useAddViewer();
+  const {
+    data: viewers = [],
+    refetch: refetchViewers,
+    isLoading: isLoadingViewers,
+  } = useViewACL();
 
   const [viewerAddress, setViewerAddress] = useState("");
   const [scope, setScope] = useState<ScopeType>("specific");
-  const [selectedTokens, setSelectedTokens] = useState<Set<string>>(
-    new Set(),
-  );
+  const [selectedTokens, setSelectedTokens] = useState<Set<string>>(new Set());
 
   const isProcessing = step === "reading-handle" || step === "granting";
+
+  useEffect(() => {
+    if (step === "confirmed") {
+      const timeout = setTimeout(() => refetchViewers(), 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [step, refetchViewers]);
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
@@ -168,11 +110,7 @@ export function SelectiveDisclosureModal() {
       if (scope === "full") return;
       setSelectedTokens((prev) => {
         const next = new Set(prev);
-        if (next.has(symbol)) {
-          next.delete(symbol);
-        } else {
-          next.add(symbol);
-        }
+        next.has(symbol) ? next.delete(symbol) : next.add(symbol);
         return next;
       });
     },
@@ -180,9 +118,7 @@ export function SelectiveDisclosureModal() {
   );
 
   const handleGrant = useCallback(async () => {
-    const tokensToGrant = confidentialTokens.filter((t) =>
-      selectedTokens.has(t.symbol),
-    );
+    const tokensToGrant = confidentialTokens.filter((t) => selectedTokens.has(t.symbol));
     await grant(viewerAddress, tokensToGrant);
   }, [viewerAddress, selectedTokens, grant]);
 
@@ -219,16 +155,13 @@ export function SelectiveDisclosureModal() {
           </DialogDescription>
         </div>
 
-        {/* Add a New Viewer — glass card */}
+        {/* Add a New Viewer */}
         <div className="flex w-full flex-col gap-5 rounded-3xl border border-surface-border bg-surface p-5 backdrop-blur-sm md:gap-[35px]">
           <div className="flex items-center justify-between">
             <h3 className="font-mulish text-xl font-bold text-text-heading">
               Add a New Viewer
             </h3>
-            <span
-              aria-hidden="true"
-              className="material-icons text-[16px]! text-primary md:hidden"
-            >
+            <span aria-hidden="true" className="material-icons text-[16px]! text-primary md:hidden">
               visibility
             </span>
           </div>
@@ -236,10 +169,7 @@ export function SelectiveDisclosureModal() {
           <div className="flex flex-col items-center gap-[26px]">
             {/* Viewer Address */}
             <div className="flex w-full flex-col gap-[11px]">
-              <label
-                htmlFor="viewer-address"
-                className="font-mulish text-sm font-bold text-text-body"
-              >
+              <label htmlFor="viewer-address" className="font-mulish text-sm font-bold text-text-body">
                 Viewer Address
               </label>
               <div className="flex h-[50px] w-full items-center gap-2 rounded-xl border border-surface-border bg-surface px-4 transition-colors focus-within:ring-2 focus-within:ring-primary/50">
@@ -255,9 +185,7 @@ export function SelectiveDisclosureModal() {
                 {viewerAddress.length > 0 && (
                   <span
                     aria-label={isValidAddress ? "Valid address" : "Invalid address"}
-                    className={`material-icons text-[24px]! ${
-                      isValidAddress ? "text-tx-success-text" : "text-tx-error-text"
-                    }`}
+                    className={`material-icons text-[24px]! ${isValidAddress ? "text-tx-success-text" : "text-tx-error-text"}`}
                   >
                     {isValidAddress ? "check_circle" : "cancel"}
                   </span>
@@ -267,90 +195,38 @@ export function SelectiveDisclosureModal() {
 
             {/* Scope of Access */}
             <div className="flex w-full flex-col gap-[15px]">
-              <span className="font-mulish text-sm font-bold text-text-body">
-                Scope of Access
-              </span>
-
-              <div
-                className="flex flex-col gap-5 md:grid md:grid-cols-2"
-                role="radiogroup"
-                aria-label="Scope of access"
-              >
-                {/* Full Portfolio */}
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={scope === "full"}
-                  onClick={() => handleScopeChange("full")}
-                  disabled={isProcessing || step === "confirmed"}
-                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors disabled:cursor-default disabled:opacity-50 ${
-                    scope === "full"
-                      ? "border-primary bg-primary-alpha-18"
-                      : "border-surface-border bg-surface"
-                  }`}
-                >
-                  <div
-                    className={`flex size-4 shrink-0 items-center justify-center rounded-full border ${
-                      scope === "full"
-                        ? "border-primary bg-primary"
-                        : "border-surface-border"
+              <span className="font-mulish text-sm font-bold text-text-body">Scope of Access</span>
+              <div className="flex flex-col gap-5 md:grid md:grid-cols-2" role="radiogroup" aria-label="Scope of access">
+                {(["full", "specific"] as ScopeType[]).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    role="radio"
+                    aria-checked={scope === s}
+                    onClick={() => handleScopeChange(s)}
+                    disabled={isProcessing || step === "confirmed"}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors disabled:cursor-default disabled:opacity-50 ${
+                      scope === s ? "border-primary bg-primary-alpha-18" : "border-surface-border bg-surface"
                     }`}
                   >
-                    {scope === "full" && (
-                      <div className="size-2 rounded-full bg-primary-foreground" />
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <p className="font-mulish text-sm font-bold text-text-heading">
-                      Full Portfolio
-                    </p>
-                    <p className="font-mulish text-xs text-text-muted">
-                      Access all confidential history
-                    </p>
-                  </div>
-                </button>
-
-                {/* Specific Token */}
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={scope === "specific"}
-                  onClick={() => handleScopeChange("specific")}
-                  disabled={isProcessing || step === "confirmed"}
-                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-[17px] backdrop-blur-sm transition-colors disabled:cursor-default disabled:opacity-50 ${
-                    scope === "specific"
-                      ? "border-primary bg-primary-alpha-18"
-                      : "border-surface-border bg-surface"
-                  }`}
-                >
-                  <div
-                    className={`flex size-4 shrink-0 items-center justify-center rounded-full border ${
-                      scope === "specific"
-                        ? "border-primary bg-primary"
-                        : "border-surface-border"
-                    }`}
-                  >
-                    {scope === "specific" && (
-                      <div className="size-2 rounded-full bg-primary-foreground" />
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <p className="font-mulish text-sm font-bold text-text-heading">
-                      Specific Token
-                    </p>
-                    <p className="font-mulish text-xs text-text-muted">
-                      Select one asset only
-                    </p>
-                  </div>
-                </button>
+                    <div className={`flex size-4 shrink-0 items-center justify-center rounded-full border ${scope === s ? "border-primary bg-primary" : "border-surface-border"}`}>
+                      {scope === s && <div className="size-2 rounded-full bg-primary-foreground" />}
+                    </div>
+                    <div className="text-left">
+                      <p className="font-mulish text-sm font-bold text-text-heading">
+                        {s === "full" ? "Full Portfolio" : "Specific Token"}
+                      </p>
+                      <p className="font-mulish text-xs text-text-muted">
+                        {s === "full" ? "Access all confidential history" : "Select one asset only"}
+                      </p>
+                    </div>
+                  </button>
+                ))}
               </div>
 
               {/* Token list */}
               <div className="flex flex-col gap-2">
-                <span className="font-mulish text-sm font-bold text-text-body">
-                  Select Token to be disclosed
-                </span>
-
+                <span className="font-mulish text-sm font-bold text-text-body">Select Token to be disclosed</span>
                 {confidentialTokens.map((token) => {
                   const isChecked = selectedTokens.has(token.symbol);
                   const baseSymbol = token.symbol.replace(/^c/, "");
@@ -361,38 +237,19 @@ export function SelectiveDisclosureModal() {
                       role="checkbox"
                       aria-checked={isChecked}
                       onClick={() => toggleToken(token.symbol)}
-                      disabled={
-                        scope === "full" ||
-                        isProcessing ||
-                        step === "confirmed"
-                      }
+                      disabled={scope === "full" || isProcessing || step === "confirmed"}
                       className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-surface-border bg-surface px-[17px] py-2 transition-colors hover:opacity-80 disabled:cursor-default disabled:opacity-70"
                     >
                       <div className="flex items-center gap-2.5">
-                        <div
-                          className={`flex size-4 shrink-0 items-center justify-center border ${
-                            isChecked
-                              ? "border-primary bg-primary"
-                              : "border-surface-border"
-                          }`}
-                        >
+                        <div className={`flex size-4 shrink-0 items-center justify-center border ${isChecked ? "border-primary bg-primary" : "border-surface-border"}`}>
                           {isChecked && (
-                            <span
-                              aria-hidden="true"
-                              className="material-icons text-[12px]! text-primary-foreground"
-                            >
-                              check
-                            </span>
+                            <span aria-hidden="true" className="material-icons text-[12px]! text-primary-foreground">check</span>
                           )}
                         </div>
-                        <span className="font-mulish text-base text-text-heading/60">
-                          {baseSymbol}
-                        </span>
+                        <span className="font-mulish text-base text-text-heading/60">{baseSymbol}</span>
                       </div>
                       <span className="font-mulish text-sm text-text-heading/60">
-                        {token.address && token.address !== "0x..."
-                          ? `${token.address.slice(0, 6)}...${token.address.slice(-4)}`
-                          : "0x12Z456...."}
+                        {token.address ? `${token.address.slice(0, 6)}...${token.address.slice(-4)}` : "—"}
                       </span>
                     </button>
                   );
@@ -409,118 +266,76 @@ export function SelectiveDisclosureModal() {
             >
               {isProcessing ? (
                 <>
-                  <span
-                    aria-hidden="true"
-                    className="material-icons animate-spin text-[16px]! text-primary-foreground motion-reduce:animate-none"
-                  >
-                    sync
-                  </span>
+                  <span aria-hidden="true" className="material-icons animate-spin text-[16px]! text-primary-foreground motion-reduce:animate-none">sync</span>
                   <span className="font-mulish text-base font-bold text-primary-foreground">
-                    {step === "reading-handle"
-                      ? "Reading..."
-                      : "Granting..."}
+                    {step === "reading-handle" ? "Reading..." : "Granting..."}
                   </span>
                 </>
               ) : step === "confirmed" ? (
                 <>
-                  <span
-                    aria-hidden="true"
-                    className="material-icons text-[16px]! text-primary-foreground"
-                  >
-                    check_circle
-                  </span>
-                  <span className="font-mulish text-base font-bold text-primary-foreground">
-                    Granted!
-                  </span>
+                  <span aria-hidden="true" className="material-icons text-[16px]! text-primary-foreground">check_circle</span>
+                  <span className="font-mulish text-base font-bold text-primary-foreground">Granted!</span>
                 </>
               ) : (
-                <span className="font-mulish text-base font-bold text-primary-foreground">
-                  Grant Access
-                </span>
+                <span className="font-mulish text-base font-bold text-primary-foreground">Grant Access</span>
               )}
             </button>
 
-            {/* Error message */}
-            {step === "error" && error && (
-              <ErrorMessage error={error} onRetry={reset} />
-            )}
+            {step === "error" && error && <ErrorMessage error={error} onRetry={reset} />}
           </div>
 
-          {/* How it works — inside glass card on mobile */}
           <InfoCard className="backdrop-blur-lg md:!p-3">
-            Selective disclosure shares a handle or balance at a given
-            moment. The recipient can access data tied to that specific
-            state only.
+            Selective disclosure shares a handle or balance at a given moment. The recipient can
+            access data tied to that specific state only.
           </InfoCard>
         </div>
 
         {/* Progress tracker */}
         <ProgressTracker currentStep={step} steps={DISCLOSURE_STEPS} />
 
-        {/* Arbiscan link on success */}
         {step === "confirmed" && txHash && (
           <TxSuccessStatus message="Viewer Access Granted" txHash={txHash} />
         )}
 
-        {/* Function called */}
         {devMode && <CodeSection code={ADD_VIEWER_CODE} />}
 
         {/* Current Viewers */}
         <div className="flex w-full items-center justify-between">
           <span className="font-mulish text-base font-bold tracking-[1.4px] text-text-muted">
-            Current Viewers ({CURRENT_VIEWERS.length})
+            Current Viewers ({viewers.length})
           </span>
           <button
             type="button"
-            aria-disabled="true"
-            className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
+            onClick={() => refetchViewers()}
+            disabled={isLoadingViewers}
+            className="font-mulish text-sm font-medium text-primary transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Refresh List
+            {isLoadingViewers ? "Refreshing..." : "Refresh List"}
           </button>
         </div>
 
         <div className="flex w-full flex-col gap-3">
-          {CURRENT_VIEWERS.map((viewer) => (
-            <ViewerCard key={viewer.address + viewer.icon} viewer={viewer} />
-          ))}
-        </div>
-
-        {/* Past Viewers — desktop only */}
-        <div className="hidden w-full flex-col gap-3 md:flex">
-          <div className="flex items-center justify-between">
-            <span className="font-mulish text-base font-bold tracking-[1.4px] text-text-muted">
-              Past Viewers ({PAST_VIEWERS.length})
-            </span>
-            <button
-              type="button"
-              aria-disabled="true"
-              className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
-            >
-              See all
-            </button>
-          </div>
-
-          {PAST_VIEWERS.map((viewer) => (
-            <ViewerCard key={viewer.address + viewer.icon} viewer={viewer} />
-          ))}
+          {isLoadingViewers ? (
+            <div className="flex items-center justify-center rounded-2xl border border-surface-border bg-surface p-[21px] backdrop-blur-sm">
+              <span className="font-mulish text-sm text-text-muted">Loading viewers...</span>
+            </div>
+          ) : viewers.length === 0 ? (
+            <div className="flex items-center justify-center rounded-2xl border border-surface-border bg-surface p-[21px] backdrop-blur-sm">
+              <span className="font-mulish text-sm text-text-muted">No viewers authorized yet</span>
+            </div>
+          ) : (
+            viewers.map((address: string) => <ViewerCard key={address} address={address} />)
+          )}
         </div>
 
         {/* Security Note */}
         <div className="flex w-full items-start gap-3 rounded-xl bg-modal-bg p-2.5 backdrop-blur-sm">
-          <span
-            aria-hidden="true"
-            className="material-icons shrink-0 text-[24px]! text-tx-pending-text"
-          >
-            info
-          </span>
+          <span aria-hidden="true" className="material-icons shrink-0 text-[24px]! text-tx-pending-text">info</span>
           <div className="flex flex-col gap-1 py-0.5 text-xs md:flex-row md:items-center md:gap-2.5">
-            <span className="font-mulish font-bold text-text-heading">
-              Security Note:
-            </span>
+            <span className="font-mulish font-bold text-text-heading">Security Note:</span>
             <span className="font-mulish text-text-body">
-              Access is tied to the current handle state at the time of
-              disclosure. Any subsequent transaction that updates the handle
-              invalidates prior access.
+              Access is tied to the current handle state at the time of disclosure. Any subsequent
+              transaction that updates the handle invalidates prior access.
             </span>
           </div>
         </div>
