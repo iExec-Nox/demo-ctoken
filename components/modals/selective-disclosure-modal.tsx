@@ -154,7 +154,6 @@ export function SelectiveDisclosureModal() {
     [setOpen, reset],
   );
 
-
   const handleScopeChange = useCallback((newScope: ScopeType) => {
     setScope(newScope);
     if (newScope === "full") {
@@ -184,9 +183,11 @@ export function SelectiveDisclosureModal() {
     const tokensToGrant = confidentialTokens.filter((t) =>
       selectedTokens.has(t.symbol),
     );
-    await grant(viewerAddress, tokensToGrant);
-    setViewerAddress("");
-    setSelectedTokens(new Set());
+    const success = await grant(viewerAddress, tokensToGrant);
+    if (success) {
+      setViewerAddress("");
+      setSelectedTokens(new Set());
+    }
   }, [viewerAddress, selectedTokens, grant]);
 
   const isValidAddress = isAddress(viewerAddress);

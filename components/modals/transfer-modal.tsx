@@ -67,8 +67,6 @@ export function TransferModal() {
     }
   }, [open, reset, setDropdownOpen]);
 
-
-
   const handleAmountChange = useCallback((value: string) => {
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
       setAmount(value);
@@ -96,9 +94,11 @@ export function TransferModal() {
 
   const handleTransfer = useCallback(async () => {
     if (!selectedTokenConfig || !amount || !recipient) return;
-    await transfer(selectedTokenConfig, amount, recipient);
-    setAmount("");
-    setRecipient("");
+    const success = await transfer(selectedTokenConfig, amount, recipient);
+    if (success) {
+      setAmount("");
+      setRecipient("");
+    }
   }, [selectedTokenConfig, amount, recipient, transfer]);
 
   // Validation

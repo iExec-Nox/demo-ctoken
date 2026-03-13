@@ -103,8 +103,6 @@ export function WrapModal() {
     }
   }, [open, activeTab, resetWrap, resetUnwrap, setDropdownOpen]);
 
-
-
   const handleAmountChange = useCallback(
     (value: string) => {
       // Allow empty, or valid decimal numbers
@@ -137,14 +135,14 @@ export function WrapModal() {
 
   const handleWrap = useCallback(async () => {
     if (!selectedTokenConfig || !amount) return;
-    await wrap(selectedTokenConfig, amount);
-    setAmount("");
+    const success = await wrap(selectedTokenConfig, amount);
+    if (success) setAmount("");
   }, [selectedTokenConfig, amount, wrap]);
 
   const handleUnwrap = useCallback(async () => {
     if (!selectedTokenConfig || !amount) return;
-    await unwrap(selectedTokenConfig, amount);
-    setAmount("");
+    const success = await unwrap(selectedTokenConfig, amount);
+    if (success) setAmount("");
   }, [selectedTokenConfig, amount, unwrap]);
 
   // Validation
