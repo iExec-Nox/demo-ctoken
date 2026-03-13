@@ -463,7 +463,7 @@ export function SelectiveDisclosureModal() {
         )}
 
         {/* Function called */}
-        {devMode && <CodeSection code={ADD_VIEWER_CODE} />}
+        {devMode && <CodeSection code={ADD_VIEWER_CODE} language="typescript" />}
 
         {/* Current Viewers */}
         <div className="flex w-full items-center justify-between">

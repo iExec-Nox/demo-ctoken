@@ -1,11 +1,26 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import { codeToHtml } from "shiki";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 
 interface CodeSectionProps {
   code: string;
+  language?: "solidity" | "typescript" | "javascript";
 }
 
-export function CodeSection({ code }: CodeSectionProps) {
+export function CodeSection({ code, language = "solidity" }: CodeSectionProps) {
   const { copied, copy } = useCopyToClipboard();
+  const { resolvedTheme } = useTheme();
+  const [highlightedHtml, setHighlightedHtml] = useState<string>("");
+
+  useEffect(() => {
+    codeToHtml(code, {
+      lang: language,
+      theme: resolvedTheme === "dark" ? "github-dark" : "github-light",
+    }).then(setHighlightedHtml);
+  }, [code, language, resolvedTheme]);
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-surface-border bg-surface px-5 py-3 backdrop-blur-sm md:px-6">
@@ -31,9 +46,16 @@ export function CodeSection({ code }: CodeSectionProps) {
           </span>
         </button>
       </div>
-      <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
-        {code}
-      </pre>
+      {highlightedHtml ? (
+        <div
+          className="overflow-x-auto font-mono text-xs leading-[19.5px] [&_pre]:bg-transparent! [&_code]:bg-transparent!"
+          dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+        />
+      ) : (
+        <pre className="overflow-x-auto font-mono text-xs leading-[19.5px] text-code-text">
+          {code}
+        </pre>
+      )}
     </div>
   );
 }
