@@ -7,6 +7,7 @@ import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
 import { formatTransactionError } from "@/lib/utils";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
+import { TEE_COOLDOWN_MS } from "@/lib/config";
 import type { TokenConfig } from "@/lib/tokens";
 
 export type WrapStep = "idle" | "approving" | "wrapping" | "confirmed" | "error";
@@ -84,7 +85,7 @@ export function useWrap(): UseWrapResult {
         await publicClient!.waitForTransactionReceipt({ hash: approveTx });
 
         // Small cooldown — NoxCompute rate-limits rapid successive calls
-        await new Promise((r) => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
         // Step 2: Wrap on cToken contract (re-estimate gas fresh)
         setStep("wrapping");

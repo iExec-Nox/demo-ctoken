@@ -1,5 +1,6 @@
 import type { ActivityEntry } from "@/lib/activity";
 import { ACTIVITY_TYPE_CONFIG } from "@/lib/activity";
+import { ARBISCAN_BASE_URL } from "@/lib/config";
 
 const COLUMNS = ["Action", "Asset", "Amount", "Time", "Details"] as const;
 
@@ -87,7 +88,7 @@ function ActivityCard({ entry }: { entry: ActivityEntry }) {
           {entry.timestamp}
         </span>
         <a
-          href={`https://sepolia.arbiscan.io/tx/${entry.txHash}`}
+          href={`${ARBISCAN_BASE_URL}/tx/${entry.txHash}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-inter text-xs font-bold text-primary transition-colors hover:text-primary-hover"
@@ -139,7 +140,7 @@ function ActivityTableRow({ entry }: { entry: ActivityEntry }) {
       </td>
       <td className="px-6 py-5 text-right">
         <a
-          href={`https://sepolia.arbiscan.io/tx/${entry.txHash}`}
+          href={`${ARBISCAN_BASE_URL}/tx/${entry.txHash}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-inter text-xs font-bold text-primary transition-colors hover:text-primary-hover"

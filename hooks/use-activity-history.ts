@@ -6,6 +6,7 @@ import { erc20Abi } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { CONTRACTS } from "@/lib/contracts";
 import { formatBalance } from "@/lib/format";
+import { CONFIG } from "@/lib/config";
 import type { ActivityEntry } from "@/lib/activity";
 import type { GetContractEventsReturnType, PublicClient } from "viem";
 
@@ -24,7 +25,6 @@ const TOKEN_PAIRS = [
   },
 ] as const;
 
-const POLL_INTERVAL = 30_000;
 
 type ConfTransferLog = GetContractEventsReturnType<typeof confidentialTokenAbi, "ConfidentialTransfer">[number];
 
@@ -199,7 +199,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
     }
 
     fetchActivity();
-    intervalRef.current = setInterval(fetchActivity, POLL_INTERVAL);
+    intervalRef.current = setInterval(fetchActivity, CONFIG.timing.activityPollMs);
 
     return () => {
       cancelled = true;

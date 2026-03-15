@@ -13,6 +13,7 @@ import { createAppKit, useAppKitTheme } from "@reown/appkit/react";
 import { arbitrumSepolia } from "@reown/appkit/networks";
 import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
 import { wagmiAdapter, projectId } from "@/lib/wagmi";
+import { APP_URL } from "@/lib/config";
 
 let appKitInitialized = false;
 
@@ -28,7 +29,7 @@ function initAppKit() {
     metadata: {
       name: "Confidential Token | Nox",
       description: "Manage your confidential assets privately",
-      url: "https://nox.iex.ec",
+      url: APP_URL,
       icons: ["/nox-icon.png"],
     },
     allowUnsupportedChain: false,

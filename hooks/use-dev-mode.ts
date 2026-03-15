@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
+import { CONFIG } from "@/lib/config";
 
-const STORAGE_KEY = "nox-dev-mode";
+const STORAGE_KEY = CONFIG.storage.devModeKey;
 
 function getSnapshot(): boolean {
   const stored = localStorage.getItem(STORAGE_KEY);

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { APP_URL } from "@/lib/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://nox.iex.ec";
+  const baseUrl = APP_URL;
 
   return [
     {

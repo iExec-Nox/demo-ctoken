@@ -1,4 +1,4 @@
-const BASE_URL = "https://sepolia.arbiscan.io/tx";
+import { ARBISCAN_BASE_URL } from "@/lib/config";
 
 interface ArbiscanLinkProps {
   txHash: string;
@@ -13,7 +13,7 @@ export function ArbiscanLink({
 }: ArbiscanLinkProps) {
   return (
     <a
-      href={`${BASE_URL}/${txHash}`}
+      href={`${ARBISCAN_BASE_URL}/tx/${txHash}`}
       target="_blank"
       rel="noopener noreferrer"
       className={`inline-flex items-center gap-1 font-mulish text-sm font-medium text-primary hover:underline ${className ?? ""}`}

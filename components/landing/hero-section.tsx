@@ -5,6 +5,7 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useConnectWallet } from "@/hooks/use-connect-wallet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { CONFIG } from "@/lib/config";
 
 export function HeroSection() {
   const { connect } = useConnectWallet();
@@ -44,7 +45,7 @@ export function HeroSection() {
           variant="ghost"
           className="h-auto rounded-xl border border-ghost-btn-border bg-ghost-btn-bg px-6 font-mulish text-sm font-bold text-ghost-btn-text backdrop-blur-sm hover:bg-ghost-btn-bg hover:opacity-80 md:px-8 md:text-base"
         >
-          <Link href="https://docs.nox.iex.ec/contact" target="_blank" rel="noopener noreferrer">Talk To Us</Link>
+          <Link href={CONFIG.urls.contact} target="_blank" rel="noopener noreferrer">Talk To Us</Link>
         </Button>
       </div>
     </section>
