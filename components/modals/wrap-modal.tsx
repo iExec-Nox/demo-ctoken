@@ -161,10 +161,12 @@ export function WrapModal() {
   const cTokenSymbol = `c${selectedToken?.symbol ?? "USDC"}`;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(value) => { if (!value && isProcessing) return; setOpen(value); }}>
       <DialogContent
         className="max-h-[90vh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto overflow-x-hidden rounded-[40px] border-modal-border bg-modal-bg px-6 py-[26px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 no-scrollbar data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 md:px-10 sm:max-w-[620px]"
         showCloseButton={false}
+        onEscapeKeyDown={(e) => { if (isProcessing) e.preventDefault(); }}
+        onInteractOutside={(e) => { if (isProcessing) e.preventDefault(); }}
       >
         {/* Content */}
         <div className="flex min-w-0 w-full flex-col items-center gap-[26px]">
@@ -179,7 +181,8 @@ export function WrapModal() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
+              disabled={isProcessing}
+              className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
               aria-label="Close"
             >
               X
@@ -193,7 +196,8 @@ export function WrapModal() {
               <button
                 type="button"
                 onClick={() => setActiveTab("wrap")}
-                className={`flex w-[48%] cursor-pointer items-center justify-center rounded-2xl py-3.5 font-mulish text-sm font-bold transition-colors ${
+                disabled={isProcessing}
+                className={`flex w-[48%] cursor-pointer items-center justify-center rounded-2xl py-3.5 font-mulish text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   isWrap
                     ? "border border-surface-border bg-surface text-text-heading"
                     : "text-text-muted hover:text-text-body"
@@ -204,7 +208,8 @@ export function WrapModal() {
               <button
                 type="button"
                 onClick={() => setActiveTab("unwrap")}
-                className={`flex w-[48%] cursor-pointer items-center justify-center rounded-2xl py-3.5 font-mulish text-sm font-bold transition-colors ${
+                disabled={isProcessing}
+                className={`flex w-[48%] cursor-pointer items-center justify-center rounded-2xl py-3.5 font-mulish text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   !isWrap
                     ? "border border-surface-border bg-surface text-text-heading"
                     : "text-text-muted hover:text-text-body"
@@ -464,7 +469,8 @@ export function WrapModal() {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="mt-1 w-full cursor-pointer text-center font-inter text-[15px] font-medium text-text-muted transition-opacity hover:opacity-70"
+          disabled={isProcessing}
+          className="mt-1 w-full cursor-pointer text-center font-inter text-[15px] font-medium text-text-muted transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
         >
           Cancel
         </button>
