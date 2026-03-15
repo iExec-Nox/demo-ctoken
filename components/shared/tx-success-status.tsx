@@ -7,13 +7,12 @@ interface TxSuccessStatusProps {
 
 export function TxSuccessStatus({ message, txHash }: TxSuccessStatusProps) {
   return (
-    <div className="flex flex-col items-center gap-1 py-2" role="status" aria-live="polite">
-      <div className="flex items-center gap-3">
-        <div className="size-3 rounded-full bg-tx-success-text opacity-70" />
-        <span className="font-mulish text-sm font-medium text-text-body">
-          {message}
-        </span>
-      </div>
+    <div className="flex items-center justify-center gap-2 py-2" role="status" aria-live="polite">
+      <div className="size-2.5 rounded-full bg-tx-success-text opacity-70" />
+      <span className="font-mulish text-sm font-medium text-text-body">
+        {message}
+      </span>
+      <span className="text-text-muted">·</span>
       <ArbiscanLink txHash={txHash} label="View on Arbiscan" className="text-xs" />
     </div>
   );
