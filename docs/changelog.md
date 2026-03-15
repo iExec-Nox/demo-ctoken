@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-15 — Étude : Migration Activity Explorer vers Subgraph
+
+Étude du subgraph Nox Protocol Indexer existant et de l'explorer iExec v2. Le subgraph indexe les handles et ACL mais pas les events token (Wrap, Unwrap, Transfer). Recommandation : étendre le subgraph avec des entités dédiées pour éliminer les appels RPC qui causent les erreurs 429.
+
+→ Voir : [Étude Subgraph](./todo/0019-subgraph-activity-explorer.md)
+
 ### 2026-03-15 — Bloquer la fermeture des modales pendant une transaction
 
 Blocage de tous les chemins de fermeture (X, Cancel, Escape, clic overlay) des modales Wrap, Transfer et Selective Disclosure quand une transaction blockchain est en cours. Empêche la perte de fonds sur les flows multi-étapes (ex: unwrap).
