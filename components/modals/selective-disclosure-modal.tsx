@@ -131,7 +131,7 @@ const DISCLOSURE_STEPS: ProgressStep[] = [
 export function SelectiveDisclosureModal() {
   const { open, setOpen } = useSelectiveDisclosureModal();
   const { enabled: devMode } = useDevMode();
-  const { step, error, txHash, grant, reset } = useAddViewer();
+  const { step, error, txEntries, grant, reset } = useAddViewer();
 
   const [viewerAddress, setViewerAddress] = useState("");
   const [scope, setScope] = useState<ScopeType>("specific");
@@ -441,8 +441,16 @@ export function SelectiveDisclosureModal() {
             <ProgressTracker currentStep={step} steps={DISCLOSURE_STEPS} />
 
             {/* Success status on confirmed */}
-            {step === "confirmed" && txHash && (
-              <TxSuccessStatus message="Viewer Access Granted" txHash={txHash} />
+            {step === "confirmed" && txEntries.length > 0 && (
+              <div className="flex flex-col gap-1">
+                {txEntries.map(({ hash, symbol }) => (
+                  <TxSuccessStatus
+                    key={hash}
+                    message={`${symbol} Access Granted`}
+                    txHash={hash}
+                  />
+                ))}
+              </div>
             )}
           </div>
 

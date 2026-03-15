@@ -24,7 +24,7 @@ export type AddViewerStep =
 interface UseAddViewerResult {
   step: AddViewerStep;
   error: string | null;
-  txHash: `0x${string}` | undefined;
+  txEntries: { hash: `0x${string}`; symbol: string }[];
   grant: (
     viewerAddress: string,
     tokens: TokenConfig[],
@@ -39,12 +39,12 @@ export function useAddViewer(): UseAddViewerResult {
 
   const [step, setStep] = useState<AddViewerStep>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
+  const [txEntries, setTxEntries] = useState<{ hash: `0x${string}`; symbol: string }[]>([]);
 
   const reset = useCallback(() => {
     setStep("idle");
     setError(null);
-    setTxHash(undefined);
+    setTxEntries([]);
     resetWriteContract();
   }, [resetWriteContract]);
 
@@ -110,9 +110,9 @@ export function useAddViewer(): UseAddViewerResult {
         // Step 2: Call addViewer for each handle
         setStep("granting");
 
-        let lastTxHash: `0x${string}` | undefined;
+        const entries: { hash: `0x${string}`; symbol: string }[] = [];
 
-        for (const { handle } of handleEntries) {
+        for (const { token, handle } of handleEntries) {
           const tx = await writeContractAsync({
             address: NOX_COMPUTE_ADDRESS,
             abi: noxComputeAbi,
@@ -123,13 +123,13 @@ export function useAddViewer(): UseAddViewerResult {
 
           // Wait for tx to be mined before sending the next one
           await publicClient.waitForTransactionReceipt({ hash: tx });
-          lastTxHash = tx;
+          entries.push({ hash: tx, symbol: token.symbol });
 
           // Cooldown — NoxCompute rate-limits rapid successive calls
           await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
         }
 
-        setTxHash(lastTxHash);
+        setTxEntries(entries);
         setStep("confirmed");
         return true;
       } catch (err) {
@@ -141,5 +141,5 @@ export function useAddViewer(): UseAddViewerResult {
     [address, publicClient, writeContractAsync],
   );
 
-  return { step, error, txHash, grant, reset };
+  return { step, error, txEntries, grant, reset };
 }
