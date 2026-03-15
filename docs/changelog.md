@@ -8,31 +8,31 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 Documentation de référence détaillant tous les appels RPC par action (Wrap, Unwrap, Transfer, AddViewer), les cooldowns NoxCompute, le polling en arrière-plan, et les pistes d'amélioration (batch, retry, fallback, polling interval).
 
-→ Voir : [Guide RPC](./todo/0020-rpc-rate-limiting-guide.md)
+→ Voir : [Guide RPC](./todo/0004-rpc-rate-limiting-guide.md)
 
 ### 2026-03-15 — Étude : Migration Activity Explorer vers Subgraph
 
 Étude du subgraph Nox Protocol Indexer existant et de l'explorer iExec v2. Le subgraph indexe les handles et ACL mais pas les events token (Wrap, Unwrap, Transfer). Recommandation : étendre le subgraph avec des entités dédiées pour éliminer les appels RPC qui causent les erreurs 429.
 
-→ Voir : [Étude Subgraph](./todo/0019-subgraph-activity-explorer.md)
+→ Voir : [Étude Subgraph](./todo/0003-subgraph-activity-explorer.md)
 
 ### 2026-03-15 — Bloquer la fermeture des modales pendant une transaction
 
 Blocage de tous les chemins de fermeture (X, Cancel, Escape, clic overlay) des modales Wrap, Transfer et Selective Disclosure quand une transaction blockchain est en cours. Empêche la perte de fonds sur les flows multi-étapes (ex: unwrap).
 
-→ ADR : [ADR-0018](./decisions/0018-block-modal-close-during-tx.md)
+→ ADR : [ADR-0016](./decisions/0016-block-modal-close-during-tx.md)
 
 ### 2026-03-15 — Audit Clean & Accessibilité
 
 Audit complet du codebase (Next.js, React, Web3, qualité, performance, accessibilité WCAG 2.1 AA). 44 findings identifiés : 5 critiques, 14 majeurs, 9 accessibilité, 16 mineurs. Build et lint passent sans erreur.
 
-→ Voir : [Audit Clean & A11y](./todo/0017-audit-clean-a11y.md)
+→ Voir : [Audit Clean & A11y](./todo/0002-audit-clean-a11y.md)
 
 ### 2026-03-15 — Conserver Shiki pour le syntax highlighting (Dev Mode)
 
 Étude comparative Shiki vs prism-react-renderer pour le highlighting des snippets Solidity/TypeScript dans les modales Dev Mode. Décision de conserver Shiki pour le support natif Solidity, la qualité VS Code-identique, et la pérennité de l'écosystème. Optimisations identifiées : passage à `shiki/core` + JS engine + singleton highlighter pour réduire le bundle de ~70%.
 
-→ ADR : [ADR-0016](./decisions/0016-syntax-highlighting-shiki.md)
+→ ADR : [ADR-0015](./decisions/0015-syntax-highlighting-shiki.md)
 
 ### 2026-03-10 — Validation de balance dans les modales Unwrap et Transfer
 
@@ -44,7 +44,7 @@ Ajout de la validation de balance dans les modales Unwrap et Transfer pour empê
 
 Recherche sur l'intégration Account Abstraction via Reown AppKit pour simplifier l'onboarding utilisateur.
 
-→ Voir : [Étude AA](./todo/0014-reown-account-abstraction.md)
+→ Voir : [Étude AA](./todo/0001-reown-account-abstraction.md)
 
 ### 2026-03-08 — Réorganisation des composants par dossiers thématiques
 
