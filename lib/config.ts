@@ -1,6 +1,6 @@
 export const CONFIG = {
   urls: {
-    app: "https://nox.iex.ec",
+    app: "https://demo.noxprotocol.io",
     arbiscan: "https://sepolia.arbiscan.io",
     docs: "https://docs.iex.ec",
     github: "https://github.com/iExec-Nox",

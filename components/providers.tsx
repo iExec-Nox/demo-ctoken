@@ -37,6 +37,7 @@ function initAppKit() {
     themeVariables: {
       "--w3m-accent": "#748eff",
       "--w3m-border-radius-master": "2px",
+      "--w3m-font-family": "var(--font-mulish), sans-serif",
     },
   });
 }
