@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-15 — Guide : Rate Limiting RPC & Cooldowns NoxCompute
+
+Documentation de référence détaillant tous les appels RPC par action (Wrap, Unwrap, Transfer, AddViewer), les cooldowns NoxCompute, le polling en arrière-plan, et les pistes d'amélioration (batch, retry, fallback, polling interval).
+
+→ Voir : [Guide RPC](./todo/0020-rpc-rate-limiting-guide.md)
+
 ### 2026-03-15 — Étude : Migration Activity Explorer vers Subgraph
 
 Étude du subgraph Nox Protocol Indexer existant et de l'explorer iExec v2. Le subgraph indexe les handles et ACL mais pas les events token (Wrap, Unwrap, Transfer). Recommandation : étendre le subgraph avec des entités dédiées pour éliminer les appels RPC qui causent les erreurs 429.
