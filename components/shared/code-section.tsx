@@ -16,10 +16,11 @@ export function CodeSection({ code, language = "solidity" }: CodeSectionProps) {
   const [highlightedHtml, setHighlightedHtml] = useState<string>("");
 
   useEffect(() => {
+    if (!resolvedTheme) return;
     codeToHtml(code, {
       lang: language,
       theme: resolvedTheme === "dark" ? "github-dark" : "github-light",
-    }).then(setHighlightedHtml);
+    }).then(setHighlightedHtml).catch(() => {});
   }, [code, language, resolvedTheme]);
 
   return (
