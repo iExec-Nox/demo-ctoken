@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAccount, usePublicClient } from "wagmi";
 import { erc20Abi } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
+import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 import { CONTRACTS } from "@/lib/contracts";
 import { formatBalance } from "@/lib/format";
 import { CONFIG } from "@/lib/config";
@@ -119,7 +120,19 @@ export function useActivityHistory(): UseActivityHistoryResult {
           }),
         );
 
+        // Fetch ViewerAdded events from NoxCompute (separate from per-token queries)
+        const viewerLogs = await publicClient.getContractEvents({
+          address: NOX_COMPUTE_ADDRESS as `0x${string}`,
+          abi: noxComputeAbi,
+          eventName: "ViewerAdded",
+          args: { sender: address },
+          fromBlock: 0n,
+        });
+
         // Collect block numbers
+        for (const log of viewerLogs) {
+          if (log.blockNumber != null) allBlockNumbers.push(log.blockNumber);
+        }
         for (const { wrapLogs, unwrapLogs, confFromLogs, confToLogs } of pairResults) {
           for (const logs of [wrapLogs, unwrapLogs, confFromLogs, confToLogs]) {
             for (const log of logs) {
@@ -176,6 +189,20 @@ export function useActivityHistory(): UseActivityHistoryResult {
               txHash: log.transactionHash!,
             });
           }
+
+        }
+
+        // Build delegation entries from NoxCompute ViewerAdded events
+        for (const log of viewerLogs) {
+          const viewer = log.args.viewer;
+          allEntries.push({
+            id: `${log.transactionHash}-${log.logIndex}`,
+            type: "delegation",
+            asset: "ACL",
+            amount: viewer ? `${viewer.slice(0, 6)}...${viewer.slice(-4)}` : "—",
+            timestamp: getTs(log.blockNumber),
+            txHash: log.transactionHash!,
+          });
         }
 
         // Sort newest first

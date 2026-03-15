@@ -31,4 +31,13 @@ export const noxComputeAbi = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    inputs: [
+      { name: "sender", type: "address", indexed: true },
+      { name: "viewer", type: "address", indexed: true },
+      { name: "handle", type: "bytes32", indexed: true },
+    ],
+    name: "ViewerAdded",
+    type: "event",
+  },
 ] as const;
