@@ -4,17 +4,17 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-15 — Audit Clean & Accessibilité
+
+Audit complet du codebase (Next.js, React, Web3, qualité, performance, accessibilité WCAG 2.1 AA). 44 findings identifiés : 5 critiques, 14 majeurs, 9 accessibilité, 16 mineurs. Build et lint passent sans erreur.
+
+→ Voir : [Audit Clean & A11y](./todo/0017-audit-clean-a11y.md)
+
 ### 2026-03-15 — Conserver Shiki pour le syntax highlighting (Dev Mode)
 
 Étude comparative Shiki vs prism-react-renderer pour le highlighting des snippets Solidity/TypeScript dans les modales Dev Mode. Décision de conserver Shiki pour le support natif Solidity, la qualité VS Code-identique, et la pérennité de l'écosystème. Optimisations identifiées : passage à `shiki/core` + JS engine + singleton highlighter pour réduire le bundle de ~70%.
 
 → ADR : [ADR-0016](./decisions/0016-syntax-highlighting-shiki.md)
-
-### 2026-03-13 — Audit Code — Clean & Accessibilité
-
-Audit complet du codebase (Next.js, React, qualité, accessibilité WCAG 2.1 AA). 16 findings identifiés : 2 critiques, 9 majeurs, 5 mineurs. Build et lint passent sans erreur.
-
-→ Voir : [Audit Clean](./todo/0015-code-audit-clean.md)
 
 ### 2026-03-10 — Validation de balance dans les modales Unwrap et Transfer
 
