@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Mulish, Anybody, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "@/components/providers";
 import { APP_URL } from "@/lib/config";
 import "./globals.css";
@@ -85,6 +86,7 @@ export default async function RootLayout({
         <Providers cookies={cookieString}>
           {children}
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
