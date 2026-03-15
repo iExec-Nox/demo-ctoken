@@ -1,4 +1,4 @@
-# ADR-0016 : Bloquer la fermeture des modales pendant une transaction
+# ADR-0018 : Bloquer la fermeture des modales pendant une transaction
 
 **Date :** 2026-03-14
 **Statut :** Accepté

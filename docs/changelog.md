@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-15 — Bloquer la fermeture des modales pendant une transaction
+
+Blocage de tous les chemins de fermeture (X, Cancel, Escape, clic overlay) des modales Wrap, Transfer et Selective Disclosure quand une transaction blockchain est en cours. Empêche la perte de fonds sur les flows multi-étapes (ex: unwrap).
+
+→ ADR : [ADR-0018](./decisions/0018-block-modal-close-during-tx.md)
+
 ### 2026-03-15 — Audit Clean & Accessibilité
 
 Audit complet du codebase (Next.js, React, Web3, qualité, performance, accessibilité WCAG 2.1 AA). 44 findings identifiés : 5 critiques, 14 majeurs, 9 accessibilité, 16 mineurs. Build et lint passent sans erreur.
