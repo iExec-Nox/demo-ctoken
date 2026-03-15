@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
+import { APP_URL } from "@/lib/config";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -9,8 +10,8 @@ const jsonLd = {
     {
       "@type": "Organization",
       name: "Nox Protocol",
-      url: "https://nox.iex.ec",
-      logo: "https://nox.iex.ec/nox-icon.png",
+      url: APP_URL,
+      logo: `${APP_URL}/nox-icon.png`,
       description:
         "Confidential token protocol enabling encrypted ERC-20 transfers and selective disclosure on Arbitrum.",
       sameAs: ["https://github.com/iExecBlockchainComputing"],
@@ -18,7 +19,7 @@ const jsonLd = {
     {
       "@type": "WebApplication",
       name: "Nox Confidential Token",
-      url: "https://nox.iex.ec",
+      url: APP_URL,
       applicationCategory: "FinanceApplication",
       operatingSystem: "Web",
       offers: {

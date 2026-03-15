@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-const REFRESH_INTERVAL = 60_000;
+import { CONFIG } from "@/lib/config";
 
 export type TokenPrices = Record<string, number>;
 
@@ -30,7 +29,7 @@ export function useTokenPrices() {
     }
 
     fetchPrices();
-    const interval = setInterval(fetchPrices, REFRESH_INTERVAL);
+    const interval = setInterval(fetchPrices, CONFIG.timing.priceRefreshMs);
 
     return () => {
       controller.abort();

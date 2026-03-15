@@ -1,6 +1,7 @@
 import type { TokenBalance } from "@/hooks/use-token-balances";
 import type { TokenPrices } from "@/hooks/use-token-prices";
 import { toFloat, formatUsd } from "@/lib/format";
+import { ARBISCAN_BASE_URL } from "@/lib/config";
 import { Card } from "@/components/ui/card";
 import { TokenRow } from "./token-row";
 
@@ -27,7 +28,7 @@ export function PublicAssets({ balances, prices, address }: PublicAssetsProps) {
         </div>
         {address ? (
           <a
-            href={`https://sepolia.arbiscan.io/address/${address}`}
+            href={`${ARBISCAN_BASE_URL}/address/${address}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 font-mulish text-xs text-text-body transition-colors hover:text-primary"

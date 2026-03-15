@@ -62,7 +62,6 @@ Create a `.env.local` file:
 
 ```env
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=<your_project_id>
-NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC=https://arbitrum-sepolia.gateway.tenderly.co
 ```
 
 ### Run

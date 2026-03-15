@@ -8,6 +8,7 @@ import { estimateGasOverrides } from "@/lib/gas";
 import { formatTransactionError } from "@/lib/utils";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
+import { TEE_COOLDOWN_MS } from "@/lib/config";
 import type { TokenConfig } from "@/lib/tokens";
 
 export type UnwrapStep =
@@ -102,7 +103,7 @@ export function useUnwrap(): UseUnwrapResult {
       resetWriteContract();
 
       // Small cooldown before retry to avoid NoxCompute rate-limiting
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
       await executeFinalize(params.cTokenAddress, params.handle, params.parsedAmount);
     } catch (err) {
@@ -203,7 +204,7 @@ export function useUnwrap(): UseUnwrapResult {
         finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle, parsedAmount };
 
         // Cooldown — NoxCompute rate-limits rapid successive calls
-        await new Promise((r) => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
         // Step 3: Finalize unwrap
         await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);

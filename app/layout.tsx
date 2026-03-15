@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Mulish, Anybody, Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { APP_URL } from "@/lib/config";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -23,7 +24,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nox.iex.ec"),
+  metadataBase: new URL(APP_URL),
   title: {
     default: "Nox — Confidential Token Protocol",
     template: "%s | Nox",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://nox.iex.ec",
+    url: APP_URL,
     siteName: "Nox Confidential Token",
     title: "Nox — Confidential Token Protocol",
     description:

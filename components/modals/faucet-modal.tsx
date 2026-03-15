@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { useFaucetModal } from "./faucet-modal-provider";
 import { FaucetCard } from "./faucet-card";
+import { CONFIG } from "@/lib/config";
 
 const FAUCET_TOKENS = [
   {
@@ -17,7 +18,7 @@ const FAUCET_TOKENS = [
     description: "Used for transaction fees",
     icon: "/faucet-eth.svg",
     mintLabel: "Mint ETH",
-    href: "https://cloud.google.com/application/web3/faucet/ethereum/sepolia",
+    href: CONFIG.urls.faucets.eth,
   },
   {
     name: "Faucet RLC",
@@ -25,7 +26,7 @@ const FAUCET_TOKENS = [
     description: "Used for private wrapping",
     icon: "/faucet-usdc.svg",
     mintLabel: "Mint RLC",
-    href: "https://explorer.iex.ec/arbitrum-sepolia-testnet/account?accountTab=Faucet",
+    href: CONFIG.urls.faucets.rlc,
   },
   {
     name: "Faucet USDC",
@@ -33,7 +34,7 @@ const FAUCET_TOKENS = [
     description: "Used for private wrapping",
     icon: "/faucet-usdc.svg",
     mintLabel: "Mint USDC",
-    href: "https://faucet.circle.com/",
+    href: CONFIG.urls.faucets.usdc,
   },
 ] as const;
 

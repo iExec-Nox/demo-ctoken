@@ -10,6 +10,7 @@ import {
   noxComputeAbi,
   NOX_COMPUTE_ADDRESS,
 } from "@/lib/nox-compute-abi";
+import { TEE_COOLDOWN_MS } from "@/lib/config";
 import type { TokenConfig } from "@/lib/tokens";
 import { ZERO_HANDLE } from "@/lib/contracts";
 
@@ -125,7 +126,7 @@ export function useAddViewer(): UseAddViewerResult {
           lastTxHash = tx;
 
           // Cooldown — NoxCompute rate-limits rapid successive calls
-          await new Promise((r) => setTimeout(r, 2000));
+          await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
         }
 
         setTxHash(lastTxHash);

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
+import { CONFIG } from "@/lib/config";
 
 export function Footer() {
   return (
@@ -7,7 +8,7 @@ export function Footer() {
       <Logo iconSize="xs" font="inter" textColorClass="text-footer-logo-text" />
       <nav className="flex items-center gap-4 font-mulish text-sm font-medium text-footer-text md:text-base">
         <Link
-          href="https://docs.iex.ec"
+          href={CONFIG.urls.docs}
           target="_blank"
           rel="noopener noreferrer"
           className="transition-colors hover:text-text-body"
@@ -15,7 +16,7 @@ export function Footer() {
           Documentation
         </Link>
         <Link
-          href="https://github.com/iExec-Nox"
+          href={CONFIG.urls.github}
           target="_blank"
           rel="noopener noreferrer"
           className="transition-colors hover:text-text-body"

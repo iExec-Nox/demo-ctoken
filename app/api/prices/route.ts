@@ -1,11 +1,10 @@
 import { coingeckoIds, tokens } from "@/lib/tokens";
-
-const COINGECKO_API = "https://api.coingecko.com/api/v3/simple/price";
+import { CONFIG } from "@/lib/config";
 
 export async function GET() {
   try {
     const res = await fetch(
-      `${COINGECKO_API}?ids=${coingeckoIds}&vs_currencies=usd`,
+      `${CONFIG.urls.coingeckoApi}?ids=${coingeckoIds}&vs_currencies=usd`,
       { next: { revalidate: 60 } }
     );
 
