@@ -439,6 +439,11 @@ export function SelectiveDisclosureModal() {
 
             {/* Progress tracker */}
             <ProgressTracker currentStep={step} steps={DISCLOSURE_STEPS} />
+
+            {/* Success status on confirmed */}
+            {step === "confirmed" && txHash && (
+              <TxSuccessStatus message="Viewer Access Granted" txHash={txHash} />
+            )}
           </div>
 
           {/* How it works — inside glass card on mobile */}
@@ -448,11 +453,6 @@ export function SelectiveDisclosureModal() {
             state only.
           </InfoCard>
         </div>
-
-        {/* Arbiscan link on success */}
-        {step === "confirmed" && txHash && (
-          <TxSuccessStatus message="Viewer Access Granted" txHash={txHash} />
-        )}
 
         {/* Function called */}
         {devMode && <CodeSection code={ADD_VIEWER_CODE} language="typescript" />}

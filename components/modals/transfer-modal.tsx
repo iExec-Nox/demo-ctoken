@@ -368,17 +368,17 @@ export function TransferModal() {
             {/* Progress tracker */}
             <ProgressTracker currentStep={step} steps={TRANSFER_STEPS} />
 
+            {/* Arbiscan link on success */}
+            {step === "confirmed" && txHash && (
+              <TxSuccessStatus message="Confidential Transfer Complete" txHash={txHash} />
+            )}
+
             {/* How it works */}
             <InfoCard className="md:p-3!">
               Amounts are encrypted.
               <br />
               The transfer is verified on-chain without revealing values.
             </InfoCard>
-
-            {/* Arbiscan link on success */}
-            {step === "confirmed" && txHash && (
-              <TxSuccessStatus message="Confidential Transfer Complete" txHash={txHash} />
-            )}
           </div>
         </div>
 

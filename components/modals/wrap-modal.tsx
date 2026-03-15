@@ -14,7 +14,7 @@ import { useDevMode } from "@/hooks/use-dev-mode";
 import { useWrap } from "@/hooks/use-wrap";
 import { useUnwrap } from "@/hooks/use-unwrap";
 import { wrappableTokens as wrappableTokenConfigs } from "@/lib/tokens";
-import { ArbiscanLink } from "@/components/shared/arbiscan-link";
+import { TxSuccessStatus } from "@/components/shared/tx-success-status";
 import { useEstimatedFee } from "@/hooks/use-estimated-fee";
 import { useDecryptBalance } from "@/hooks/use-decrypt-balance";
 import { useDropdown } from "@/hooks/use-dropdown";
@@ -443,6 +443,14 @@ export function WrapModal() {
               steps={isWrap ? WRAP_STEPS : UNWRAP_STEPS}
             />
 
+            {/* Success status on confirmed */}
+            {isWrap && wrapStep === "confirmed" && wrapTxHash && (
+              <TxSuccessStatus message="Wrap Complete" txHash={wrapTxHash} />
+            )}
+            {!isWrap && unwrapStep === "confirmed" && finalizeTxHash && (
+              <TxSuccessStatus message="Unwrap Complete" txHash={finalizeTxHash} />
+            )}
+
             {/* How it works */}
             <InfoCard>
               {isWrap
@@ -450,14 +458,6 @@ export function WrapModal() {
                 : "Unwrapping moves your confidential tokens back to the public Arbitrum ledger. Once unwrapped, your balance and transfers are visible on-chain."}
             </InfoCard>
           </div>
-
-          {/* Arbiscan link on success */}
-          {isWrap && wrapStep === "confirmed" && wrapTxHash && (
-            <ArbiscanLink txHash={wrapTxHash} />
-          )}
-          {!isWrap && unwrapStep === "confirmed" && finalizeTxHash && (
-            <ArbiscanLink txHash={finalizeTxHash} />
-          )}
 
           {/* Function called */}
           {devMode && (
