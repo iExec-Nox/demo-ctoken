@@ -60,7 +60,7 @@ export function exportToCsv(
     : ["Token", "Status", "Viewer", "Handle", "Date", "Tx Hash"];
 
   const rows = entries.map((entry) => {
-    const token = entry.token?.symbol ?? "Unknown";
+    const token = entry.token?.symbol ?? "Sealed";
     const status = entry.isActive ? "Active" : "Outdated";
     const date = formatTimestampForExport(entry.timestamp);
     if (isShared) {

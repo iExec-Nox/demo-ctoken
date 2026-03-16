@@ -19,23 +19,26 @@ function truncateHandle(handle: string): string {
   return `${handle.slice(0, 8)}...${handle.slice(-4)}`;
 }
 
-function TokenBadge({ entry }: { entry: DelegatedViewEntry }) {
-  const symbol = entry.token?.symbol ?? "Unknown";
+function TokenLabel({ entry }: { entry: DelegatedViewEntry }) {
+  const symbol = entry.token?.symbol ?? "Sealed";
   return (
-    <div className="flex items-center gap-2">
-      <span className="font-inter text-sm font-bold text-text-heading">
-        {symbol}
-      </span>
-      <span
-        className={`inline-flex items-center rounded-full px-2 py-0.5 font-inter text-[10px] font-bold uppercase tracking-wider ${
-          entry.isActive
-            ? "bg-tx-success-bg text-tx-success-text"
-            : "bg-tx-pending-bg text-tx-pending-text"
-        }`}
-      >
-        {entry.isActive ? "Active" : "Outdated"}
-      </span>
-    </div>
+    <span className="font-inter text-sm font-bold text-text-heading">
+      {symbol}
+    </span>
+  );
+}
+
+function StatusBadge({ entry }: { entry: DelegatedViewEntry }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 font-inter text-[10px] font-bold uppercase tracking-wider ${
+        entry.isActive
+          ? "bg-tx-success-bg text-tx-success-text"
+          : "bg-tx-pending-bg text-tx-pending-text"
+      }`}
+    >
+      {entry.isActive ? "Active" : "Outdated"}
+    </span>
   );
 }
 
@@ -69,6 +72,7 @@ interface DelegatedViewTableProps {
 
 const SHARED_COLUMNS = [
   "Token",
+  "Status",
   "Shared by",
   "Handle",
   "Value",
@@ -78,6 +82,7 @@ const SHARED_COLUMNS = [
 
 const GRANTS_COLUMNS = [
   "Token",
+  "Status",
   "Viewer",
   "Handle",
   "Date",
@@ -178,7 +183,10 @@ function SharedRow({
   return (
     <tr className="bg-surface/50 transition-colors hover:bg-surface">
       <td className="px-6 py-5">
-        <TokenBadge entry={entry} />
+        <TokenLabel entry={entry} />
+      </td>
+      <td className="px-6 py-5">
+        <StatusBadge entry={entry} />
       </td>
       <td className="px-6 py-5">
         <span className="font-inter text-sm font-medium text-text-body">
@@ -245,7 +253,10 @@ function GrantsRow({ entry }: { entry: DelegatedViewEntry }) {
   return (
     <tr className="bg-surface/50 transition-colors hover:bg-surface">
       <td className="px-6 py-5">
-        <TokenBadge entry={entry} />
+        <TokenLabel entry={entry} />
+      </td>
+      <td className="px-6 py-5">
+        <StatusBadge entry={entry} />
       </td>
       <td className="px-6 py-5">
         <span className="font-inter text-sm font-medium text-text-body">
@@ -289,9 +300,12 @@ function MobileCard({
 
   return (
     <div className="rounded-xl border border-surface-border bg-surface p-4 backdrop-blur-sm">
-      {/* Row 1: Token + Counterparty */}
+      {/* Row 1: Token + Status + Counterparty */}
       <div className="flex items-center justify-between">
-        <TokenBadge entry={entry} />
+        <div className="flex items-center gap-2">
+          <TokenLabel entry={entry} />
+          <StatusBadge entry={entry} />
+        </div>
         <span className="font-inter text-sm font-medium text-text-body">
           {truncateAddress(entry.counterparty)}
         </span>
