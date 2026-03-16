@@ -37,91 +37,6 @@ await walletClient.writeContract({
   args: [handle, viewerAddress],
 });`;
 
-interface MockViewer {
-  address: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  scope: "full" | "token";
-  tokenLabel?: string;
-  date: string;
-}
-
-const CURRENT_VIEWERS: MockViewer[] = [
-  {
-    address: "0x3fA...E901",
-    icon: "account_balance",
-    iconColor: "text-primary",
-    iconBg: "bg-primary-alpha-18",
-    scope: "full",
-    date: "12/02/2026 10:30 CET",
-  },
-  {
-    address: "0x882...19a4",
-    icon: "person",
-    iconColor: "text-primary",
-    iconBg: "bg-primary-alpha-18",
-    scope: "token",
-    tokenLabel: "USDC Only",
-    date: "12/02/2026 10:30 CET",
-  },
-  {
-    address: "0x91d...77b2",
-    icon: "verified_user",
-    iconColor: "text-text-body",
-    iconBg: "bg-surface",
-    scope: "full",
-    date: "12/02/2026 10:30 CET",
-  },
-];
-
-const PAST_VIEWERS: MockViewer[] = [
-  {
-    address: "0x3fA...E901",
-    icon: "account_balance",
-    iconColor: "text-primary",
-    iconBg: "bg-primary-alpha-18",
-    scope: "full",
-    date: "12/02/2026 10:30 CET",
-  },
-];
-
-function ViewerCard({ viewer }: { viewer: MockViewer }) {
-  return (
-    <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-surface p-[21px] backdrop-blur-sm">
-      <div className="flex items-center gap-2.5 md:gap-4">
-        <div
-          className={`flex size-[29px] shrink-0 items-center justify-center rounded-full md:size-10 ${viewer.iconBg}`}
-        >
-          <span
-            aria-hidden="true"
-            className={`material-icons text-[14px]! md:text-[20px]! ${viewer.iconColor}`}
-          >
-            {viewer.icon}
-          </span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="font-mulish text-xs text-text-heading md:text-sm">
-            {viewer.address}
-          </span>
-          {viewer.scope === "full" ? (
-            <span className="inline-flex w-fit items-center rounded-full border border-tx-success-text/20 bg-tx-success-bg px-2 py-0.5 font-mulish text-[10px] font-bold text-tx-success-text">
-              Full Portfolio
-            </span>
-          ) : (
-            <span className="inline-flex w-fit items-center rounded-full border border-primary bg-primary px-2 py-0.5 font-mulish text-[10px] font-bold text-primary-foreground">
-              {viewer.tokenLabel}
-            </span>
-          )}
-        </div>
-      </div>
-      <span className="flex-1 text-right font-mulish text-[11px] text-text-muted md:flex-none md:text-sm">
-        {viewer.date}
-      </span>
-    </div>
-  );
-}
-
 const DISCLOSURE_STEPS: ProgressStep[] = [
   { key: "reading-handle", icon: "search", label: "Read Handle" },
   { key: "granting", icon: "sync", label: "Grant Access" },
@@ -464,46 +379,6 @@ export function SelectiveDisclosureModal() {
 
         {/* Function called */}
         {devMode && <CodeSection code={ADD_VIEWER_CODE} language="typescript" />}
-
-        {/* Current Viewers */}
-        <div className="flex w-full items-center justify-between">
-          <span className="font-mulish text-base font-bold tracking-[1.4px] text-text-muted">
-            Current Viewers ({CURRENT_VIEWERS.length})
-          </span>
-          <button
-            type="button"
-            aria-disabled="true"
-            className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
-          >
-            Refresh List
-          </button>
-        </div>
-
-        <div className="flex w-full flex-col gap-3">
-          {CURRENT_VIEWERS.map((viewer) => (
-            <ViewerCard key={viewer.address + viewer.icon} viewer={viewer} />
-          ))}
-        </div>
-
-        {/* Past Viewers — desktop only */}
-        <div className="hidden w-full flex-col gap-3 md:flex">
-          <div className="flex items-center justify-between">
-            <span className="font-mulish text-base font-bold tracking-[1.4px] text-text-muted">
-              Past Viewers ({PAST_VIEWERS.length})
-            </span>
-            <button
-              type="button"
-              aria-disabled="true"
-              className="cursor-default font-mulish text-sm font-medium text-primary opacity-50"
-            >
-              See all
-            </button>
-          </div>
-
-          {PAST_VIEWERS.map((viewer) => (
-            <ViewerCard key={viewer.address + viewer.icon} viewer={viewer} />
-          ))}
-        </div>
 
         {/* Security Note */}
         <div className="flex w-full items-start gap-3 rounded-xl bg-modal-bg p-2.5 backdrop-blur-sm">
