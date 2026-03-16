@@ -272,7 +272,6 @@ export function SelectiveDisclosureModal() {
 
                 {confidentialTokens.map((token) => {
                   const isChecked = selectedTokens.has(token.symbol);
-                  const baseSymbol = token.symbol.replace(/^c/, "");
                   return (
                     <button
                       key={token.symbol}
@@ -305,7 +304,7 @@ export function SelectiveDisclosureModal() {
                           )}
                         </div>
                         <span className="font-mulish text-base text-text-heading/60">
-                          {baseSymbol}
+                          {token.symbol}
                         </span>
                       </div>
                       <span className="font-mulish text-sm text-text-heading/60">
