@@ -3,7 +3,7 @@ import Image from "next/image";
 interface FaucetCardProps {
   name: string;
   category: string;
-  description: string;
+  description: React.ReactNode;
   icon: string;
   mintLabel: string;
   href: string;

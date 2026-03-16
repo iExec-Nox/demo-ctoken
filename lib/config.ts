@@ -6,6 +6,7 @@ export const CONFIG = {
     github: "https://github.com/iExec-Nox",
     contact: "https://docs.nox.iex.ec/contact",
     coingeckoApi: "https://api.coingecko.com/api/v3/simple/price",
+    bridge: "https://portal.arbitrum.io/bridge?amount=0&sourceChain=sepolia&destinationChain=arbitrum-sepolia&tab=bridge&sanitized=true",
     faucets: {
       eth: "https://cloud.google.com/application/web3/faucet/ethereum/sepolia",
       rlc: "https://explorer.iex.ec/arbitrum-sepolia-testnet/account?accountTab=Faucet",

@@ -15,7 +15,19 @@ const FAUCET_TOKENS = [
   {
     name: "Faucet ETH",
     category: "Gas Asset",
-    description: "Used for transaction fees",
+    description: (
+      <>
+        Used for transaction fees{" "}
+        <a
+          href={CONFIG.urls.bridge}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline"
+        >
+          (bridge)
+        </a>
+      </>
+    ),
     icon: "/faucet-eth.svg",
     mintLabel: "Mint ETH",
     href: CONFIG.urls.faucets.eth,
