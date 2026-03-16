@@ -16,5 +16,6 @@
 | 0014 | [Centralisation de la configuration dans lib/config.ts](./0014-centralize-config.md) | 2026-03-15 | Accepté |
 | 0015 | [Conserver Shiki pour le syntax highlighting (Dev Mode)](./0015-syntax-highlighting-shiki.md) | 2026-03-15 | Accepté |
 | 0016 | [Bloquer la fermeture des modales pendant une transaction](./0016-block-modal-close-during-tx.md) | 2026-03-14 | Accepté |
+| 0017 | [Page Delegated View — visualisation des ACL on-chain](./0017-delegated-view-page.md) | 2026-03-16 | Accepté |
 
 > Les dossiers d'étude et backlogs sont dans [`docs/todo/`](../todo/).
