@@ -46,7 +46,6 @@ export function useUnwrap(): UseUnwrapResult {
   const finalizeParamsRef = useRef<{
     cTokenAddress: `0x${string}`;
     handle: `0x${string}`;
-    parsedAmount: bigint;
   } | null>(null);
 
   const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
@@ -66,11 +65,18 @@ export function useUnwrap(): UseUnwrapResult {
     async (
       cTokenAddress: `0x${string}`,
       handle: `0x${string}`,
-      parsedAmount: bigint,
     ) => {
+      if (!handleClient) {
+        throw new Error("Handle client not initialized");
+      }
+
       setStep("finalizing");
       setError(null);
       setIsFinalizeError(false);
+
+      // Decrypt the unwrap handle publicly to get the cleartext amount + proof
+      const { value, decryptionProof } = await handleClient.publicDecrypt(handle);
+      const cleartextAmount = typeof value === "bigint" ? value : BigInt(String(value));
 
       const gasOverrides = await estimateGasOverrides(publicClient);
 
@@ -78,8 +84,7 @@ export function useUnwrap(): UseUnwrapResult {
         address: cTokenAddress,
         abi: confidentialTokenAbi,
         functionName: "finalizeUnwrap",
-        // TODO: replace mock proof with real decryption proof from NoxCompute
-        args: [handle, parsedAmount, "0x00"],
+        args: [handle, cleartextAmount, decryptionProof],
         ...gasOverrides,
       });
 
@@ -88,7 +93,7 @@ export function useUnwrap(): UseUnwrapResult {
       invalidateBalances();
       finalizeParamsRef.current = null;
     },
-    [writeContractAsync, publicClient, invalidateBalances],
+    [handleClient, writeContractAsync, publicClient, invalidateBalances],
   );
 
   const retryFinalize = useCallback(async () => {
@@ -105,7 +110,7 @@ export function useUnwrap(): UseUnwrapResult {
       // Small cooldown before retry to avoid NoxCompute rate-limiting
       await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
-      await executeFinalize(params.cTokenAddress, params.handle, params.parsedAmount);
+      await executeFinalize(params.cTokenAddress, params.handle);
     } catch (err) {
       setError(formatTransactionError(err));
       setStep("error");
@@ -201,13 +206,13 @@ export function useUnwrap(): UseUnwrapResult {
         }
 
         // Store finalize params in case it fails and needs retry
-        finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle, parsedAmount };
+        finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle };
 
         // Cooldown — NoxCompute rate-limits rapid successive calls
         await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
-        // Step 3: Finalize unwrap
-        await executeFinalize(cTokenAddress, finalizeHandle, parsedAmount);
+        // Step 3: Finalize unwrap (publicDecrypt + on-chain finalize)
+        await executeFinalize(cTokenAddress, finalizeHandle);
         return true;
       } catch (err) {
         setError(formatTransactionError(err));
