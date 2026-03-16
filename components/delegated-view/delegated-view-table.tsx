@@ -1,5 +1,4 @@
 import type { DelegatedViewEntry, DelegatedViewTab } from "@/lib/delegated-view";
-import { getOperatorConfig } from "@/lib/delegated-view";
 import { ARBISCAN_BASE_URL } from "@/lib/config";
 import { truncateAddress } from "@/lib/utils";
 
@@ -20,22 +19,21 @@ function truncateHandle(handle: string): string {
   return `${handle.slice(0, 8)}...${handle.slice(-4)}`;
 }
 
-function OperatorBadge({ operator }: { operator: string }) {
-  const config = getOperatorConfig(operator);
+function TokenBadge({ entry }: { entry: DelegatedViewEntry }) {
+  const symbol = entry.token?.symbol ?? "Unknown";
   return (
-    <div className="flex items-center gap-3">
-      <div
-        className={`flex size-9 items-center justify-center rounded-lg ${config.iconBg}`}
-      >
-        <span
-          aria-hidden="true"
-          className={`material-icons text-[18px]! ${config.iconColor}`}
-        >
-          {config.icon}
-        </span>
-      </div>
+    <div className="flex items-center gap-2">
       <span className="font-inter text-sm font-bold text-text-heading">
-        {config.label}
+        {symbol}
+      </span>
+      <span
+        className={`inline-flex items-center rounded-full px-2 py-0.5 font-inter text-[10px] font-bold uppercase tracking-wider ${
+          entry.isActive
+            ? "bg-tx-success-bg text-tx-success-text"
+            : "bg-tx-pending-bg text-tx-pending-text"
+        }`}
+      >
+        {entry.isActive ? "Active" : "Outdated"}
       </span>
     </div>
   );
@@ -64,14 +62,13 @@ interface DelegatedViewTableProps {
   tab: DelegatedViewTab;
   decryptedValues: Record<string, string>;
   decryptingHandle: string | null;
-  onDecrypt: (handleId: string) => void;
+  onDecrypt: (handleId: string, decimals?: number) => void;
 }
 
-// ── Shared with me: columns ────────────────────────────────────────
-// Origin | Shared by | Handle | Value | Date | Details
+// ── Columns ────────────────────────────────────────────────────────
 
 const SHARED_COLUMNS = [
-  "Origin",
+  "Token",
   "Shared by",
   "Handle",
   "Value",
@@ -79,11 +76,8 @@ const SHARED_COLUMNS = [
   "Details",
 ] as const;
 
-// ── My grants: columns ─────────────────────────────────────────────
-// Origin | Viewer | Handle | Date | Details
-
 const GRANTS_COLUMNS = [
-  "Origin",
+  "Token",
   "Viewer",
   "Handle",
   "Date",
@@ -176,7 +170,7 @@ function SharedRow({
   entry: DelegatedViewEntry;
   decryptedValues: Record<string, string>;
   decryptingHandle: string | null;
-  onDecrypt: (handleId: string) => void;
+  onDecrypt: (handleId: string, decimals?: number) => void;
 }) {
   const isDecrypting = decryptingHandle === entry.handleId;
   const decrypted = decryptedValues[entry.handleId];
@@ -184,7 +178,7 @@ function SharedRow({
   return (
     <tr className="bg-surface/50 transition-colors hover:bg-surface">
       <td className="px-6 py-5">
-        <OperatorBadge operator={entry.operator} />
+        <TokenBadge entry={entry} />
       </td>
       <td className="px-6 py-5">
         <span className="font-inter text-sm font-medium text-text-body">
@@ -200,12 +194,16 @@ function SharedRow({
         {decrypted ? (
           <span className="font-inter text-sm font-medium text-text-heading">
             {decrypted}
-            <span className="ml-1 text-xs text-text-muted">(raw)</span>
+            {entry.token && (
+              <span className="ml-1 text-xs text-text-muted">
+                {entry.token.symbol}
+              </span>
+            )}
           </span>
         ) : (
           <button
             type="button"
-            onClick={() => onDecrypt(entry.handleId)}
+            onClick={() => onDecrypt(entry.handleId, entry.token?.decimals)}
             disabled={isDecrypting}
             className="inline-flex cursor-pointer items-center gap-1 font-inter text-xs font-bold text-primary transition-colors hover:text-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Decrypt handle ${truncateHandle(entry.handleId)}`}
@@ -247,7 +245,7 @@ function GrantsRow({ entry }: { entry: DelegatedViewEntry }) {
   return (
     <tr className="bg-surface/50 transition-colors hover:bg-surface">
       <td className="px-6 py-5">
-        <OperatorBadge operator={entry.operator} />
+        <TokenBadge entry={entry} />
       </td>
       <td className="px-6 py-5">
         <span className="font-inter text-sm font-medium text-text-body">
@@ -284,22 +282,22 @@ function MobileCard({
   tab: DelegatedViewTab;
   decryptedValues: Record<string, string>;
   decryptingHandle: string | null;
-  onDecrypt: (handleId: string) => void;
+  onDecrypt: (handleId: string, decimals?: number) => void;
 }) {
   const isDecrypting = decryptingHandle === entry.handleId;
   const decrypted = decryptedValues[entry.handleId];
 
   return (
     <div className="rounded-xl border border-surface-border bg-surface p-4 backdrop-blur-sm">
-      {/* Row 1: Operator + Counterparty */}
+      {/* Row 1: Token + Counterparty */}
       <div className="flex items-center justify-between">
-        <OperatorBadge operator={entry.operator} />
+        <TokenBadge entry={entry} />
         <span className="font-inter text-sm font-medium text-text-body">
           {truncateAddress(entry.counterparty)}
         </span>
       </div>
 
-      {/* Row 2: Handle + Value (shared) or Date (grants) */}
+      {/* Row 2: Handle + Value (shared) */}
       <div className="mt-3 flex items-center justify-between border-t border-surface-border pt-3">
         <span className="font-mono text-xs text-text-body">
           {truncateHandle(entry.handleId)}
@@ -310,11 +308,16 @@ function MobileCard({
             {decrypted ? (
               <span className="font-inter text-sm font-medium text-text-heading">
                 {decrypted}
+                {entry.token && (
+                  <span className="ml-1 text-xs text-text-muted">
+                    {entry.token.symbol}
+                  </span>
+                )}
               </span>
             ) : (
               <button
                 type="button"
-                onClick={() => onDecrypt(entry.handleId)}
+                onClick={() => onDecrypt(entry.handleId, entry.token?.decimals)}
                 disabled={isDecrypting}
                 className="inline-flex cursor-pointer items-center gap-1 font-inter text-xs font-bold text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={`Decrypt handle ${truncateHandle(entry.handleId)}`}

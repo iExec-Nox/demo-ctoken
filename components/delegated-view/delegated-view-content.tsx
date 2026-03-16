@@ -15,33 +15,39 @@ import {
 
 const ITEMS_PER_PAGE = 10;
 
-const GRAPHQL_SHARED = `query SharedWithMe($user: String!) {
-  handleRoles(
-    where: { account: $user, role: VIEWER }
-    orderBy: blockTimestamp
-    orderDirection: desc
-  ) {
-    handle { id operator isPubliclyDecryptable }
-    account
-    grantedBy
-    blockTimestamp
-    transactionHash
-  }
-}`;
+const DEV_CODE_SHARED = `// Fetch ViewerAdded events where I am the viewer
+const logs = await publicClient.getContractEvents({
+  address: NOX_COMPUTE_ADDRESS,
+  abi: noxComputeAbi,
+  eventName: "ViewerAdded",
+  args: { viewer: myAddress },
+  fromBlock: 0n,
+});
 
-const GRAPHQL_GRANTS = `query MyGrants($user: String!) {
-  handleRoles(
-    where: { grantedBy: $user, role: VIEWER }
-    orderBy: blockTimestamp
-    orderDirection: desc
-  ) {
-    handle { id operator isPubliclyDecryptable }
-    account
-    grantedBy
-    blockTimestamp
-    transactionHash
-  }
-}`;
+// Resolve token by matching handle to current balances
+const handle = await publicClient.readContract({
+  address: cTokenAddress,
+  abi: confidentialTokenAbi,
+  functionName: "confidentialBalanceOf",
+  args: [grantorAddress],
+});`;
+
+const DEV_CODE_GRANTS = `// Fetch ViewerAdded events where I am the sender
+const logs = await publicClient.getContractEvents({
+  address: NOX_COMPUTE_ADDRESS,
+  abi: noxComputeAbi,
+  eventName: "ViewerAdded",
+  args: { sender: myAddress },
+  fromBlock: 0n,
+});
+
+// Active = handle matches current confidentialBalanceOf
+const currentHandle = await publicClient.readContract({
+  address: cTokenAddress,
+  abi: confidentialTokenAbi,
+  functionName: "confidentialBalanceOf",
+  args: [myAddress],
+});`;
 
 function TableSkeleton() {
   return (
@@ -231,15 +237,14 @@ export function DelegatedViewContent() {
       {devMode && (
         <div className="flex flex-col gap-4">
           <InfoCard>
-            The Delegated View queries the Nox Protocol Indexer subgraph for{" "}
-            <code className="font-mono text-xs">HandleRole</code> entities.
-            &quot;Shared with me&quot; shows handles where you are a VIEWER.
-            &quot;My grants&quot; shows handles where you granted VIEWER access.
-            Handle values are encrypted on-chain and decrypted on-demand via the
-            Nox SDK.
+            The Delegated View reads <code className="font-mono text-xs">ViewerAdded</code> events
+            from the NoxCompute contract, then resolves each handle to a token
+            via <code className="font-mono text-xs">confidentialBalanceOf</code> on
+            each cToken. If the handle matches the current balance, the grant is
+            marked <strong>Active</strong>; otherwise <strong>Outdated</strong>.
           </InfoCard>
           <CodeSection
-            code={activeTab === "shared" ? GRAPHQL_SHARED : GRAPHQL_GRANTS}
+            code={activeTab === "shared" ? DEV_CODE_SHARED : DEV_CODE_GRANTS}
             language="typescript"
           />
         </div>

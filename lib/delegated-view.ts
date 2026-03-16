@@ -10,57 +10,11 @@ export const DELEGATED_VIEW_TABS: {
   { label: "My grants", value: "grants" },
 ];
 
-// ── Operator config ────────────────────────────────────────────────
+// ── Token info ─────────────────────────────────────────────────────
 
-interface OperatorConfig {
-  label: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-}
-
-export const OPERATOR_CONFIG: Record<string, OperatorConfig> = {
-  Mint: {
-    label: "Wrap",
-    icon: "add_box",
-    iconColor: "text-primary",
-    iconBg: "bg-primary/10",
-  },
-  Burn: {
-    label: "Unwrap",
-    icon: "move_to_inbox",
-    iconColor: "text-orange-400",
-    iconBg: "bg-orange-500/10",
-  },
-  Transfer: {
-    label: "Transfer",
-    icon: "send",
-    iconColor: "text-blue-400",
-    iconBg: "bg-blue-500/10",
-  },
-  Add: {
-    label: "Delegation",
-    icon: "group_add",
-    iconColor: "text-violet-400",
-    iconBg: "bg-violet-500/10",
-  },
-  PlaintextToEncrypted: {
-    label: "Encrypted",
-    icon: "lock",
-    iconColor: "text-emerald-400",
-    iconBg: "bg-emerald-500/10",
-  },
-};
-
-const FALLBACK_OPERATOR: OperatorConfig = {
-  label: "Unknown",
-  icon: "help_outline",
-  iconColor: "text-text-muted",
-  iconBg: "bg-surface-border",
-};
-
-export function getOperatorConfig(operator: string): OperatorConfig {
-  return OPERATOR_CONFIG[operator] ?? FALLBACK_OPERATOR;
+export interface TokenInfo {
+  symbol: string;
+  decimals: number;
 }
 
 // ── Entry type ─────────────────────────────────────────────────────
@@ -69,10 +23,10 @@ export interface DelegatedViewEntry {
   id: string;
   handleId: string;
   counterparty: string;
-  operator: string;
+  token: TokenInfo | null;
+  isActive: boolean;
   timestamp: number;
   txHash: string;
-  isPubliclyDecryptable: boolean;
 }
 
 // ── CSV Export ──────────────────────────────────────────────────────
@@ -102,17 +56,18 @@ export function exportToCsv(
   const isShared = tab === "shared";
 
   const headers = isShared
-    ? ["Origin", "Shared by", "Handle", "Value", "Date", "Tx Hash"]
-    : ["Origin", "Viewer", "Handle", "Date", "Tx Hash"];
+    ? ["Token", "Status", "Shared by", "Handle", "Value", "Date", "Tx Hash"]
+    : ["Token", "Status", "Viewer", "Handle", "Date", "Tx Hash"];
 
   const rows = entries.map((entry) => {
-    const origin = getOperatorConfig(entry.operator).label;
+    const token = entry.token?.symbol ?? "Unknown";
+    const status = entry.isActive ? "Active" : "Outdated";
     const date = formatTimestampForExport(entry.timestamp);
     if (isShared) {
       const value = decryptedValues[entry.handleId] ?? "Encrypted";
-      return [origin, entry.counterparty, entry.handleId, value, date, entry.txHash];
+      return [token, status, entry.counterparty, entry.handleId, value, date, entry.txHash];
     }
-    return [origin, entry.counterparty, entry.handleId, date, entry.txHash];
+    return [token, status, entry.counterparty, entry.handleId, date, entry.txHash];
   });
 
   const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
