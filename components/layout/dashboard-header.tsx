@@ -14,6 +14,7 @@ import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
 const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Activity", href: "/activity" },
+  { label: "Delegated View", href: "/delegated-view" },
 ] as const;
 
 export function DashboardHeader() {

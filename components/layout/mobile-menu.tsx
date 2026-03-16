@@ -18,6 +18,7 @@ import { useState } from "react";
 const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Activity", href: "/activity" },
+  { label: "Delegated View", href: "/delegated-view" },
 ] as const;
 
 export function MobileMenu() {
