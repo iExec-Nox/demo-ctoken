@@ -2,6 +2,8 @@ export const CONFIG = {
   urls: {
     app: "https://demo.noxprotocol.io",
     arbiscan: "https://sepolia.arbiscan.io",
+    subgraph:
+      "https://thegraph.arbitrum-sepolia-testnet.noxprotocol.io/api/subgraphs/id/BjQAX2HpmsSAzURJimKDhjZZnkSJtaczA8RPumggrStb",
     docs: "https://docs.iex.ec",
     github: "https://github.com/iExec-Nox",
     contact: "https://docs.nox.iex.ec/contact",
@@ -40,5 +42,6 @@ if (CONFIG.walletConnect.projectId === "demo") {
 // Convenience aliases
 export const APP_URL = CONFIG.urls.app;
 export const ARBISCAN_BASE_URL = CONFIG.urls.arbiscan;
+export const SUBGRAPH_URL = CONFIG.urls.subgraph;
 export const RPC_URL = CONFIG.rpc.arbitrumSepolia;
 export const TEE_COOLDOWN_MS = CONFIG.timing.teeCooldownMs;
