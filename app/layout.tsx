@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import Script from "next/script";
 import { Mulish, Anybody, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "@/components/providers";
-import { APP_URL } from "@/lib/config";
+import { APP_URL, CONFIG } from "@/lib/config";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -75,6 +76,17 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <Script
+        id="gtm-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${CONFIG.gtm.id}');`,
+        }}
+      />
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
@@ -83,6 +95,14 @@ export default async function RootLayout({
       <body
         className={`${mulish.variable} ${anybody.variable} ${inter.variable} flex min-h-screen flex-col antialiased`}
       >
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${CONFIG.gtm.id}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         <Providers cookies={cookieString}>
           {children}
         </Providers>

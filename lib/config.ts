@@ -28,6 +28,9 @@ export const CONFIG = {
     projectId:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "demo",
   },
+  gtm: {
+    id: "GTM-P7KSD4T",
+  },
 } as const;
 
 if (CONFIG.walletConnect.projectId === "demo") {
