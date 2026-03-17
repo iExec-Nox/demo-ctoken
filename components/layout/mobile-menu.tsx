@@ -90,7 +90,7 @@ export function MobileMenu() {
         <div className="border-t border-surface-border px-4 py-4">
           <div className="flex items-center justify-between">
             <span className="font-mulish text-xs font-medium text-text-muted">
-              Developer Mode
+              Dev Mode
             </span>
             <DevModeToggle />
           </div>

@@ -8,7 +8,7 @@ interface DevModeToggleProps {
   label?: string;
 }
 
-export function DevModeToggle({ label = "Developer Mode" }: DevModeToggleProps) {
+export function DevModeToggle({ label = "Dev Mode" }: DevModeToggleProps) {
   const { enabled, toggle } = useDevMode();
 
   return (
