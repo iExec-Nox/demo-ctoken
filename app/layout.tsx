@@ -28,33 +28,33 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Nox — Confidential Token Protocol",
-    template: "%s | Nox",
+    default: "Confidential Token by iExec",
+    template: "%s | Confidential Token by iExec",
   },
   description:
-    "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers, selective disclosure, and ACL management on Arbitrum.",
+    "Transform any ERC-20 into confidential and auditable on-chain assets. The missing privacy layer for institutional DeFi on Arbitrum.",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: APP_URL,
-    siteName: "Nox Confidential Token",
-    title: "Nox — Confidential Token Protocol",
+    siteName: "Confidential Token by iExec",
+    title: "Confidential Token by iExec",
     description:
-      "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers, selective disclosure, and ACL management on Arbitrum.",
+      "Transform any ERC-20 into confidential and auditable on-chain assets. The missing privacy layer for institutional DeFi on Arbitrum.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Nox Confidential Token Protocol",
+        alt: "Confidential Token by iExec",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nox — Confidential Token Protocol",
+    title: "Confidential Token by iExec",
     description:
-      "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers and selective disclosure on Arbitrum.",
+      "Transform any ERC-20 into confidential and auditable on-chain assets. The missing privacy layer for institutional DeFi on Arbitrum.",
     images: ["/og-image.png"],
   },
   robots: {
