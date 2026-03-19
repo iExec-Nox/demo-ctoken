@@ -40,10 +40,9 @@ function unwrap(
     bytes32 encryptedAmount, bytes inputProof
 ) external;
 
-// Step 2: Finalize unwrap with cleartext amount
+// Step 2: Finalize unwrap — contract decrypts the amount on-chain
 function finalizeUnwrap(
-    bytes32 handle,
-    uint256 clearAmount,
+    euint256 unwrapAmount,
     bytes decryptionProof
 ) external;`;
 
