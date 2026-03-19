@@ -15,7 +15,7 @@ export const CONTRACTS = {
   /** Confidential RLC (ERC-7984, decimals: 9) */
   cRLC: "0x92b23f4a59175415ced5cb37e64a1fc6a9d79af4",
   /** NoxCompute proxy — addViewer / isViewer */
-  NOX_COMPUTE: "0x5633472D35E18464CA24Ab974954fB3b1B122eA6",
+  NOX_COMPUTE: "0xd464B198f06756a1d00be223634b85E0a731c229",
 } as const;
 
 /** Null address — used to filter native tokens (ETH) in contract calls */
