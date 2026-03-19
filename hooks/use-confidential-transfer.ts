@@ -8,6 +8,7 @@ import { estimateGasOverrides } from "@/lib/gas";
 import { formatTransactionError } from "@/lib/utils";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
+import { pushGtmEvent } from "@/lib/gtm";
 import type { TokenConfig } from "@/lib/tokens";
 
 export type TransferStep =
@@ -110,6 +111,7 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
         await publicClient!.waitForTransactionReceipt({ hash: transferTx });
 
         setStep("confirmed");
+        pushGtmEvent("cdefi_transfer");
         invalidateBalances();
         return true;
       } catch (err) {
