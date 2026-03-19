@@ -80,23 +80,18 @@ export function useUnwrap(): UseUnwrapResult {
       // Retry silently up to 5 times with 2s between each — TEE needs time to make the handle publicly decryptable
       const MAX_RETRIES = 5;
       let decryptionProof: `0x${string}` | undefined;
-      let decryptValue: unknown;
 
       for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-          console.log(`[unwrap:finalize] publicDecrypt attempt ${attempt}/${MAX_RETRIES} for handle:`, handle);
           const result = await Promise.race([
             handleClient.publicDecrypt(handle),
             new Promise<never>((_, reject) =>
               setTimeout(() => reject(new Error("publicDecrypt timeout")), 15_000)
             ),
           ]);
-          decryptValue = result.value;
           decryptionProof = result.decryptionProof;
-          console.log(`[unwrap:finalize] publicDecrypt succeeded on attempt ${attempt} — value:`, decryptValue, "proof length:", decryptionProof?.length);
           break;
         } catch (err) {
-          console.warn(`[unwrap:finalize] publicDecrypt attempt ${attempt} failed:`, err);
           if (attempt === MAX_RETRIES) {
             throw new Error("Unable to decrypt unwrap handle after multiple attempts — the TEE may be congested. Please retry later.");
           }
@@ -109,9 +104,7 @@ export function useUnwrap(): UseUnwrapResult {
       }
 
       const gasOverrides = await estimateGasOverrides(publicClient);
-      console.log("[unwrap:finalize] gas overrides:", gasOverrides);
 
-      console.log("[unwrap:finalize] calling finalizeUnwrap with args:", { handle, decryptionProof: decryptionProof?.slice(0, 20) + "..." });
       const finalizeTx = await writeContractAsync({
         address: cTokenAddress,
         abi: confidentialTokenAbi,
@@ -120,7 +113,6 @@ export function useUnwrap(): UseUnwrapResult {
         ...gasOverrides,
       });
 
-      console.log("[unwrap:finalize] finalizeTx hash:", finalizeTx);
       setFinalizeTxHash(finalizeTx);
       setStep("confirmed");
       pushGtmEvent("cdefi_unwrap");
@@ -183,18 +175,15 @@ export function useUnwrap(): UseUnwrapResult {
         setError(null);
         setIsFinalizeError(false);
 
-        console.log("[unwrap] encrypting amount:", parsedAmount.toString(), "for cToken:", cTokenAddress);
         const { handle, handleProof } = await handleClient.encryptInput(
           parsedAmount,
           "uint256",
           cTokenAddress,
         );
-        console.log("[unwrap] encryptInput result — handle:", handle, "proof length:", handleProof?.length);
 
         // Step 2: Initiate unwrap (from and to = msg.sender)
         setStep("unwrapping");
 
-        console.log("[unwrap] calling unwrap with args:", { from: address, to: address, handle, proofLength: handleProof?.length });
         const unwrapTx = await writeContractAsync({
           address: cTokenAddress,
           abi: confidentialTokenAbi,
@@ -203,7 +192,6 @@ export function useUnwrap(): UseUnwrapResult {
           ...gasOverrides,
         });
 
-        console.log("[unwrap] unwrapTx hash:", unwrapTx);
         setUnwrapTxHash(unwrapTx);
 
         // Step 2b: Extract the contract-generated handle from UnwrapRequested event.
@@ -220,9 +208,7 @@ export function useUnwrap(): UseUnwrapResult {
         // Decode the UnwrapRequested event to get the contract's handle
         let finalizeHandle: `0x${string}` | null = null;
 
-        console.log("[unwrap] receipt logs count:", receipt.logs.length);
         for (const log of receipt.logs) {
-          console.log("[unwrap] log address:", log.address, "topics:", log.topics, "data:", log.data);
           if (log.address.toLowerCase() !== cTokenAddress.toLowerCase()) continue;
           try {
             const decoded = decodeEventLog({
@@ -230,7 +216,6 @@ export function useUnwrap(): UseUnwrapResult {
               data: log.data,
               topics: log.topics,
             });
-            console.log("[unwrap] decoded event:", decoded.eventName, "args:", decoded.args);
             if (decoded.eventName === "UnwrapRequested") {
               finalizeHandle = (decoded.args as { amount: `0x${string}` }).amount;
               break;
@@ -240,8 +225,6 @@ export function useUnwrap(): UseUnwrapResult {
           }
         }
 
-        console.log("[unwrap] finalizeHandle:", finalizeHandle);
-
         if (!finalizeHandle) {
           throw new Error(
             "Could not find UnwrapRequested event in transaction logs — unwrap may have failed silently"
@@ -250,14 +233,11 @@ export function useUnwrap(): UseUnwrapResult {
 
         // Store finalize params in case it fails and needs retry
         finalizeParamsRef.current = { cTokenAddress, handle: finalizeHandle };
-        console.log("[unwrap] stored finalize params — cToken:", cTokenAddress, "handle:", finalizeHandle);
 
         // Cooldown — NoxCompute rate-limits rapid successive calls
-        console.log("[unwrap] waiting TEE cooldown:", TEE_COOLDOWN_MS, "ms");
         await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
         // Step 3: Finalize unwrap (publicDecrypt + on-chain finalize)
-        console.log("[unwrap] calling executeFinalize...");
         await executeFinalize(cTokenAddress, finalizeHandle);
         return true;
       } catch (err) {
