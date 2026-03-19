@@ -81,10 +81,10 @@ export const confidentialTokenAbi = [
   },
 
   // Unwrap step 2: finalize (handle must be the one from UnwrapRequested event)
+  // Contract computes cleartextAmount internally via Nox.publicDecrypt(unwrapAmount, decryptionProof)
   {
     inputs: [
       { name: "unwrapAmount", type: "bytes32" },
-      { name: "cleartextAmount", type: "uint256" },
       { name: "decryptionProof", type: "bytes" },
     ],
     name: "finalizeUnwrap",
