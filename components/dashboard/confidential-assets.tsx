@@ -106,7 +106,8 @@ function ConfidentialTokenRow({
       const formatted = formatUnits(typeof value === "bigint" ? value : BigInt(String(value)), token.decimals);
       setDecryptedAmount(formatted);
       setDecryptState("revealed");
-    } catch {
+    } catch (err) {
+      console.error("[decrypt] Failed to decrypt balance:", err);
       setDecryptState("hidden");
     }
   }, [handleClient, decryptState, token]);
