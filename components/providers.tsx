@@ -33,6 +33,10 @@ function initAppKit() {
       icons: ["/nox-icon.png"],
     },
     allowUnsupportedChain: false,
+    features: {
+      socials: ["google", "x", "discord", "apple", "github", "farcaster"],
+      connectMethodsOrder: ["wallet", "social", "email"],
+    },
     themeMode: "dark",
     themeVariables: {
       "--w3m-accent": "#748eff",

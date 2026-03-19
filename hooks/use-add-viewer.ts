@@ -11,6 +11,7 @@ import {
   NOX_COMPUTE_ADDRESS,
 } from "@/lib/nox-compute-abi";
 import { TEE_COOLDOWN_MS } from "@/lib/config";
+import { pushGtmEvent } from "@/lib/gtm";
 import type { TokenConfig } from "@/lib/tokens";
 import { ZERO_HANDLE } from "@/lib/contracts";
 
@@ -131,6 +132,7 @@ export function useAddViewer(): UseAddViewerResult {
 
         setTxEntries(entries);
         setStep("confirmed");
+        pushGtmEvent("cdefi_selectiveDisclosure");
         return true;
       } catch (err) {
         setError(formatTransactionError(err));

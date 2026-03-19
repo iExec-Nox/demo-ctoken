@@ -19,8 +19,8 @@ export function Header() {
     <header className="flex w-full items-center justify-between bg-background px-5 py-2.5 md:px-20 md:py-6">
       <Logo />
       <div className="flex items-center gap-2 md:gap-3">
-        <ThemeToggle />
         <WalletButton />
+        <ThemeToggle />
       </div>
     </header>
   );

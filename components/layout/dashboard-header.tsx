@@ -60,7 +60,6 @@ export function DashboardHeader() {
       <div className="flex items-center gap-4 md:gap-6">
         {/* Desktop only */}
         <div className="hidden items-center gap-6 md:flex">
-          <ThemeToggle />
           <DevModeToggle />
           <Button
             asChild
@@ -72,6 +71,9 @@ export function DashboardHeader() {
 
         {/* Always visible */}
         <WalletButton />
+        <div className="hidden md:block">
+          <ThemeToggle />
+        </div>
 
         {/* Mobile only */}
         <MobileMenu />

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import Script from "next/script";
 import { Mulish, Anybody, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "@/components/providers";
-import { APP_URL } from "@/lib/config";
+import { APP_URL, CONFIG } from "@/lib/config";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -27,33 +28,33 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Nox — Confidential Token Protocol",
-    template: "%s | Nox",
+    default: "Confidential Token by iExec",
+    template: "%s | Confidential Token by iExec",
   },
   description:
-    "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers, selective disclosure, and ACL management on Arbitrum.",
+    "Transform any ERC-20 into confidential and auditable on-chain assets. The missing privacy layer for institutional DeFi on Arbitrum.",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: APP_URL,
-    siteName: "Nox Confidential Token",
-    title: "Nox — Confidential Token Protocol",
+    siteName: "Confidential Token by iExec",
+    title: "Confidential Token by iExec",
     description:
-      "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers, selective disclosure, and ACL management on Arbitrum.",
+      "Transform any ERC-20 into confidential and auditable on-chain assets. The missing privacy layer for institutional DeFi on Arbitrum.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
-        height: 630,
-        alt: "Nox Confidential Token Protocol",
+        height: 675,
+        alt: "Confidential Token by iExec",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nox — Confidential Token Protocol",
+    title: "Confidential Token by iExec",
     description:
-      "Wrap any ERC-20 into encrypted, auditable on-chain assets. Confidential transfers and selective disclosure on Arbitrum.",
+      "Transform any ERC-20 into confidential and auditable on-chain assets. The missing privacy layer for institutional DeFi on Arbitrum.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -75,6 +76,17 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <Script
+        id="gtm-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${CONFIG.gtm.id}');`,
+        }}
+      />
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
@@ -83,6 +95,14 @@ export default async function RootLayout({
       <body
         className={`${mulish.variable} ${anybody.variable} ${inter.variable} flex min-h-screen flex-col antialiased`}
       >
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${CONFIG.gtm.id}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         <Providers cookies={cookieString}>
           {children}
         </Providers>

@@ -9,6 +9,7 @@ import { formatTransactionError } from "@/lib/utils";
 import { useHandleClient } from "@/hooks/use-handle-client";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import { TEE_COOLDOWN_MS } from "@/lib/config";
+import { pushGtmEvent } from "@/lib/gtm";
 import type { TokenConfig } from "@/lib/tokens";
 
 export type UnwrapStep =
@@ -90,6 +91,7 @@ export function useUnwrap(): UseUnwrapResult {
 
       setFinalizeTxHash(finalizeTx);
       setStep("confirmed");
+      pushGtmEvent("cdefi_unwrap");
       invalidateBalances();
       finalizeParamsRef.current = null;
     },

@@ -387,5 +387,5 @@ html {
   translate: 2px 0 !important;
 }
 .theme-toggle [data-slot="switch-thumb"][data-state="checked"] {
-  translate: 26px 0 !important;
+  translate: 17px 0 !important;
 }

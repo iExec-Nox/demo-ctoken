@@ -8,6 +8,7 @@ import { estimateGasOverrides } from "@/lib/gas";
 import { formatTransactionError } from "@/lib/utils";
 import { useInvalidateBalances } from "@/hooks/use-invalidate-balances";
 import { TEE_COOLDOWN_MS } from "@/lib/config";
+import { pushGtmEvent } from "@/lib/gtm";
 import type { TokenConfig } from "@/lib/tokens";
 
 export type WrapStep = "idle" | "approving" | "wrapping" | "confirmed" | "error";
@@ -104,6 +105,7 @@ export function useWrap(): UseWrapResult {
         await publicClient!.waitForTransactionReceipt({ hash: wrapTx });
 
         setStep("confirmed");
+        pushGtmEvent("cdefi_wrap");
         invalidateBalances();
         return true;
       } catch (err) {
