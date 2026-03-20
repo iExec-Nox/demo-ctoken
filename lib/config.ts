@@ -4,7 +4,7 @@ export const CONFIG = {
     arbiscan: "https://sepolia.arbiscan.io",
     docs: "https://docs.iex.ec",
     github: "https://github.com/iExec-Nox",
-    contact: "https://docs.nox.iex.ec/contact",
+    contact: "https://airtable.com/applLw3eU2LlWXv76/pagDYHSWf5kUuJGv1/form",
     coingeckoApi: "https://api.coingecko.com/api/v3/simple/price",
     bridge: "https://portal.arbitrum.io/bridge?amount=0&sourceChain=sepolia&destinationChain=arbitrum-sepolia&tab=bridge&sanitized=true",
     faucets: {

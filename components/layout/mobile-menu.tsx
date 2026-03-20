@@ -13,6 +13,7 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { DevModeToggle } from "@/components/shared/dev-mode-toggle";
 import { Button } from "@/components/ui/button";
 import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
+import { CONFIG } from "@/lib/config";
 import { useState } from "react";
 
 const NAV_LINKS = [
@@ -101,7 +102,7 @@ export function MobileMenu() {
             asChild
             className="w-full rounded-xl bg-primary px-3 py-2 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] hover:bg-primary-hover"
           >
-            <Link href="#" onClick={() => setOpen(false)}>
+            <Link href={CONFIG.urls.contact} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
               Contact us
             </Link>
           </Button>
