@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuthModal } from "@account-kit/react";
+import { useAppKit } from "@reown/appkit/react";
 
 export function useConnectWallet() {
-  const { openAuthModal } = useAuthModal();
+  const { open } = useAppKit();
 
-  return { connect: () => openAuthModal() };
+  return { connect: () => open() };
 }

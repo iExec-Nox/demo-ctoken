@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 interface UseWalletRedirectOptions {
   onConnect?: string;
@@ -11,7 +11,7 @@ interface UseWalletRedirectOptions {
 
 export function useWalletRedirect({ onConnect, onDisconnect }: UseWalletRedirectOptions) {
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const { isConnected } = useAppKitAccount();
   const wasConnected = useRef(isConnected);
 
   useEffect(() => {
