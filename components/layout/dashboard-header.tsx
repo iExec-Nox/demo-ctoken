@@ -7,7 +7,6 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { WalletButton } from "@/components/shared/wallet-button";
 import { DevModeToggle } from "@/components/shared/dev-mode-toggle";
 import { Button } from "@/components/ui/button";
-import { CONFIG } from "@/lib/config";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
 import { useFaucetModal } from "@/components/modals/faucet-modal-provider";
@@ -66,7 +65,7 @@ export function DashboardHeader() {
             asChild
             className="rounded-[10px] bg-primary px-3 py-1.5 font-mulish text-sm font-bold text-primary-foreground shadow-[0px_2px_4px_0px_rgba(71,37,244,0.2)] hover:bg-primary-hover"
           >
-            <Link href={CONFIG.urls.contact} target="_blank" rel="noopener noreferrer">Contact us</Link>
+            <Link href="#">Contact us</Link>
           </Button>
         </div>
 

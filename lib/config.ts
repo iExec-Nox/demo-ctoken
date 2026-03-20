@@ -4,7 +4,7 @@ export const CONFIG = {
     arbiscan: "https://sepolia.arbiscan.io",
     docs: "https://docs.iex.ec",
     github: "https://github.com/iExec-Nox",
-    contact: "https://airtable.com/applLw3eU2LlWXv76/pagDYHSWf5kUuJGv1/form",
+    contact: "https://docs.nox.iex.ec/contact",
     coingeckoApi: "https://api.coingecko.com/api/v3/simple/price",
     bridge: "https://portal.arbitrum.io/bridge?amount=0&sourceChain=sepolia&destinationChain=arbitrum-sepolia&tab=bridge&sanitized=true",
     faucets: {
@@ -24,13 +24,21 @@ export const CONFIG = {
   storage: {
     devModeKey: "nox-dev-mode",
   },
-  alchemy: {
-    apiKey: "1UZGVqkhGdpukdiQ47Xb7",
+  walletConnect: {
+    projectId:
+      process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "demo",
   },
   gtm: {
     id: "GTM-P7KSD4T",
   },
 } as const;
+
+if (CONFIG.walletConnect.projectId === "demo") {
+  console.warn(
+    "[wagmi] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set — WalletConnect will not work. " +
+    "Get a project ID at https://cloud.reown.com"
+  );
+}
 
 // Convenience aliases
 export const APP_URL = CONFIG.urls.app;
