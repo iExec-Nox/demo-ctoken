@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useAccount } from "wagmi";
 import { useConnectWallet } from "@/hooks/use-connect-wallet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { CONFIG } from "@/lib/config";
 
 export function HeroSection() {
   const { connect } = useConnectWallet();
-  const { isConnected } = useAppKitAccount();
+  const { isConnected } = useAccount();
   const router = useRouter();
 
   function handleTryItNow() {

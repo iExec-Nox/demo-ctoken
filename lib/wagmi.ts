@@ -1,18 +1,36 @@
-import { cookieStorage, createStorage, http } from "@wagmi/core";
-import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { arbitrumSepolia } from "@reown/appkit/networks";
-import { RPC_URL, CONFIG } from "@/lib/config";
+import {
+  createConfig,
+  cookieStorage,
+  configForExternalWallets,
+  type AlchemyAccountsUIConfig,
+} from "@account-kit/react";
+import { alchemy, arbitrumSepolia } from "@account-kit/infra";
+import { QueryClient } from "@tanstack/react-query";
+import { CONFIG } from "@/lib/config";
 
-export const projectId = CONFIG.walletConnect.projectId;
-
-export const networks = [arbitrumSepolia];
-
-export const wagmiAdapter = new WagmiAdapter({
-  storage: createStorage({ storage: cookieStorage }),
-  ssr: true,
-  projectId,
-  networks,
-  transports: {
-    [arbitrumSepolia.id]: http(RPC_URL),
-  },
+const externalWalletsConfig = configForExternalWallets({
+  wallets: ["metamask", "coinbase wallet", "wallet_connect"],
+  chainType: ["evm"],
+  numFeaturedWallets: 3,
 });
+
+const uiConfig: AlchemyAccountsUIConfig = {
+  auth: {
+    sections: [
+      [{ type: "external_wallets", ...externalWalletsConfig.uiConfig }],
+    ],
+  },
+};
+
+export const alchemyConfig = createConfig(
+  {
+    transport: alchemy({ apiKey: CONFIG.alchemy.apiKey }),
+    chain: arbitrumSepolia,
+    ssr: true,
+    storage: cookieStorage,
+    connectors: externalWalletsConfig.connectors,
+  } as Parameters<typeof createConfig>[0],
+  uiConfig
+);
+
+export const queryClient = new QueryClient();
