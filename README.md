@@ -25,6 +25,7 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 - **Wrap / Unwrap** — Convert public tokens (USDC, RLC) into confidential tokens (cUSDC, cRLC) at 1:1 ratio
 - **Confidential Transfer** — Send cTokens with encrypted amounts
 - **Selective Disclosure** — Grant auditors read access to your confidential balance
+- **Delegated View** — View balances shared with you by other users
 - **Activity Explorer** — Transaction history with filtering
 - **Developer Mode** — Inspect smart contract calls and Nox SDK methods
 - **Light / Dark theme** — Full theme support
@@ -36,10 +37,10 @@ A web3 frontend demo showcasing the **Nox confidential computing protocol** on A
 | Contract | Address |
 |----------|---------|
 | USDC (ERC-20) | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` |
-| cUSDC (ERC-7984) | `0x305df62f6903fad716cc45abcc0e5c180979c169` |
+| cUSDC (ERC-7984) | `0x1ccec6bc60db15e4055d43dc2531bb7d4e5b808e` |
 | RLC (ERC-20) | `0x9923eD3cbd90CD78b910c475f9A731A6e0b8C963` |
-| cRLC (ERC-7984) | `0x271f46e78f2fe59817854dabde47729ac4935765` |
-| NoxCompute | `0x5633472D35E18464CA24Ab974954fB3b1B122eA6` |
+| cRLC (ERC-7984) | `0x92b23f4a59175415ced5cb37e64a1fc6a9d79af4` |
+| NoxCompute | `0xd464B198f06756a1d00be223634b85E0a731c229` |
 
 ---
 
@@ -79,7 +80,7 @@ npm run lint      # ESLint
 ```
 app/
   (landing)/            # Landing page + Terms (Header + Footer layout)
-  (app)/                # Dashboard, Explorer (Topbar + DashboardHeader layout)
+  (app)/                # Dashboard, Activity, Delegated View (Topbar + DashboardHeader layout)
   api/prices/           # CoinGecko proxy
 components/
   layout/               # Topbar, Header, Footer, DashboardHeader, MobileMenu
@@ -88,9 +89,10 @@ components/
   modals/               # Faucet, Wrap, Transfer, SelectiveDisclosure
   shared/               # Logo, CodeSection, InfoCard, ErrorMessage, TxStatus…
   explorer/             # ExplorerContent, ActivityTable
+  delegated-view/       # DelegatedViewContent, DelegatedViewTable
   ui/                   # shadcn primitives
 hooks/                  # Transaction hooks, balance hooks, UI hooks
-lib/                    # Contracts, tokens, wagmi config, gas, ABIs
+lib/                    # Contracts, tokens, config, wagmi, gas, ABIs
 ```
 
 ---
@@ -108,6 +110,10 @@ Transfer cTokens to another address. The amount is encrypted — no on-chain obs
 ### Selective Disclosure
 
 Grant a viewer (auditor, regulator) read access to your confidential balance. Access is per-handle and must be re-granted after each transaction.
+
+### Delegated View
+
+View confidential balances that other users have shared with you. Displays the list of tokens you have been granted access to, with decrypted amounts.
 
 ---
 
