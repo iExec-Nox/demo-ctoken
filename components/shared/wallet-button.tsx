@@ -14,13 +14,16 @@ function formatAddress(address: string) {
 }
 
 export function WalletButton() {
-  const { isConnected, address, connect, logout } = useWalletAuth();
+  const { isConnected, address, smartAccountAddress, type, connect, logout } = useWalletAuth();
+
+  // For SCA: show the smart account address (where tokens live)
+  const displayAddress = type === "sca" ? (smartAccountAddress ?? address) : address;
 
   function handleCopyAddress() {
-    if (address) navigator.clipboard.writeText(address);
+    if (displayAddress) navigator.clipboard.writeText(displayAddress);
   }
 
-  if (isConnected && address) {
+  if (isConnected && displayAddress) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -30,7 +33,7 @@ export function WalletButton() {
           >
             <span aria-hidden="true" className="material-icons text-lg! leading-7">wallet</span>
             <span className="whitespace-nowrap font-mulish text-sm font-bold leading-5">
-              {formatAddress(address)}
+              {formatAddress(displayAddress)}
             </span>
           </Button>
         </DropdownMenuTrigger>

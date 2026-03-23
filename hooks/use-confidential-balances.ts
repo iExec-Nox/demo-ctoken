@@ -22,10 +22,13 @@ export interface ConfidentialBalance {
 }
 
 export function useConfidentialBalances() {
-  const { address, isConnected, status } = useWalletAuth();
+  const { address, smartAccountAddress, isConnected, type } = useWalletAuth();
   const chainId = useChainId();
-  const isReady = isConnected && !!address;
-  const isInitializing = status === "initializing" || status === "authenticating";
+
+  // For SCA: cTokens live on the smart account — no fallback to signer.
+  // For EOA: cTokens live on the wallet address.
+  const balanceAddress = type === "sca" ? smartAccountAddress : address;
+  const isReady = isConnected && !!balanceAddress;
 
   // Filter tokens that have a real confidential address (not placeholder "0x...")
   const activeTokens = useMemo(
@@ -38,7 +41,7 @@ export function useConfidentialBalances() {
       address: token.address as `0x${string}`,
       abi: confidentialTokenAbi,
       functionName: "confidentialBalanceOf" as const,
-      args: [address ?? ZERO_ADDRESS],
+      args: [balanceAddress ?? ZERO_ADDRESS],
       chainId,
     })),
     query: { enabled: isReady && activeTokens.length > 0 },
@@ -66,7 +69,7 @@ export function useConfidentialBalances() {
 
   const hasAnyConfidentialBalance = balances.some((b) => b.isInitialized);
 
-  const isLoading = !isReady || isInitializing || isContractLoading;
+  const isLoading = !isReady || isContractLoading;
 
   return { balances, hasAnyConfidentialBalance, isLoading };
 }

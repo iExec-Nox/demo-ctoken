@@ -68,7 +68,8 @@ async function buildHandleTokenMap(
 // ── Hook ───────────────────────────────────────────────────────────
 
 export function useDelegatedView() {
-  const { address } = useWalletAuth();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
   const publicClient = usePublicClient();
 
   const query = useQuery({
@@ -83,14 +84,14 @@ export function useDelegatedView() {
           address: NOX_COMPUTE_ADDRESS as `0x${string}`,
           abi: noxComputeAbi,
           eventName: "ViewerAdded",
-          args: { sender: address },
+          args: { sender: onChainAddress },
           fromBlock: 0n,
         }),
         publicClient.getContractEvents({
           address: NOX_COMPUTE_ADDRESS as `0x${string}`,
           abi: noxComputeAbi,
           eventName: "ViewerAdded",
-          args: { viewer: address },
+          args: { viewer: onChainAddress },
           fromBlock: 0n,
         }),
       ]);

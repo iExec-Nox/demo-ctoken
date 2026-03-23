@@ -61,7 +61,8 @@ export interface UseActivityHistoryResult {
 }
 
 export function useActivityHistory(): UseActivityHistoryResult {
-  const { address } = useWalletAuth();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
   const publicClient = usePublicClient();
   const [entries, setEntries] = useState<ActivityEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,28 +93,28 @@ export function useActivityHistory(): UseActivityHistoryResult {
                 address: pair.underlying,
                 abi: erc20Abi,
                 eventName: "Transfer",
-                args: { from: address, to: pair.cToken },
+                args: { from: onChainAddress, to: pair.cToken },
                 fromBlock: 0n,
               }),
               publicClient.getContractEvents({
                 address: pair.cToken,
                 abi: confidentialTokenAbi,
                 eventName: "UnwrapFinalized",
-                args: { receiver: address },
+                args: { receiver: onChainAddress },
                 fromBlock: 0n,
               }),
               publicClient.getContractEvents({
                 address: pair.cToken,
                 abi: confidentialTokenAbi,
                 eventName: "ConfidentialTransfer",
-                args: { from: address },
+                args: { from: onChainAddress },
                 fromBlock: 0n,
               }),
               publicClient.getContractEvents({
                 address: pair.cToken,
                 abi: confidentialTokenAbi,
                 eventName: "ConfidentialTransfer",
-                args: { to: address },
+                args: { to: onChainAddress },
                 fromBlock: 0n,
               }),
             ]);
@@ -126,7 +127,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
           address: NOX_COMPUTE_ADDRESS as `0x${string}`,
           abi: noxComputeAbi,
           eventName: "ViewerAdded",
-          args: { sender: address },
+          args: { sender: onChainAddress },
           fromBlock: 0n,
         });
 

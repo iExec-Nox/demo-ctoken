@@ -18,16 +18,20 @@ export interface TokenBalance {
 }
 
 export function useTokenBalances() {
-  const { address, isConnected, status } = useWalletAuth();
+  const { address, smartAccountAddress, isConnected, type } = useWalletAuth();
   const chainId = useChainId();
-  const isReady = isConnected && !!address;
-  const isInitializing = status === "initializing" || status === "authenticating";
+
+  // For SCA: tokens live on the smart account. For EOA: on the wallet.
+  // For SCA: tokens live on the smart account — no fallback to signer.
+  // For EOA: tokens live on the wallet address.
+  const balanceAddress = type === "sca" ? smartAccountAddress : address;
+  const isReady = isConnected && !!balanceAddress;
 
   const {
     data: nativeBalance,
     isLoading: isNativeLoading,
   } = useBalance({
-    address,
+    address: balanceAddress,
     chainId,
     query: { enabled: isReady },
   });
@@ -40,7 +44,7 @@ export function useTokenBalances() {
       address: token.address as `0x${string}`,
       abi: erc20Abi,
       functionName: "balanceOf" as const,
-      args: [address ?? ZERO_ADDRESS],
+      args: [balanceAddress ?? ZERO_ADDRESS],
       chainId,
     })),
     query: { enabled: isReady },
@@ -80,7 +84,7 @@ export function useTokenBalances() {
 
   const hasAnyBalance = balances.some((b) => b.balance > 0n);
 
-  const isLoading = !isReady || isInitializing || isNativeLoading || isErc20Loading;
+  const isLoading = !isReady || isNativeLoading || isErc20Loading;
 
   return { balances, hasAnyBalance, isLoading };
 }
