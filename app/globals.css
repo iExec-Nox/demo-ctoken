@@ -1,4 +1,6 @@
+@import "@account-kit/react/styles.css" layer(account-kit);
 @import "tailwindcss";
+@import "./account-kit-ui.css";
 
 /* ─── shadcn/tailwind.css (inlined) ─── */
 @theme inline {
