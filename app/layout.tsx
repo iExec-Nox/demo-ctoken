@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import Script from "next/script";
 import { Mulish, Anybody, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { cookieToInitialState } from "@account-kit/core";
 import { Providers } from "@/components/providers";
+import { alchemyConfig } from "@/lib/alchemy";
 import { APP_URL, CONFIG } from "@/lib/config";
 import "./globals.css";
 
@@ -68,11 +70,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const cookieString = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  const headerStore = await headers();
+  const initialState = cookieToInitialState(
+    alchemyConfig,
+    headerStore.get("cookie") ?? undefined
+  );
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -103,7 +105,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        <Providers cookies={cookieString}>
+        <Providers initialState={initialState}>
           {children}
         </Providers>
         <Analytics />

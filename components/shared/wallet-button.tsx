@@ -1,7 +1,6 @@
 "use client";
 
-import { useAppKitAccount } from "@reown/appkit/react";
-import { useDisconnect } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import { useConnectWallet } from "@/hooks/use-connect-wallet";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +16,7 @@ function formatAddress(address: string) {
 
 export function WalletButton() {
   const { connect } = useConnectWallet();
-  const { address, isConnected } = useAppKitAccount();
+  const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   function handleCopyAddress() {
     if (address) navigator.clipboard.writeText(address);
