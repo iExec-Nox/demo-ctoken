@@ -9,6 +9,7 @@ export const alchemyConfig = createConfig(
   {
     transport: alchemy({ apiKey: CONFIG.alchemy.apiKey }),
     chain: arbitrumSepolia,
+    policyId: CONFIG.alchemy.policyId || undefined,
     ssr: true,
   },
   {
