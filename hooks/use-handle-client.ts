@@ -3,14 +3,19 @@
 import { useWalletClient } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { createViemHandleClient, type HandleClient } from "@iexec-nox/handle";
-import { useSignerStatus } from "@account-kit/react";
-import { useWalletAuth } from "@/hooks/use-wallet-auth";
-import { createLightAccount } from "@/lib/smart-account";
+import { useSignerStatus, useAccount } from "@account-kit/react";
+import { useWalletAuth, ACCOUNT_TYPE } from "@/hooks/use-wallet-auth";
 
 export function useHandleClient() {
   const { data: walletClient } = useWalletClient();
   const { type, address, smartAccountAddress } = useWalletAuth();
   const signerStatus = useSignerStatus();
+
+  // Get Account Kit's LightAccount instance (correct address + signing)
+  const { account: lightAccount } = useAccount({
+    type: ACCOUNT_TYPE,
+    skipCreate: type !== "sca",
+  });
 
   const { data: handleClient = null, error } = useQuery<HandleClient | null>({
     queryKey: ["handle-client", type, address, smartAccountAddress],
@@ -20,11 +25,9 @@ export function useHandleClient() {
         return createViemHandleClient(walletClient);
       }
 
-      // SCA path — create a LightSmartAccount and pass it directly.
-      // The handle SDK detects SmartAccount type and uses its signTypedData
-      // (signs locally with owner key + ERC-1271 verification).
-      if (type === "sca" && smartAccountAddress) {
-        const lightAccount = await createLightAccount();
+      // SCA path — use Account Kit's LightAccount which has the correct
+      // smart account address and signs via the Alchemy signer (ERC-1271).
+      if (type === "sca" && lightAccount) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- SmartAccount is compatible with ViemClient
         return createViemHandleClient(lightAccount as any);
       }
@@ -33,7 +36,7 @@ export function useHandleClient() {
     },
     enabled:
       (type === "eoa" && !!walletClient) ||
-      (type === "sca" && !!smartAccountAddress && signerStatus.isConnected),
+      (type === "sca" && !!lightAccount && signerStatus.isConnected),
     staleTime: Infinity,
     retry: 3,
   });

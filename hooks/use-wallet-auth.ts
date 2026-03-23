@@ -5,9 +5,8 @@ import {
   useSignerStatus,
   useLogout,
   useAuthModal,
+  useAccount,
 } from "@account-kit/react";
-import { useQuery } from "@tanstack/react-query";
-import { createLightAccount } from "@/lib/smart-account";
 
 type WalletStatus = "connected" | "disconnected" | "initializing" | "authenticating";
 
@@ -24,6 +23,13 @@ interface UseWalletAuthResult {
   connect: () => void;
 }
 
+/**
+ * Account Kit account type — must be consistent across all hooks.
+ * LightAccount is used because ModularAccountV2 is not yet available on Arbitrum Sepolia.
+ * Same signer + same type = same deterministic address across sessions.
+ */
+export const ACCOUNT_TYPE = "LightAccount" as const;
+
 export function useWalletAuth(): UseWalletAuthResult {
   const user = useUser();
   const signerStatus = useSignerStatus();
@@ -34,17 +40,11 @@ export function useWalletAuth(): UseWalletAuthResult {
   const type = user?.type;
   const address = user?.address as `0x${string}` | undefined;
 
-  // Compute smart account address via useQuery — cached, stable, no flicker.
-  // The address is deterministic: same signer always gives same smart account.
-  const { data: smartAccountAddress } = useQuery({
-    queryKey: ["smart-account-address", address],
-    queryFn: async () => {
-      const lightAccount = await createLightAccount();
-      return lightAccount.address;
-    },
-    enabled: type === "sca" && !!address && signerStatus.isConnected,
-    staleTime: Infinity,
-    retry: 3,
+  // Smart account address from Account Kit — deterministic, stable across sessions.
+  // useAccount returns the on-chain smart account address (NOT the signer address).
+  const { address: smartAccountAddress } = useAccount({
+    type: ACCOUNT_TYPE,
+    skipCreate: type !== "sca",
   });
 
   let status: WalletStatus = "disconnected";

@@ -1,21 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback } from "react";
 import { useWriteContract, usePublicClient } from "wagmi";
+import { encodeFunctionData } from "viem";
 import {
-  createPublicClient,
-  encodeFunctionData,
-  http,
-} from "viem";
-import { arbitrumSepolia } from "viem/chains";
-import {
-  createBundlerClient,
-  createPaymasterClient,
-  entryPoint06Address,
-} from "viem/account-abstraction";
-import { toLightSmartAccount } from "permissionless/accounts";
-import { useWalletAuth } from "@/hooks/use-wallet-auth";
-import { CONFIG } from "@/lib/config";
+  useSmartAccountClient,
+  useSendUserOperation,
+} from "@account-kit/react";
+import { useWalletAuth, ACCOUNT_TYPE } from "@/hooks/use-wallet-auth";
 
 interface WriteTransactionParams {
   address: `0x${string}`;
@@ -31,106 +23,33 @@ interface WriteTransactionParams {
 }
 
 /**
- * Unified write transaction hook that works for both EOA (wagmi) and SCA (bundler).
+ * Unified write transaction hook that works for both EOA (wagmi) and SCA (Account Kit).
  *
  * - EOA: uses wagmi `writeContractAsync` (direct tx)
- * - SCA: encodes calldata, creates a LightSmartAccount from the Alchemy signer,
- *   and sends via bundlerClient.sendUserOperation (standard ERC-4337 bundler API)
+ * - SCA: uses Account Kit's `useSmartAccountClient` + `useSendUserOperation`
+ *   which handles the correct smart account address, nonce, and paymaster.
  *
  * Returns `writeTransaction(params)` which resolves to a tx hash in both cases.
  */
 export function useWriteTransaction() {
-  const { type, address: userAddress } = useWalletAuth();
+  const { type } = useWalletAuth();
   const publicClient = usePublicClient();
 
   // EOA path
   const { writeContractAsync } = useWriteContract();
 
-  // SCA path — bundler client ref (created lazily on first SCA tx)
-  const bundlerRef = useRef<{
-    bundlerClient: ReturnType<typeof createBundlerClient> | null;
-    accountAddress: string | null;
-  }>({ bundlerClient: null, accountAddress: null });
+  // SCA path — Account Kit smart account client (uses ACCOUNT_TYPE for consistency)
+  const { client: smartAccountClient } = useSmartAccountClient({
+    type: ACCOUNT_TYPE,
+  });
 
-  // Reset bundler client when user changes
-  useEffect(() => {
-    if (!userAddress || type !== "sca") {
-      bundlerRef.current = { bundlerClient: null, accountAddress: null };
-    }
-  }, [userAddress, type]);
-
-  const getBundlerClient = useCallback(async () => {
-    console.log("[getBundlerClient] called, cached:", !!bundlerRef.current.bundlerClient, "for:", bundlerRef.current.accountAddress?.slice(0,10));
-    // Return cached if same user
-    if (
-      bundlerRef.current.bundlerClient &&
-      bundlerRef.current.accountAddress === userAddress
-    ) {
-      console.log("[getBundlerClient] returning cached");
-      return bundlerRef.current.bundlerClient;
-    }
-
-    if (!userAddress) throw new Error("No user address");
-    console.log("[getBundlerClient] creating new bundler client...");
-
-    const alchemyRpcUrl = `https://arb-sepolia.g.alchemy.com/v2/${CONFIG.alchemy.apiKey}`;
-
-    const viemClient = createPublicClient({
-      chain: arbitrumSepolia,
-      transport: http(alchemyRpcUrl),
-    });
-
-    // Get the Alchemy signer from Account Kit's internal store
-    // and convert it to a viem LocalAccount for permissionless compatibility
-    console.log("[getBundlerClient] getting signer...");
-    const { alchemyConfig } = await import("@/lib/alchemy");
-    const signer = alchemyConfig.store.getState().signer;
-
-    if (!signer) {
-      throw new Error("Alchemy signer not available — please reconnect");
-    }
-
-    console.log("[getBundlerClient] signer OK, creating light account...");
-    const owner = signer.toViemAccount();
-
-    const lightAccount = await toLightSmartAccount({
-      client: viemClient,
-      owner,
-      version: "1.1.0",
-      entryPoint: {
-        address: entryPoint06Address,
-        version: "0.6",
-      },
-    });
-
-    console.log("[getBundlerClient] light account created:", lightAccount.address.slice(0,10));
-
-    const paymasterClient = createPaymasterClient({
-      transport: http(alchemyRpcUrl),
-    });
-
-    const bundlerClient = createBundlerClient({
-      account: lightAccount,
-      client: viemClient,
-      chain: arbitrumSepolia,
-      paymaster: paymasterClient,
-      paymasterContext: {
-        policyId: CONFIG.alchemy.policyId,
-      },
-      transport: http(alchemyRpcUrl),
-    });
-
-    bundlerRef.current = {
-      bundlerClient: bundlerClient as any,
-      accountAddress: userAddress,
-    };
-
-    return bundlerClient as any;
-  }, [userAddress]);
+  const { sendUserOperationAsync } = useSendUserOperation({
+    client: smartAccountClient,
+    waitForTxn: true,
+  });
 
   const writeTransaction = useCallback(
     async (params: WriteTransactionParams): Promise<`0x${string}`> => {
-      console.log(`[writeTransaction] type=${type} fn=${params.functionName}`);
       if (type === "sca") {
         const data = encodeFunctionData({
           abi: params.abi,
@@ -138,26 +57,15 @@ export function useWriteTransaction() {
           args: params.args ?? [],
         });
 
-        const bundlerClient = await getBundlerClient();
-        console.log("[writeTransaction] sending UserOp...");
-
-        const hash = await bundlerClient.sendUserOperation({
-          calls: [
-            {
-              to: params.address,
-              data,
-              value: params.value ?? 0n,
-            },
-          ],
+        const result = await sendUserOperationAsync({
+          uo: {
+            target: params.address,
+            data,
+            value: params.value ?? 0n,
+          },
         });
 
-        // Wait for the UserOperation to be included in a block
-        const receipt = await bundlerClient.waitForUserOperationReceipt({
-          hash,
-          timeout: 120_000,
-        });
-
-        return receipt.receipt.transactionHash;
+        return result.hash;
       }
 
       // EOA path — use wagmi writeContractAsync
@@ -170,7 +78,7 @@ export function useWriteTransaction() {
         ...params.gasOverrides,
       });
     },
-    [type, writeContractAsync, getBundlerClient],
+    [type, writeContractAsync, sendUserOperationAsync],
   );
 
   const waitForReceipt = useCallback(
