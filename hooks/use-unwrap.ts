@@ -51,7 +51,7 @@ export function useUnwrap(): UseUnwrapResult {
     handle: `0x${string}`;
   } | null>(null);
 
-  const { writeTransaction, waitForReceipt, publicClient } = useWriteTransaction();
+  const { writeTransaction, publicClient } = useWriteTransaction();
   const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
@@ -92,7 +92,7 @@ export function useUnwrap(): UseUnwrapResult {
           ]);
           decryptionProof = result.decryptionProof;
           break;
-        } catch (err) {
+        } catch {
           if (attempt === MAX_RETRIES) {
             throw new Error("Unable to decrypt unwrap handle after multiple attempts — the TEE may be congested. Please retry later.");
           }

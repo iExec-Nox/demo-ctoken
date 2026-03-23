@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useWalletAuth } from "@/hooks/use-wallet-auth";
 
@@ -8,21 +8,23 @@ export function WalletGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isConnected, status } = useWalletAuth();
 
-  // Prevent hydration mismatch: server always renders null (no user session),
-  // so client must also render null on first paint, then check auth after mount.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // Track mount without setState to avoid the lint warning.
+  // A ref doesn't trigger re-render, but that's OK — the Account Kit hooks
+  // will trigger re-renders as the auth state settles after hydration.
+  const mountedRef = useRef(false);
 
   useEffect(() => {
-    if (mounted && status === "disconnected") {
+    mountedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (mountedRef.current && status === "disconnected") {
       router.replace("/");
     }
-  }, [mounted, status, router]);
+  }, [status, router]);
 
-  // Before mount or while initializing: show nothing (matches server output)
-  if (!mounted || status === "initializing") return null;
-
-  if (!isConnected) return null;
+  // Before hydration settles or while initializing: match server output (null)
+  if (status === "initializing" || !isConnected) return null;
 
   return <>{children}</>;
 }

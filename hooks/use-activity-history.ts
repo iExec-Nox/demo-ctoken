@@ -70,7 +70,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
   const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
 
   useEffect(() => {
-    if (!address || !publicClient) {
+    if (!onChainAddress || !publicClient) {
       setEntries([]);
       setIsLoading(false);
       return;
@@ -80,7 +80,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
 
     async function fetchActivity() {
       try {
-        if (!publicClient || !address) return;
+        if (!publicClient || !onChainAddress) return;
 
         const allBlockNumbers: bigint[] = [];
         const allEntries: ActivityEntry[] = [];
@@ -239,7 +239,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
       cancelled = true;
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [address, publicClient]);
+  }, [onChainAddress, publicClient]);
 
   return { entries, isLoading, error };
 }

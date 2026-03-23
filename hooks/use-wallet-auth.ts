@@ -7,11 +7,7 @@ import {
   useAuthModal,
 } from "@account-kit/react";
 import { useQuery } from "@tanstack/react-query";
-import { createPublicClient, http } from "viem";
-import { arbitrumSepolia } from "viem/chains";
-import { entryPoint06Address } from "viem/account-abstraction";
-import { toLightSmartAccount } from "permissionless/accounts";
-import { CONFIG } from "@/lib/config";
+import { createLightAccount } from "@/lib/smart-account";
 
 type WalletStatus = "connected" | "disconnected" | "initializing" | "authenticating";
 
@@ -43,29 +39,11 @@ export function useWalletAuth(): UseWalletAuthResult {
   const { data: smartAccountAddress } = useQuery({
     queryKey: ["smart-account-address", address],
     queryFn: async () => {
-      const { alchemyConfig } = await import("@/lib/alchemy");
-      const signer = alchemyConfig.store.getState().signer;
-      if (!signer) throw new Error("Signer not available");
-
-      const owner = signer.toViemAccount();
-      const rpcUrl = `https://arb-sepolia.g.alchemy.com/v2/${CONFIG.alchemy.apiKey}`;
-
-      const viemClient = createPublicClient({
-        chain: arbitrumSepolia,
-        transport: http(rpcUrl),
-      });
-
-      const lightAccount = await toLightSmartAccount({
-        client: viemClient,
-        owner,
-        version: "1.1.0",
-        entryPoint: { address: entryPoint06Address, version: "0.6" },
-      });
-
+      const lightAccount = await createLightAccount();
       return lightAccount.address;
     },
     enabled: type === "sca" && !!address && signerStatus.isConnected,
-    staleTime: Infinity,  // Address is deterministic — never refetch
+    staleTime: Infinity,
     retry: 3,
   });
 
