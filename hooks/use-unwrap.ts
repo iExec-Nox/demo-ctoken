@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { useWriteContract, usePublicClient } from "wagmi";
 import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { useWriteTransaction } from "@/hooks/use-write-transaction";
 import { parseUnits, decodeEventLog } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -34,7 +34,8 @@ interface UseUnwrapResult {
 }
 
 export function useUnwrap(): UseUnwrapResult {
-  const { address } = useWalletAuth();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
   const { handleClient } = useHandleClient();
   const [step, setStep] = useState<UnwrapStep>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -50,8 +51,7 @@ export function useUnwrap(): UseUnwrapResult {
     handle: `0x${string}`;
   } | null>(null);
 
-  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
-  const publicClient = usePublicClient();
+  const { writeTransaction, waitForReceipt, publicClient } = useWriteTransaction();
   const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
@@ -106,12 +106,12 @@ export function useUnwrap(): UseUnwrapResult {
 
       const gasOverrides = await estimateGasOverrides(publicClient);
 
-      const finalizeTx = await writeContractAsync({
+      const finalizeTx = await writeTransaction({
         address: cTokenAddress,
         abi: confidentialTokenAbi,
         functionName: "finalizeUnwrap",
         args: [handle, decryptionProof],
-        ...gasOverrides,
+        gasOverrides,
       });
 
       setFinalizeTxHash(finalizeTx);
@@ -120,7 +120,7 @@ export function useUnwrap(): UseUnwrapResult {
       invalidateBalances();
       finalizeParamsRef.current = null;
     },
-    [handleClient, writeContractAsync, publicClient, invalidateBalances],
+    [handleClient, writeTransaction, publicClient, invalidateBalances],
   );
 
   const retryFinalize = useCallback(async () => {
@@ -131,9 +131,6 @@ export function useUnwrap(): UseUnwrapResult {
     }
 
     try {
-      // Reset wagmi's internal mutation state so writeContractAsync can be called again
-      resetWriteContract();
-
       // Small cooldown before retry to avoid NoxCompute rate-limiting
       await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
@@ -143,11 +140,11 @@ export function useUnwrap(): UseUnwrapResult {
       setStep("error");
       setIsFinalizeError(true);
     }
-  }, [executeFinalize, resetWriteContract]);
+  }, [executeFinalize]);
 
   const unwrap = useCallback(
     async (token: TokenConfig, amount: string) => {
-      if (!address) {
+      if (!onChainAddress) {
         setError("Wallet not connected");
         setStep("error");
         return false;
@@ -169,8 +166,6 @@ export function useUnwrap(): UseUnwrapResult {
       const cTokenAddress = token.confidentialAddress as `0x${string}`;
 
       try {
-        const gasOverrides = await estimateGasOverrides(publicClient);
-
         // Step 1: Encrypt the amount via Handle Gateway
         setStep("encrypting");
         setError(null);
@@ -185,12 +180,12 @@ export function useUnwrap(): UseUnwrapResult {
         // Step 2: Initiate unwrap (from and to = msg.sender)
         setStep("unwrapping");
 
-        const unwrapTx = await writeContractAsync({
+        const unwrapTx = await writeTransaction({
           address: cTokenAddress,
           abi: confidentialTokenAbi,
           functionName: "unwrap",
-          args: [address, address, handle, handleProof],
-          ...gasOverrides,
+          args: [onChainAddress, onChainAddress, handle, handleProof],
+          gasOverrides: await estimateGasOverrides(publicClient),
         });
 
         setUnwrapTxHash(unwrapTx);
@@ -249,7 +244,7 @@ export function useUnwrap(): UseUnwrapResult {
         return false;
       }
     },
-    [address, handleClient, writeContractAsync, publicClient, executeFinalize],
+    [onChainAddress, handleClient, writeTransaction, publicClient, executeFinalize],
   );
 
   return {
