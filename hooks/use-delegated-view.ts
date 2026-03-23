@@ -1,7 +1,8 @@
 "use client";
 
-import { usePublicClient } from "wagmi";
+import { useMemo } from "react";
 import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { createTenderlyPublicClient } from "@/lib/smart-account";
 import { useQuery } from "@tanstack/react-query";
 import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
@@ -70,7 +71,8 @@ async function buildHandleTokenMap(
 export function useDelegatedView() {
   const { address, smartAccountAddress, type } = useWalletAuth();
   const onChainAddress = type === "sca" ? smartAccountAddress : address;
-  const publicClient = usePublicClient();
+  // Use Tenderly RPC for getLogs — no rate limits unlike Alchemy free tier
+  const publicClient = useMemo(() => createTenderlyPublicClient(), []);
 
   const query = useQuery({
     queryKey: ["delegated-view", address],
@@ -79,6 +81,7 @@ export function useDelegatedView() {
         return { sharedWithMe: [], myGrants: [] };
 
       // 1. Fetch ViewerAdded events (sender = me / viewer = me)
+
       const [myGrantsLogs, sharedLogs] = await Promise.all([
         publicClient.getContractEvents({
           address: NOX_COMPUTE_ADDRESS as `0x${string}`,

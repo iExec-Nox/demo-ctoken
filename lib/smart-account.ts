@@ -4,14 +4,22 @@ import { entryPoint06Address } from "viem/account-abstraction";
 import { toLightSmartAccount } from "permissionless/accounts";
 import { CONFIG } from "@/lib/config";
 
-/** Alchemy RPC URL for Arbitrum Sepolia — single source of truth */
+/** Alchemy RPC URL — used for bundler/paymaster (requires Alchemy API key) */
 export const ALCHEMY_RPC_URL = `https://arb-sepolia.g.alchemy.com/v2/${CONFIG.alchemy.apiKey}`;
 
-/** Shared viem public client for on-chain reads (Arbitrum Sepolia via Alchemy) */
+/** Public client via Alchemy — used for smart account creation and bundler */
 export function createAlchemyPublicClient() {
   return createPublicClient({
     chain: arbitrumSepolia,
     transport: http(ALCHEMY_RPC_URL),
+  });
+}
+
+/** Public client via Tenderly — used for on-chain reads (no rate limits on getLogs) */
+export function createTenderlyPublicClient() {
+  return createPublicClient({
+    chain: arbitrumSepolia,
+    transport: http(CONFIG.rpc.arbitrumSepolia),
   });
 }
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePublicClient } from "wagmi";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { createTenderlyPublicClient } from "@/lib/smart-account";
 import { erc20Abi } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
@@ -63,7 +63,8 @@ export interface UseActivityHistoryResult {
 export function useActivityHistory(): UseActivityHistoryResult {
   const { address, smartAccountAddress, type } = useWalletAuth();
   const onChainAddress = type === "sca" ? smartAccountAddress : address;
-  const publicClient = usePublicClient();
+  // Use Tenderly RPC for getLogs — no rate limits unlike Alchemy free tier
+  const publicClient = useMemo(() => createTenderlyPublicClient(), []);
   const [entries, setEntries] = useState<ActivityEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
