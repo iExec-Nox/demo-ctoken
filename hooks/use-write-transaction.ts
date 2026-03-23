@@ -2,20 +2,24 @@
 
 import { useCallback, useRef, useEffect } from "react";
 import { useWriteContract, usePublicClient } from "wagmi";
-import { type Abi, encodeFunctionData } from "viem";
+import {
+  createPublicClient,
+  encodeFunctionData,
+  http,
+} from "viem";
+import { arbitrumSepolia } from "viem/chains";
 import {
   createBundlerClient,
   createPaymasterClient,
+  entryPoint06Address,
 } from "viem/account-abstraction";
-import { arbitrumSepolia } from "viem/chains";
+import { toLightSmartAccount } from "permissionless/accounts";
 import { useWalletAuth } from "@/hooks/use-wallet-auth";
-import { createLightAccount, createAlchemyPublicClient, ALCHEMY_RPC_URL } from "@/lib/smart-account";
 import { CONFIG } from "@/lib/config";
-import { http } from "viem";
 
 interface WriteTransactionParams {
   address: `0x${string}`;
-  abi: Abi;
+  abi: readonly unknown[];
   functionName: string;
   args?: readonly unknown[];
   value?: bigint;
@@ -25,9 +29,6 @@ interface WriteTransactionParams {
     maxPriorityFeePerGas?: bigint;
   };
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- bundlerClient type is complex and version-dependent
-type BundlerClient = any;
 
 /**
  * Unified write transaction hook that works for both EOA (wagmi) and SCA (bundler).
@@ -47,7 +48,7 @@ export function useWriteTransaction() {
 
   // SCA path — bundler client ref (created lazily on first SCA tx)
   const bundlerRef = useRef<{
-    bundlerClient: BundlerClient | null;
+    bundlerClient: ReturnType<typeof createBundlerClient> | null;
     accountAddress: string | null;
   }>({ bundlerClient: null, accountAddress: null });
 
@@ -58,22 +59,54 @@ export function useWriteTransaction() {
     }
   }, [userAddress, type]);
 
-  const getBundlerClient = useCallback(async (): Promise<BundlerClient> => {
+  const getBundlerClient = useCallback(async () => {
+    console.log("[getBundlerClient] called, cached:", !!bundlerRef.current.bundlerClient, "for:", bundlerRef.current.accountAddress?.slice(0,10));
     // Return cached if same user
     if (
       bundlerRef.current.bundlerClient &&
       bundlerRef.current.accountAddress === userAddress
     ) {
+      console.log("[getBundlerClient] returning cached");
       return bundlerRef.current.bundlerClient;
     }
 
     if (!userAddress) throw new Error("No user address");
+    console.log("[getBundlerClient] creating new bundler client...");
 
-    const viemClient = createAlchemyPublicClient();
-    const lightAccount = await createLightAccount();
+    const alchemyRpcUrl = `https://arb-sepolia.g.alchemy.com/v2/${CONFIG.alchemy.apiKey}`;
+
+    const viemClient = createPublicClient({
+      chain: arbitrumSepolia,
+      transport: http(alchemyRpcUrl),
+    });
+
+    // Get the Alchemy signer from Account Kit's internal store
+    // and convert it to a viem LocalAccount for permissionless compatibility
+    console.log("[getBundlerClient] getting signer...");
+    const { alchemyConfig } = await import("@/lib/alchemy");
+    const signer = alchemyConfig.store.getState().signer;
+
+    if (!signer) {
+      throw new Error("Alchemy signer not available — please reconnect");
+    }
+
+    console.log("[getBundlerClient] signer OK, creating light account...");
+    const owner = signer.toViemAccount();
+
+    const lightAccount = await toLightSmartAccount({
+      client: viemClient,
+      owner,
+      version: "1.1.0",
+      entryPoint: {
+        address: entryPoint06Address,
+        version: "0.6",
+      },
+    });
+
+    console.log("[getBundlerClient] light account created:", lightAccount.address.slice(0,10));
 
     const paymasterClient = createPaymasterClient({
-      transport: http(ALCHEMY_RPC_URL),
+      transport: http(alchemyRpcUrl),
     });
 
     const bundlerClient = createBundlerClient({
@@ -81,27 +114,23 @@ export function useWriteTransaction() {
       client: viemClient,
       chain: arbitrumSepolia,
       paymaster: paymasterClient,
-      paymasterContext: { policyId: CONFIG.alchemy.policyId },
-      transport: http(ALCHEMY_RPC_URL),
-      userOperation: {
-        async estimateFeesPerGas() {
-          const block = await viemClient.getBlock({ blockTag: "latest" });
-          const baseFee = block.baseFeePerGas ?? 0n;
-          const minPriorityFee = 2_000_000n; // ~2 gwei floor for Arbitrum
-          return {
-            maxPriorityFeePerGas: minPriorityFee,
-            maxFeePerGas: baseFee * 2n + minPriorityFee,
-          };
-        },
+      paymasterContext: {
+        policyId: CONFIG.alchemy.policyId,
       },
+      transport: http(alchemyRpcUrl),
     });
 
-    bundlerRef.current = { bundlerClient, accountAddress: userAddress };
-    return bundlerClient;
+    bundlerRef.current = {
+      bundlerClient: bundlerClient as any,
+      accountAddress: userAddress,
+    };
+
+    return bundlerClient as any;
   }, [userAddress]);
 
   const writeTransaction = useCallback(
     async (params: WriteTransactionParams): Promise<`0x${string}`> => {
+      console.log(`[writeTransaction] type=${type} fn=${params.functionName}`);
       if (type === "sca") {
         const data = encodeFunctionData({
           abi: params.abi,
@@ -110,11 +139,19 @@ export function useWriteTransaction() {
         });
 
         const bundlerClient = await getBundlerClient();
+        console.log("[writeTransaction] sending UserOp...");
 
         const hash = await bundlerClient.sendUserOperation({
-          calls: [{ to: params.address, data, value: params.value ?? 0n }],
+          calls: [
+            {
+              to: params.address,
+              data,
+              value: params.value ?? 0n,
+            },
+          ],
         });
 
+        // Wait for the UserOperation to be included in a block
         const receipt = await bundlerClient.waitForUserOperationReceipt({
           hash,
           timeout: 120_000,
@@ -126,9 +163,9 @@ export function useWriteTransaction() {
       // EOA path — use wagmi writeContractAsync
       return writeContractAsync({
         address: params.address,
-        abi: params.abi,
+        abi: params.abi as any,
         functionName: params.functionName,
-        args: params.args as unknown[],
+        args: params.args as any,
         value: params.value,
         ...params.gasOverrides,
       });

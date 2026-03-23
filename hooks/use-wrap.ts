@@ -73,7 +73,9 @@ export function useWrap(): UseWrapResult {
         setStep("approving");
         setError(null);
 
+        console.log("[wrap] step1: approving", { erc20Address, cTokenAddress, parsedAmount: parsedAmount.toString(), type });
         const gasOverrides = await estimateGasOverrides(publicClient);
+        console.log("[wrap] gasOverrides ok");
 
         const approveTx = await writeTransaction({
           address: erc20Address,
@@ -82,9 +84,11 @@ export function useWrap(): UseWrapResult {
           args: [cTokenAddress, parsedAmount],
           gasOverrides,
         });
+        console.log("[wrap] approve tx:", approveTx);
 
         setApproveTxHash(approveTx);
         await waitForReceipt(approveTx);
+        console.log("[wrap] approve receipt ok");
 
         // Small cooldown — NoxCompute rate-limits rapid successive calls
         await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
