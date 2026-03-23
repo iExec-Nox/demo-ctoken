@@ -243,6 +243,79 @@ useWriteTransaction (routage EOA/SCA transparent)
 
 ---
 
+## Intégration CSS : isolation Tailwind v3 / v4
+
+### Problème
+
+Account Kit (`@account-kit/react/styles.css`) embarque du CSS basé sur **Tailwind v3** incluant un reset CSS complet. Notre application utilise **Tailwind v4**. L'import direct du CSS Account Kit écrase les utilities Tailwind v4, cassant le styling de toute l'application (boutons, inputs, layouts).
+
+### Solution : CSS Cascade Layers
+
+La stratégie utilise les [CSS Cascade Layers](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer) pour isoler les deux frameworks CSS.
+
+**Ordre des imports dans `app/globals.css` :**
+
+```css
+@import "@account-kit/react/styles.css" layer(account-kit);  /* 1. Layer bas — reset isolé */
+@import "tailwindcss";                                         /* 2. Tailwind v4 utilities */
+@import "./account-kit-ui.css";                                /* 3. Unlayered — plus haute priorité */
+```
+
+| Import | Layer | Priorité | Rôle |
+|--------|-------|----------|------|
+| `@account-kit/react/styles.css` | `layer(account-kit)` | Basse | Reset CSS Tailwind v3 isolé — n'écrase pas Tailwind v4 |
+| `tailwindcss` | (défaut) | Normale | Utilities Tailwind v4 du projet |
+| `./account-kit-ui.css` | Aucun (unlayered) | Haute | Styles des composants Account Kit (`.akui-*`) |
+
+**Pourquoi ça marche :** En CSS, le contenu sans layer (`unlayered`) a toujours priorité sur le contenu dans un layer. Le reset de Tailwind v3 dans `layer(account-kit)` ne peut donc jamais écraser les utilities Tailwind v4, tandis que les styles `.akui-*` (unlayered) s'appliquent correctement aux composants Account Kit.
+
+### Fichier `app/account-kit-ui.css` (612 lignes)
+
+Styles des composants UI de la modale d'authentification Account Kit, extraits de `@account-kit/react/styles.css` et importés hors layer pour garantir leur application.
+
+**Variables CSS (light/dark mode) :**
+
+Les variables suivent le pattern `--akui-*` et s'adaptent au thème via `:root:is(.dark, .dark *)` et `@media (prefers-color-scheme: dark)` :
+
+| Variable | Light | Dark | Usage |
+|----------|-------|------|-------|
+| `--akui-btn-primary` | `#E82594` | `#FF66CC` | Bouton principal (rose Alchemy) |
+| `--akui-btn-secondary` | `#E2E8F0` | `#374151` | Bouton secondaire |
+| `--akui-btn-auth` | `#FFF` | `rgba(255,255,255,0.05)` | Bouton OAuth (Google, Apple) |
+| `--akui-fg-primary` | `#020617` | `#fff` | Texte principal |
+| `--akui-fg-secondary` | `#475569` | `#E2E8F0` | Texte secondaire |
+| `--akui-fg-accent-brand` | `#E82594` | `#FF66CC` | Liens, accents |
+| `--akui-bg-surface-default` | `#fff` | `#020617` | Fond de la modale |
+| `--akui-bg-surface-subtle` | `#FBFDFF` | `#0F172A` | Fond de section |
+| `--akui-bg-surface-inset` | `#EFF4F9` | `#1F2937` | Fond d'input désactivé |
+| `--akui-static` | `#CBD5E1` | `#374151` | Bordures |
+| `--akui-critical` | `#F87171` | `#DC2626` | États d'erreur |
+| `--akui-border-radius-base` | `8px` | `8px` | Rayon de base (×1 pour inputs, ×2 pour modale) |
+
+**Composants stylisés :**
+
+| Sélecteur | Rôle |
+|-----------|------|
+| `.akui-modal` | Conteneur modale (border-radius ×2, fond surface) |
+| `.akui-btn` | Bouton de base (40px, transitions, hover shadow) |
+| `.akui-btn-primary` | Bouton rose Alchemy (CTA) |
+| `.akui-btn-secondary` | Bouton secondaire |
+| `.akui-btn-auth` | Bouton OAuth avec bordure (Google, Apple, WalletConnect) |
+| `.akui-btn-link` | Lien stylisé en bouton |
+| `.akui-input` | Input de base (40px, bordure, focus/error states) |
+| `.akui-form-controls` | Layout formulaire (flex column, gap) |
+| `.akui-form-label` | Label de formulaire |
+| `.akui-form-hint` | Texte d'aide / erreur sous l'input |
+| `.akui-btn-group` | Groupe de boutons (flex, wrap, gap) |
+
+### Impact zéro sur le design system existant
+
+- Les tokens CSS Nox (`--background`, `--foreground`, `--primary`, etc.) dans `globals.css` sont **inchangés**
+- Les composants shadcn/ui ne sont pas affectés (ils utilisent les tokens Nox, pas `--akui-*`)
+- Aucune modification de `postcss.config.mjs` ni de la config Tailwind
+
+---
+
 ## Fichiers impactés
 
 | Fichier | Rôle | Changement |
@@ -254,6 +327,8 @@ useWriteTransaction (routage EOA/SCA transparent)
 | `hooks/use-wallet-auth.ts` | Auth unifié | `useAccount()` Account Kit au lieu de permissionless |
 | `hooks/use-write-transaction.ts` | Envoi tx | `useSmartAccountClient` + `useSendUserOperation` |
 | `hooks/use-handle-client.ts` | Client decrypt | `useAccount()` Account Kit au lieu de permissionless |
+| `app/globals.css` | Imports CSS | +2 imports (Account Kit layer + UI styles) |
+| `app/account-kit-ui.css` | Styles modale auth | Nouveau fichier (612 lignes) — composants `.akui-*` |
 | `package.json` | Dépendances | +`@account-kit/*`, -`permissionless`, -`@reown/appkit*` |
 
 ---
