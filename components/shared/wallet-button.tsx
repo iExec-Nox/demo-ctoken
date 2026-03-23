@@ -1,7 +1,6 @@
 "use client";
 
-import { useAccount, useDisconnect } from "wagmi";
-import { useConnectWallet } from "@/hooks/use-connect-wallet";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,9 +14,8 @@ function formatAddress(address: string) {
 }
 
 export function WalletButton() {
-  const { connect } = useConnectWallet();
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
+  const { isConnected, address, connect, logout } = useWalletAuth();
+
   function handleCopyAddress() {
     if (address) navigator.clipboard.writeText(address);
   }
@@ -48,7 +46,7 @@ export function WalletButton() {
             Copy Address
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => disconnect()}
+            onClick={() => logout()}
             className="cursor-pointer gap-2 font-mulish text-xs font-semibold leading-5 text-dropdown-text"
           >
             <span aria-hidden="true" className="material-icons text-[14px]!">logout</span>

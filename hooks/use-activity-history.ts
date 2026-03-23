@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { erc20Abi } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
@@ -60,7 +61,7 @@ export interface UseActivityHistoryResult {
 }
 
 export function useActivityHistory(): UseActivityHistoryResult {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const publicClient = usePublicClient();
   const [entries, setEntries] = useState<ActivityEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);

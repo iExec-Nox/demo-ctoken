@@ -2,9 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useChainId, useSwitchChain } from "wagmi";
 import { useAuthModal } from "@account-kit/react";
 import { arbitrumSepolia } from "@account-kit/infra";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 
 interface UseWalletRedirectOptions {
   onConnect?: string;
@@ -15,7 +16,7 @@ const TARGET_CHAIN_ID = arbitrumSepolia.id;
 
 export function useWalletRedirect({ onConnect, onDisconnect }: UseWalletRedirectOptions) {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
+  const { isConnected, address, type } = useWalletAuth();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const { closeAuthModal } = useAuthModal();
@@ -23,8 +24,8 @@ export function useWalletRedirect({ onConnect, onDisconnect }: UseWalletRedirect
 
   useEffect(() => {
     if (isConnected && address && !wasConnected.current) {
-      // Ensure user is on Arbitrum Sepolia
-      if (chainId !== TARGET_CHAIN_ID) {
+      // EOA wallets may be on the wrong chain — request switch
+      if (type === "eoa" && chainId !== TARGET_CHAIN_ID) {
         switchChain({ chainId: TARGET_CHAIN_ID });
       }
       closeAuthModal();
@@ -34,5 +35,5 @@ export function useWalletRedirect({ onConnect, onDisconnect }: UseWalletRedirect
       router.push(onDisconnect);
     }
     wasConnected.current = isConnected;
-  }, [isConnected, address, chainId, router, onConnect, onDisconnect, closeAuthModal, switchChain]);
+  }, [isConnected, address, type, chainId, router, onConnect, onDisconnect, closeAuthModal, switchChain]);
 }

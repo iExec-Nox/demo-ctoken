@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAccount, useChainId, useReadContracts } from "wagmi";
+import { useChainId, useReadContracts } from "wagmi";
 import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { confidentialTokens } from "@/lib/tokens";
 import { ZERO_ADDRESS, ZERO_HANDLE } from "@/lib/contracts";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 
 export interface ConfidentialBalance {
   symbol: string;
@@ -21,10 +22,10 @@ export interface ConfidentialBalance {
 }
 
 export function useConfidentialBalances() {
-  const { address, isConnected, status } = useAccount();
+  const { address, isConnected, status } = useWalletAuth();
   const chainId = useChainId();
   const isReady = isConnected && !!address;
-  const isReconnecting = status === "reconnecting" || status === "connecting";
+  const isInitializing = status === "initializing" || status === "authenticating";
 
   // Filter tokens that have a real confidential address (not placeholder "0x...")
   const activeTokens = useMemo(
@@ -65,7 +66,7 @@ export function useConfidentialBalances() {
 
   const hasAnyConfidentialBalance = balances.some((b) => b.isInitialized);
 
-  const isLoading = !isReady || isReconnecting || isContractLoading;
+  const isLoading = !isReady || isInitializing || isContractLoading;
 
   return { balances, hasAnyConfidentialBalance, isLoading };
 }

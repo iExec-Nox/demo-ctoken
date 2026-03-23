@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -34,7 +35,7 @@ interface UseAddViewerResult {
 }
 
 export function useAddViewer(): UseAddViewerResult {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const publicClient = usePublicClient();
   const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
 

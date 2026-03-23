@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { parseUnits, isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -27,7 +28,7 @@ interface UseConfidentialTransferResult {
 }
 
 export function useConfidentialTransfer(): UseConfidentialTransferResult {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const { handleClient } = useHandleClient();
   const [step, setStep] = useState<TransferStep>("idle");
   const [error, setError] = useState<string | null>(null);

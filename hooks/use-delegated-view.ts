@@ -1,6 +1,7 @@
 "use client";
 
-import { useAccount, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { useQuery } from "@tanstack/react-query";
 import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
@@ -67,7 +68,7 @@ async function buildHandleTokenMap(
 // ── Hook ───────────────────────────────────────────────────────────
 
 export function useDelegatedView() {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const publicClient = usePublicClient();
 
   const query = useQuery({

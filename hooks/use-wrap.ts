@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { erc20Abi, parseUnits } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -23,7 +24,7 @@ interface UseWrapResult {
 }
 
 export function useWrap(): UseWrapResult {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const [step, setStep] = useState<WrapStep>("idle");
   const [error, setError] = useState<string | null>(null);
   const [approveTxHash, setApproveTxHash] = useState<`0x${string}` | undefined>();

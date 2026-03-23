@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { useTokenBalances } from "@/hooks/use-token-balances";
 import { useConfidentialBalances } from "@/hooks/use-confidential-balances";
 import { useTokenPrices } from "@/hooks/use-token-prices";
@@ -12,7 +12,7 @@ import { PortfolioHeader } from "./portfolio-header";
 import { DashboardSkeleton } from "./dashboard-skeleton";
 
 export function DashboardContent() {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const { balances, hasAnyBalance, isLoading } = useTokenBalances();
   const { hasAnyConfidentialBalance, isLoading: isConfidentialLoading } = useConfidentialBalances();
   const { prices } = useTokenPrices();

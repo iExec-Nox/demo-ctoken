@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { parseUnits, decodeEventLog } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -33,7 +34,7 @@ interface UseUnwrapResult {
 }
 
 export function useUnwrap(): UseUnwrapResult {
-  const { address } = useAccount();
+  const { address } = useWalletAuth();
   const { handleClient } = useHandleClient();
   const [step, setStep] = useState<UnwrapStep>("idle");
   const [error, setError] = useState<string | null>(null);
