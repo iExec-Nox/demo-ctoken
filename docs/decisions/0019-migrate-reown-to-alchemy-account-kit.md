@@ -1,7 +1,7 @@
 # ADR-0018 : Migration de Reown AppKit vers Alchemy Account Kit
 
 **Date :** 2026-03-23
-**Statut :** En cours (implémenté, en test sur Arbitrum Sepolia)
+**Statut :** En cours (implémenté, en test sur Arbitrum Sepolia — HandleClient SCA corrigé 2026-03-24)
 
 ## Contexte
 
@@ -222,10 +222,46 @@ return result.hash;  // tx hash on-chain
 
 ### `useHandleClient` — Client de déchiffrement (Nox SDK)
 
-Le handle client nécessite un objet capable de `signTypedData` pour déchiffrer les balances confidentielles.
+Le handle client nécessite un objet capable de `signTypedData` pour déchiffrer les balances confidentielles. `createViemHandleClient` de `@iexec-nox/handle` accepte soit un viem `WalletClient` (via `isViemWalletClient`), soit un viem `SmartAccount` (via `isViemSmartAccount`).
 
-- **EOA :** utilise le `walletClient` wagmi directement
-- **SCA :** utilise l'instance `account` retournée par `useAccount({ type: ACCOUNT_TYPE })`, qui signe via le signer Alchemy avec vérification ERC-1271
+- **EOA :** utilise le `walletClient` wagmi directement → passe `isViemWalletClient`
+- **SCA :** nécessite un **wrapper SmartAccount-like** car Account Kit ne fournit aucun objet compatible nativement :
+  - `useAccount().account` retourne un `LocalAccount` (`type: 'local'`) → ne passe **aucun** type guard
+  - `useSmartAccountClient().client.account` est aussi un `LocalAccount` (le signer)
+  - `useSmartAccountClient().client` a `getChainId` + `signTypedData` mais pas `getAddresses` → ne passe pas `isViemWalletClient`
+
+**Solution :** un wrapper léger qui satisfait `isViemSmartAccount` :
+
+```ts
+const smartAccountLike = {
+  type: "smart" as const,
+  getAddress: async () => smartAccountAddress,
+  signTypedData: async (typedData) => {
+    // Bridge du format : le SDK passe EIP712TypedData directement,
+    // mais le client action Account Kit destructure comme { typedData }
+    return smartAccountClient.signTypedData({ typedData });
+  },
+  client: smartAccountClient,
+};
+const handleClient = await createViemHandleClient(smartAccountLike);
+```
+
+**Pourquoi le bridge `signTypedData` :**
+
+Le SDK `@iexec-nox/handle` (via `SmartAccountAdapter`) appelle `smartAccount.signTypedData(eip712Data)` avec l'objet EIP712 directement (`{ domain, types, primaryType, message }`).
+
+Mais le client action `signTypedData` d'Account Kit (`@aa-sdk/core`) destructure son argument comme `{ typedData }` :
+
+```js
+// @aa-sdk/core/actions/smartAccount/signTypedData.js
+export const signTypedData = async (client, { account, typedData }) => {
+    return account.signTypedDataWith6492(typedData);
+};
+```
+
+Sans le wrapping `{ typedData }`, le `typedData` interne est `undefined`, ce qui cause `Cannot read properties of undefined (reading 'domain')` dans `hashTypedData`.
+
+Le hook utilise `useEffect` + `useState` (au lieu de `useQuery`) car `createViemHandleClient` est asynchrone et les dépendances (`smartAccountClient`, `smartAccountAddress`) se résolvent progressivement après l'hydration.
 
 ### Hooks consommateurs (inchangés)
 
@@ -326,7 +362,7 @@ Les variables suivent le pattern `--akui-*` et s'adaptent au thème via `:root:i
 | `components/providers.tsx` | Provider tree | `AlchemyAccountProvider` + wagmi via Account Kit |
 | `hooks/use-wallet-auth.ts` | Auth unifié | `useAccount()` Account Kit au lieu de permissionless |
 | `hooks/use-write-transaction.ts` | Envoi tx | `useSmartAccountClient` + `useSendUserOperation` |
-| `hooks/use-handle-client.ts` | Client decrypt | `useAccount()` Account Kit au lieu de permissionless |
+| `hooks/use-handle-client.ts` | Client decrypt | `useSmartAccountClient` + wrapper SmartAccount-like pour `@iexec-nox/handle` |
 | `app/globals.css` | Imports CSS | +2 imports (Account Kit layer + UI styles) |
 | `app/account-kit-ui.css` | Styles modale auth | Nouveau fichier (612 lignes) — composants `.akui-*` |
 | `package.json` | Dépendances | +`@account-kit/*`, -`permissionless`, -`@reown/appkit*` |
@@ -353,6 +389,61 @@ permissionless toLightSmartAccount:   0x28FA...  (permissionless factory)
 ### Solution
 
 Ne **jamais** construire de smart account manuellement. Utiliser exclusivement les hooks Account Kit (`useSmartAccountClient`, `useSendUserOperation`, `useAccount`) qui garantissent la cohérence des adresses.
+
+---
+
+## Piège rencontré : incompatibilité HandleClient / Account Kit
+
+### Problème
+
+Après la migration, le bouton "Reveal balance" (oeil) sur les cTokens restait désactivé pour les utilisateurs SCA. Le `handleClient` de `@iexec-nox/handle` ne se créait jamais.
+
+### Diagnostic (3 couches de problème)
+
+**1. `useAccount()` ne retourne pas un `SmartAccount` viem :**
+
+```
+useAccount({ type: "LightAccount" }).account
+├── type: "local"          ← attendu: "smart"
+├── getAddress: undefined  ← attendu: function
+├── client: false          ← attendu: truthy Client
+└── Résultat: ne passe ni isViemWalletClient ni isViemSmartAccount
+```
+
+**2. `useSmartAccountClient().client.account` est le signer, pas le smart account :**
+
+```
+smartAccountClient.account
+├── type: "local"          ← c'est le signer Alchemy, pas le smart account
+└── Même problème que useAccount()
+```
+
+**3. `smartAccountClient.signTypedData` a un format d'arguments différent du SDK :**
+
+```
+@iexec-nox/handle (SmartAccountAdapter):
+  smartAccount.signTypedData({ domain, types, primaryType, message })
+
+@aa-sdk/core (client action):
+  signTypedData(client, { account, typedData })  ← destructure { typedData }
+```
+
+Résultat : `typedData` est `undefined` → `hashTypedData(undefined)` → `Cannot read properties of undefined (reading 'domain')`.
+
+### Solution
+
+Wrapper SmartAccount-like qui satisfait `isViemSmartAccount` et bridge le format `signTypedData` :
+
+```ts
+{
+  type: "smart",
+  getAddress: async () => smartAccountAddress,
+  signTypedData: async (typedData) => smartAccountClient.signTypedData({ typedData }),
+  client: smartAccountClient,
+}
+```
+
+Le hook utilise `useEffect` + `useState` plutôt que `useQuery` car les dépendances async (`smartAccountClient`, `smartAccountAddress`) se résolvent progressivement, et `useQuery` avec `staleTime: Infinity` ne re-fetchait pas quand les dépendances changeaient de key.
 
 ---
 
@@ -388,4 +479,4 @@ Ne **jamais** construire de smart account manuellement. Utiliser exclusivement l
 
 - Disponibilité de `ModularAccountV2` sur Arbitrum Sepolia
 - Migration vers Account Kit v5 (`@alchemy/wallet-apis`) qui utilise EIP-7702 (signer address = smart account address)
-- Vérifier que le handle client Nox SDK fonctionne correctement avec le `account` retourné par `useAccount` (signature ERC-1271)
+- ~~Vérifier que le handle client Nox SDK fonctionne correctement avec le `account` retourné par `useAccount` (signature ERC-1271)~~ → **Résolu** : wrapper SmartAccount-like avec bridge `signTypedData` (voir piège HandleClient ci-dessus)
