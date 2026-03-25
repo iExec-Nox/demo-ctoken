@@ -63,7 +63,9 @@ export function useConfidentialBalances() {
     });
   }, [activeTokens, results]);
 
+  const hasAnyConfidentialBalance = balances.some((b) => b.isInitialized);
+
   const isLoading = !isReady || isReconnecting || isContractLoading;
 
-  return { balances, isLoading };
+  return { balances, hasAnyConfidentialBalance, isLoading };
 }
