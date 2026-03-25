@@ -8,47 +8,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useFaucetModal } from "./faucet-modal-provider";
+import { FaucetSection } from "./faucet-section";
 import { FaucetCard } from "./faucet-card";
 import { CONFIG } from "@/lib/config";
-
-const FAUCET_TOKENS = [
-  {
-    name: "Faucet ETH",
-    category: "Gas Asset",
-    description: (
-      <>
-        Used for transaction fees{" "}
-        <a
-          href={CONFIG.urls.bridge}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:underline"
-        >
-          (bridge)
-        </a>
-      </>
-    ),
-    icon: "/faucet-eth.svg",
-    mintLabel: "Mint ETH",
-    href: CONFIG.urls.faucets.eth,
-  },
-  {
-    name: "Faucet RLC",
-    category: "Assets",
-    description: "Used for private wrapping",
-    icon: "/faucet-usdc.svg",
-    mintLabel: "Mint RLC",
-    href: CONFIG.urls.faucets.rlc,
-  },
-  {
-    name: "Faucet USDC",
-    category: "Assets",
-    description: "Used for private wrapping",
-    icon: "/faucet-usdc.svg",
-    mintLabel: "Mint USDC",
-    href: CONFIG.urls.faucets.usdc,
-  },
-] as const;
 
 export function FaucetModal() {
   const { open, setOpen } = useFaucetModal();
@@ -57,10 +19,18 @@ export function FaucetModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className="max-h-[90dvh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto rounded-[40px] border-modal-border bg-modal-bg p-[30px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[714px] sm:p-10"
-        showCloseButton={true}
+        showCloseButton={false}
       >
         {/* Header */}
-        <div className="flex flex-col items-center gap-2.5">
+        <div className="relative flex flex-col items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="absolute top-0 right-0 cursor-pointer font-mulish text-xl text-text-heading transition-opacity hover:opacity-70"
+            aria-label="Close"
+          >
+            X
+          </button>
           <div className="relative size-[35px] overflow-hidden rounded-[10px] sm:size-16 sm:rounded-xl">
             <Image
               src="/nox-icon.png"
@@ -80,20 +50,50 @@ export function FaucetModal() {
           </DialogDescription>
         </div>
 
-        {/* Token cards */}
-        <div className="flex flex-col gap-6 sm:flex-row">
-          {FAUCET_TOKENS.map((token) => (
+        {/* Section 1: GET GAS */}
+        <FaucetSection number={1} title="Get Gas" defaultOpen>
+          <div className="flex flex-col gap-6 sm:flex-row">
             <FaucetCard
-              key={token.name}
-              name={token.name}
-              category={token.category}
-              description={token.description}
-              icon={token.icon}
-              mintLabel={token.mintLabel}
-              href={token.href}
+              name="Ethereum (Gas)"
+              description="Required to pay transaction fees"
+              icon="/icon-eth.svg"
+              mintLabel="Mint ETH"
+              href={CONFIG.urls.faucets.eth}
+              subtitle=""
             />
-          ))}
-        </div>
+            <FaucetCard
+              name="Bridge to Arbitrum Sepolia"
+              description="Move your ETH to Arbitrum to use tokens in the demo"
+              icon="/icon-bridge.png"
+              mintLabel="Bridge ETH"
+              href={CONFIG.urls.bridge}
+              subtitle="Takes ~10 minutes"
+            />
+          </div>
+        </FaucetSection>
+
+        {/* Section 2: GET TOKENS */}
+        <FaucetSection number={2} title="Get Tokens" defaultOpen>
+          <div className="flex flex-col gap-6">
+            <FaucetCard
+              name="Faucet RLC"
+              category="Assets"
+              description="Used for private wrapping"
+              icon="/faucet-usdc.svg"
+              mintLabel="Mint RLC"
+              href={CONFIG.urls.faucets.rlc}
+            />
+            <FaucetCard
+              name="Faucet USDC"
+              category="Assets"
+              description="Used for private wrapping"
+              icon="/faucet-usdc.svg"
+              mintLabel="Mint USDC"
+              href={CONFIG.urls.faucets.usdc}
+              warning="Tokens will only appear if you select Arbitrum Sepolia Network"
+            />
+          </div>
+        </FaucetSection>
 
         {/* Limits warning */}
         <div className="flex items-center justify-center gap-2 text-text-muted">
