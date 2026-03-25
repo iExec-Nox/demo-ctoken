@@ -18,7 +18,7 @@ export function FaucetModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-h-[90dvh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto rounded-[40px] border-modal-border bg-modal-bg p-[30px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[714px] sm:p-10"
+        className="max-h-[90dvh] max-w-[calc(100%-2rem)] gap-2.5 overflow-y-auto scrollbar-none rounded-[40px] border-modal-border bg-modal-bg p-[30px] shadow-[0px_2px_4px_0px_rgba(116,142,255,0.22)] duration-300 data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8 motion-reduce:data-[state=open]:slide-in-from-bottom-0 motion-reduce:data-[state=closed]:slide-out-to-bottom-0 sm:max-w-[714px] sm:p-10"
         showCloseButton={false}
       >
         {/* Header */}
@@ -73,7 +73,7 @@ export function FaucetModal() {
         </FaucetSection>
 
         {/* Section 2: GET TOKENS */}
-        <FaucetSection number={2} title="Get Tokens" defaultOpen>
+        <FaucetSection number={2} title="Get Tokens" defaultOpen className="mt-2.5">
           <div className="flex flex-col gap-6">
             <FaucetCard
               name="Faucet RLC"

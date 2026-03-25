@@ -11,6 +11,7 @@ interface FaucetSectionProps {
   number: number;
   title: string;
   defaultOpen?: boolean;
+  className?: string;
   children: React.ReactNode;
 }
 
@@ -18,12 +19,13 @@ export function FaucetSection({
   number,
   title,
   defaultOpen = true,
+  className,
   children,
 }: FaucetSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
+    <Collapsible open={open} onOpenChange={setOpen} className={className}>
       <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="flex size-8 items-center justify-center rounded-full bg-primary font-inter text-sm font-bold text-primary-foreground">
