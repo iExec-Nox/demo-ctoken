@@ -4,6 +4,12 @@ Historique chronologique des décisions et implémentations du projet Nox Confid
 
 ---
 
+### 2026-03-25 — Refonte modal Faucet avec sections collapsibles
+
+Restructuration de la modal faucet en deux sections collapsibles numérotées "GET GAS" (ETH + Bridge) et "GET TOKENS" (RLC + USDC). Ajout d'une carte Bridge to Arbitrum Sepolia, warning réseau sous USDC, et composant `FaucetSection` réutilisable basé sur shadcn Collapsible.
+
+→ ADR : [ADR-0018](./decisions/0018-revamp-faucet-modal-collapsible-sections.md)
+
 ### 2026-03-15 — Guide : Rate Limiting RPC & Cooldowns NoxCompute
 
 Documentation de référence détaillant tous les appels RPC par action (Wrap, Unwrap, Transfer, AddViewer), les cooldowns NoxCompute, le polling en arrière-plan, et les pistes d'amélioration (batch, retry, fallback, polling interval).
