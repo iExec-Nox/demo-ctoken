@@ -57,15 +57,15 @@ export function SelectiveDisclosureModal() {
   const isProcessing = step === "reading-handle" || step === "granting";
 
   const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      if (!isOpen && isProcessing) return;
-      setOpen(isOpen);
-      if (isOpen) {
+    (value: boolean) => {
+      if (!value && isProcessing) return;
+      if (!value) {
         setViewerAddress("");
         setScope("specific");
         setSelectedTokens(new Set());
         reset();
       }
+      setOpen(value);
     },
     [setOpen, reset, isProcessing],
   );
