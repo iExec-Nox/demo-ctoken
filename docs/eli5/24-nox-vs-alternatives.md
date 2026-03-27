@@ -180,4 +180,4 @@ Every approach makes a different trade-off:
 
 ---
 
-*This is the final article in the series. Start from the beginning: [01 — Handles](./01-handles.md)*
+*Next in the series: [25 — RWA Token Standards & Nox](./25-rwa-token-standards.md)*

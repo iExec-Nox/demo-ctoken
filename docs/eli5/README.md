@@ -62,3 +62,4 @@ A series of beginner-friendly explanations for the core concepts behind the Nox 
 | 19 | [Privacy by Convergence](./19-privacy-by-convergence.md) | TEE + Threshold Crypto + MPC + ZK Proofs — why Nox combines four privacy technologies |
 | 20 | [Permissionless Architecture](./20-permissionless-architecture.md) | Anyone can run a node, create primitives, and earn rewards — no gatekeepers |
 | 24 | [Nox vs. Alternatives](./24-nox-vs-alternatives.md) | Zama, Inco, Railgun, Aztec — how Nox compares and when to choose what |
+| 25 | [RWA Token Standards & Nox](./25-rwa-token-standards.md) | ERC-3643, ERC-4626, ERC-7540 — how Nox adds confidentiality to regulated assets and vaults |
