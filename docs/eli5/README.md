@@ -47,9 +47,18 @@ A series of beginner-friendly explanations for the core concepts behind the Nox 
 | 17 | [The Ingestor & NATS Pipeline](./17-ingestor-and-nats.md) | How blockchain events get picked up and delivered to the computation engine |
 | 18 | [The Runner](./18-the-runner.md) | The only component that ever sees plaintext — inside a locked room, for a brief moment |
 
+### Architecture Deep-Dives (continued)
+
+| # | Topic | Description |
+|---|---|---|
+| 21 | [The Handle Gateway](./21-handle-gateway.md) | The single front door for all encrypted data — encryption, storage, and decryption coordination |
+| 22 | [Remote Attestation & Proof of Cloud](./22-remote-attestation.md) | How you verify a TEE is genuine and running on the right machine — without trusting anyone |
+| 23 | [EIP-712 Signatures in Nox](./23-eip712-in-nox.md) | Structured, gasless signatures for input proofs and decryption requests |
+
 ### Vision
 
 | # | Topic | Description |
 |---|---|---|
 | 19 | [Privacy by Convergence](./19-privacy-by-convergence.md) | TEE + Threshold Crypto + MPC + ZK Proofs — why Nox combines four privacy technologies |
 | 20 | [Permissionless Architecture](./20-permissionless-architecture.md) | Anyone can run a node, create primitives, and earn rewards — no gatekeepers |
+| 24 | [Nox vs. Alternatives](./24-nox-vs-alternatives.md) | Zama, Inco, Railgun, Aztec — how Nox compares and when to choose what |

@@ -191,4 +191,4 @@ DeFi was built on the principle that **no single entity should control the syste
 
 ---
 
-*This is the final article in the series. Go back to the [index](./README.md) to review all topics.*
+*Next in the series: [21 — The Handle Gateway](./21-handle-gateway.md)*
