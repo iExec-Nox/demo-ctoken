@@ -45,14 +45,16 @@ After this, your browser only has the handle and the proof — the plaintext `10
 
 Every ciphertext in the Nox protocol lives in the Handle Gateway's S3 storage. For each handle, it stores:
 
-| Field | What it is |
-|---|---|
-| **Ciphertext** | The AES-256-GCM encrypted value |
+| Field                    | What it is                                          |
+| ------------------------ | --------------------------------------------------- |
+| **Ciphertext**           | The AES-256-GCM encrypted value                     |
 | **Ephemeral public key** | The ECIES ephemeral key `K` (needed for decryption) |
-| **Nonce** | The 12-byte AES-GCM nonce |
-| **Handle** | The 32-byte on-chain pointer |
+| **Nonce**                | The 12-byte AES-GCM nonce                           |
+| **Handle**               | The 32-byte on-chain pointer                        |
 
 The handle is the key to find the box. The box itself contains everything needed to decrypt — if you have the right key.
+
+TOLEARN: comment son mapper les handle et cyphertext, je pensais qu'il y a avait un mapping dans le smart contract sur la partie handle gateway n°2 what mean point to the real data
 
 ### 3. Serve Data to the Runner
 
@@ -104,12 +106,12 @@ The Handle Gateway sees the encrypted shared secret pass through, but can't use 
 
 This is just as important as what it does:
 
-| Action | Does it? | Why not |
-|---|---|---|
-| Decrypt user data | **No** | It coordinates decryption delegation with the KMS, but never holds the shared secret in the clear |
-| Store plaintext | **No** | Only ciphertext lives in S3 |
-| Decide permissions | **No** | It reads the ACL from the blockchain — the smart contract is the source of truth |
-| Compute on encrypted data | **No** | That's the Runner's job |
+| Action                    | Does it? | Why not                                                                                           |
+| ------------------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| Decrypt user data         | **No**   | It coordinates decryption delegation with the KMS, but never holds the shared secret in the clear |
+| Store plaintext           | **No**   | Only ciphertext lives in S3                                                                       |
+| Decide permissions        | **No**   | It reads the ACL from the blockchain — the smart contract is the source of truth                  |
+| Compute on encrypted data | **No**   | That's the Runner's job                                                                           |
 
 ---
 
@@ -122,6 +124,7 @@ Even though the Handle Gateway never sees plaintext values, it still handles sen
 - **It knows which handles exist** — metadata can reveal information (e.g., "this address made 10 transactions today")
 
 Running inside Intel TDX ensures:
+
 - The plaintext input during encryption is protected in hardware-isolated memory
 - The cloud provider can't snoop on encryption/decryption requests
 - Metadata about handle access patterns is protected
@@ -172,4 +175,4 @@ Every arrow into or out of the Handle Gateway carries **only encrypted or signed
 
 ---
 
-*Next in the series: [22 — Remote Attestation & Proof of Cloud](./22-remote-attestation.md)*
+_Next in the series: [22 — Remote Attestation & Proof of Cloud](./22-remote-attestation.md)_

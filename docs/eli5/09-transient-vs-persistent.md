@@ -8,10 +8,10 @@
 
 You're at a tech conference. There are two kinds of badges:
 
-| Badge type | What it does | Nox equivalent |
-|---|---|---|
-| **Day pass** (sticker on your shirt) | Gets you into sessions today. At the end of the day, security takes it back. | **Transient access** — works during this transaction only |
-| **Registered badge** (laminated, in the system) | Gets you in every day of the conference. Your name is in the database. | **Persistent access** — stored on-chain, works forever |
+| Badge type                                      | What it does                                                                 | Nox equivalent                                            |
+| ----------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Day pass** (sticker on your shirt)            | Gets you into sessions today. At the end of the day, security takes it back. | **Transient access** — works during this transaction only |
+| **Registered badge** (laminated, in the system) | Gets you in every day of the conference. Your name is in the database.       | **Persistent access** — stored on-chain, works forever    |
 
 When NoxCompute creates a result handle, it gives your contract a **day pass**. If you want to come back tomorrow (use that handle in a future transaction), you need to register for a **real badge** before the day ends.
 
@@ -20,6 +20,8 @@ When NoxCompute creates a result handle, it gives your contract a **day pass**. 
 ## Why Two Levels?
 
 You might wonder: "Why not just give persistent access automatically?" Two reasons:
+
+TOLEARN: est ce que les actions sont chainé dans un tx que le transient acces est parceque le contrat doi utiliser un donnée pendant et uniquement cette TX
 
 ### 1. Gas Savings
 
@@ -105,14 +107,14 @@ And if a user should be able to decrypt the value later, also call `Nox.allow(so
 
 ## Side-by-Side Comparison
 
-| | Transient | Persistent |
-|---|---|---|
-| **How it's granted** | Automatic (by NoxCompute) | Explicit (`Nox.allow()`) |
-| **Lifetime** | Current transaction only | Forever |
-| **Gas cost** | Very low (transient storage) | Higher (permanent storage write) |
-| **Use case** | Intermediate computation results | Final values stored in contract state |
-| **Survives transaction end?** | No | Yes |
-| **Can be used in future txs?** | No | Yes |
+|                                | Transient                        | Persistent                            |
+| ------------------------------ | -------------------------------- | ------------------------------------- |
+| **How it's granted**           | Automatic (by NoxCompute)        | Explicit (`Nox.allow()`)              |
+| **Lifetime**                   | Current transaction only         | Forever                               |
+| **Gas cost**                   | Very low (transient storage)     | Higher (permanent storage write)      |
+| **Use case**                   | Intermediate computation results | Final values stored in contract state |
+| **Survives transaction end?**  | No                               | Yes                                   |
+| **Can be used in future txs?** | No                               | Yes                                   |
 
 ---
 
@@ -130,4 +132,4 @@ And if a user should be able to decrypt the value later, also call `Nox.allow(so
 
 ---
 
-*Next in the series: [10 — Selective Disclosure](./10-selective-disclosure.md)*
+_Next in the series: [10 — Selective Disclosure](./10-selective-disclosure.md)_

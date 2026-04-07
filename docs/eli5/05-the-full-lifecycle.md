@@ -102,6 +102,8 @@ Step by step:
 8. **The encrypted result** is stored in the Handle Gateway, associated with the output handle.
 9. **The Runner acknowledges** the message, removing it from the queue.
 
+TOLEARN: pourquoi on dit que c'est stored in the handle gateways
+
 The plaintext value `1000` only ever existed **in the Runner's TEE memory** — never on disk, never on-chain, never in transit unencrypted.
 
 ---
@@ -187,4 +189,4 @@ Step by step:
 
 ---
 
-*Next in the series: [06 — ECIES Encryption](./06-ecies-encryption.md)*
+_Next in the series: [06 — ECIES Encryption](./06-ecies-encryption.md)_

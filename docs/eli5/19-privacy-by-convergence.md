@@ -1,5 +1,7 @@
 # Privacy by Convergence (ELI5)
 
+TOLEARN: verifier ce qui est acrtuel ou non?
+
 > **TL;DR** — Instead of betting on a single privacy technology, Nox combines four: TEEs for fast computation, threshold cryptography for key distribution, MPC for collaborative secrets, and ZK proofs for on-chain verification. Each covers the others' weaknesses.
 
 ---
@@ -65,13 +67,13 @@ That's **privacy by convergence**.
 
 ## How They Complement Each Other
 
-| Weakness of... | ...covered by |
-|---|---|
-| TEE hardware vulnerability | Threshold crypto (key isn't in one TEE) |
-| Threshold crypto latency | TEE speed (computations stay in TEE) |
-| MPC communication overhead | TEE (MPC only for key operations, not all computation) |
-| ZK proof generation cost | TEE (bulk computation in TEE, ZK only for verification) |
-| Single TEE compromise | MPC + threshold (distributed trust) |
+| Weakness of...             | ...covered by                                           |
+| -------------------------- | ------------------------------------------------------- |
+| TEE hardware vulnerability | Threshold crypto (key isn't in one TEE)                 |
+| Threshold crypto latency   | TEE speed (computations stay in TEE)                    |
+| MPC communication overhead | TEE (MPC only for key operations, not all computation)  |
+| ZK proof generation cost   | TEE (bulk computation in TEE, ZK only for verification) |
+| Single TEE compromise      | MPC + threshold (distributed trust)                     |
 
 The key insight: **no technology needs to be perfect**. Each one only needs to be good at its specific job, and the others cover its blind spots.
 
@@ -81,12 +83,12 @@ The key insight: **no technology needs to be perfect**. Each one only needs to b
 
 The documentation maps each technology to its role:
 
-| Technology | Where it applies | What it's best at |
-|---|---|---|
-| **TEE (Intel TDX)** | Runner, Handle Gateway, Ingestor, KMS | Fast computation on encrypted data |
-| **Threshold cryptography** | KMS | Distributed key management, no single point of failure |
-| **MPC** | KMS | Collaborative computation without reconstructing secrets |
-| **ZK Proofs** | On-chain verification | Gas-efficient proof verification without revealing data |
+| Technology                 | Where it applies                      | What it's best at                                        |
+| -------------------------- | ------------------------------------- | -------------------------------------------------------- |
+| **TEE (Intel TDX)**        | Runner, Handle Gateway, Ingestor, KMS | Fast computation on encrypted data                       |
+| **Threshold cryptography** | KMS                                   | Distributed key management, no single point of failure   |
+| **MPC**                    | KMS                                   | Collaborative computation without reconstructing secrets |
+| **ZK Proofs**              | On-chain verification                 | Gas-efficient proof verification without revealing data  |
 
 ---
 
@@ -119,13 +121,13 @@ Phase 3 — Full Convergence (Target)
 
 Each technology alone has a fatal flaw for DeFi:
 
-| Technology alone | Why it's not enough |
-|---|---|
-| TEE only | Hardware vulnerability = game over. Single manufacturer trust. |
-| Threshold crypto only | Too slow for real-time DeFi computation. |
-| MPC only | Communication overhead makes it impractical for complex operations. |
-| ZK proofs only | Proof generation too expensive for high-frequency operations. |
-| FHE (Fully Homomorphic Encryption) | Orders of magnitude too slow for practical DeFi. |
+| Technology alone                   | Why it's not enough                                                 |
+| ---------------------------------- | ------------------------------------------------------------------- |
+| TEE only                           | Hardware vulnerability = game over. Single manufacturer trust.      |
+| Threshold crypto only              | Too slow for real-time DeFi computation.                            |
+| MPC only                           | Communication overhead makes it impractical for complex operations. |
+| ZK proofs only                     | Proof generation too expensive for high-frequency operations.       |
+| FHE (Fully Homomorphic Encryption) | Orders of magnitude too slow for practical DeFi.                    |
 
 Convergence means the system's security doesn't depend on any single technology being unbreakable. It depends on an **attacker needing to break multiple independent systems simultaneously**.
 
@@ -145,4 +147,4 @@ Convergence means the system's security doesn't depend on any single technology 
 
 ---
 
-*Next in the series: [20 — Permissionless Architecture](./20-permissionless-architecture.md)*
+_Next in the series: [20 — Permissionless Architecture](./20-permissionless-architecture.md)_

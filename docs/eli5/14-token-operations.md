@@ -68,6 +68,7 @@ Moves an amount from one balance to another.
 | `newToBalance` | Receiver's new balance |
 
 **Inside the TEE:**
+
 ```
 If amount ≤ fromBalance:
     actualAmount = amount
@@ -80,6 +81,8 @@ Else:
 ```
 
 ### Mint
+
+TOLEARN: mint et burn sont uniquement pour le cToken smart contract
 
 Creates new tokens and adds them to a balance, updating total supply.
 
@@ -141,12 +144,12 @@ Atomic transfer:
 
 ## Gas and Computation Comparison
 
-| Approach | Events emitted | Runner computations | Gas cost |
-|---|---|---|---|
-| Manual (`sub` + `add` + `ge` + `select`) | 4 | 4 | Higher |
-| Atomic (`transfer`) | 1 | 1 | Lower |
-| Manual (`add` + `add` for mint) | 2 | 2 | Medium |
-| Atomic (`mint`) | 1 | 1 | Lower |
+| Approach                                 | Events emitted | Runner computations | Gas cost |
+| ---------------------------------------- | -------------- | ------------------- | -------- |
+| Manual (`sub` + `add` + `ge` + `select`) | 4              | 4                   | Higher   |
+| Atomic (`transfer`)                      | 1              | 1                   | Lower    |
+| Manual (`add` + `add` for mint)          | 2              | 2                   | Medium   |
+| Atomic (`mint`)                          | 1              | 1                   | Lower    |
 
 The atomic operations are always more efficient because they batch everything into a single event and a single Runner execution.
 
@@ -178,4 +181,4 @@ This prevents replay attacks (reusing old handles) and ensures every computation
 
 ---
 
-*Next in the series: [15 — The Protocol Architecture](./15-protocol-architecture.md)*
+_Next in the series: [15 — The Protocol Architecture](./15-protocol-architecture.md)_

@@ -18,6 +18,8 @@ That's **threshold cryptography**. The "treasure" is the protocol's master priva
 
 ## Today: Single KMS
 
+TOLEARN: ils ont parlé de cérémonie pour la generation de la clé ??
+
 The current MVP runs a **single KMS node** that holds the full private key:
 
 ```
@@ -32,6 +34,7 @@ The current MVP runs a **single KMS node** that holds the full private key:
 ```
 
 This works because:
+
 - The key is inside a **TEE** (Intel TDX) — even the server operator can't read it
 - **Remote attestation** proves the correct code is running
 
@@ -98,12 +101,12 @@ The private key `privkey_KMS` never exists in one place. It's distributed across
 
 ## Security Properties
 
-| Threat | Single KMS | Threshold KMS |
-|---|---|---|
-| One node compromised | Game over — attacker has the key | Useless — one share reveals nothing |
-| One node goes down | Service disrupted | Other nodes continue (if ≥ t remain) |
-| Colluding operators | One bad operator = full access | Need t bad operators to collude |
-| Hardware vulnerability | Single point of failure | Would need to exploit t independent machines |
+| Threat                 | Single KMS                       | Threshold KMS                                |
+| ---------------------- | -------------------------------- | -------------------------------------------- |
+| One node compromised   | Game over — attacker has the key | Useless — one share reveals nothing          |
+| One node goes down     | Service disrupted                | Other nodes continue (if ≥ t remain)         |
+| Colluding operators    | One bad operator = full access   | Need t bad operators to collude              |
+| Hardware vulnerability | Single point of failure          | Would need to exploit t independent machines |
 
 ---
 
@@ -156,4 +159,4 @@ Phase 3 (Future): Quantum-resistant
 
 ---
 
-*Next in the series: [17 — The Ingestor & NATS Pipeline](./17-ingestor-and-nats.md)*
+_Next in the series: [17 — The Ingestor & NATS Pipeline](./17-ingestor-and-nats.md)_

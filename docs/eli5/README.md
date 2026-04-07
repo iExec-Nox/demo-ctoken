@@ -63,3 +63,10 @@ A series of beginner-friendly explanations for the core concepts behind the Nox 
 | 20 | [Permissionless Architecture](./20-permissionless-architecture.md) | Anyone can run a node, create primitives, and earn rewards — no gatekeepers |
 | 24 | [Nox vs. Alternatives](./24-nox-vs-alternatives.md) | Zama, Inco, Railgun, Aztec — how Nox compares and when to choose what |
 | 25 | [RWA Token Standards & Nox](./25-rwa-token-standards.md) | ERC-3643, ERC-4626, ERC-7540 — how Nox adds confidentiality to regulated assets and vaults |
+
+### Practical
+
+| # | Topic | Description |
+|---|---|---|
+| 26 | [The On-Chain Smart Contracts](./26-smart-contracts.md) | ERC-20, cToken (ERC-7984), NoxCompute — the three contract types and their roles in the demo |
+| 27 | [NoxCompute Deep Dive](./27-noxcompute-deep-dive.md) | The computation engine — operands, arithmetic primitives, comparisons, why mint/burn live here |

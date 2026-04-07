@@ -9,6 +9,7 @@
 Real-World Assets (RWA) are one of the fastest-growing segments in crypto. But tokenizing a bond, a real estate fund, or a private credit pool isn't just a technical problem — it's a **confidentiality** problem.
 
 Today, if you tokenize a $50M real estate fund on Ethereum:
+
 - Everyone sees the fund's total AUM (Assets Under Management)
 - Everyone sees who invested and how much
 - Everyone sees redemption timing and amounts
@@ -44,6 +45,7 @@ ERC-3643 Token
 ```
 
 Before any transfer happens, the contract checks:
+
 1. Is the sender's identity verified? (KYC)
 2. Is the receiver's identity verified?
 3. Does this transfer comply with all rules?
@@ -142,6 +144,7 @@ Anyone can see:
 ```
 
 For a DeFi capital allocator, this is a disaster:
+
 - Competitors see your TVL and copy your strategy
 - Deposit/withdrawal patterns reveal conviction changes
 - Whale tracking bots front-run large redemptions
@@ -174,6 +177,8 @@ With Nox (Confidential Vault):
 
 ### What It Is
 
+TOLEARN: est ce que c'est pas le 4626 qui est une extension de 7540?
+
 ERC-7540 is an **extension of ERC-4626** designed for assets that can't be redeemed instantly — think private credit, real estate, or any illiquid asset. It adds an **asynchronous request/claim flow** on top of the standard vault interface.
 
 ### Why ERC-4626 Isn't Enough for RWA
@@ -182,12 +187,12 @@ In traditional DeFi (Aave, Yearn), you deposit and withdraw instantly. The under
 
 But real-world assets don't work that way:
 
-| DeFi Vault (ERC-4626) | RWA Vault (ERC-7540) |
-|---|---|
-| Deposit USDC → get shares instantly | Request deposit → wait for fund manager approval → get shares |
-| Withdraw → get USDC instantly | Request redemption → wait for liquidity / lock-up period → claim USDC |
-| Shares always redeemable | Redemptions may be queued or gated |
-| NAV updates every block | NAV updates weekly/monthly (off-chain valuation) |
+| DeFi Vault (ERC-4626)               | RWA Vault (ERC-7540)                                                  |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| Deposit USDC → get shares instantly | Request deposit → wait for fund manager approval → get shares         |
+| Withdraw → get USDC instantly       | Request redemption → wait for liquidity / lock-up period → claim USDC |
+| Shares always redeemable            | Redemptions may be queued or gated                                    |
+| NAV updates every block             | NAV updates weekly/monthly (off-chain valuation)                      |
 
 ### How ERC-7540 Works
 
@@ -242,6 +247,7 @@ Anyone can see:
 In traditional finance, this information would be **strictly confidential** between the fund and its investors. On-chain, it's on a billboard.
 
 For private credit especially, this is devastating:
+
 - Pending redemptions signal distress to the market
 - Deposit timing reveals investor conviction
 - Queue depth exposes the fund's liquidity position
@@ -323,15 +329,15 @@ A concrete example: **Confidential Private Credit Fund**
 
 ## The Competitive Landscape
 
-| Feature | ERC-3643 alone | ERC-4626/7540 alone | + Nox |
-|---|---|---|---|
-| Compliance rules | On-chain, public | N/A | On-chain, **enforced in TEE** (private) |
-| Investor balances | Public | Public | **Encrypted** (handles) |
-| Transfer amounts | Public | Public | **Encrypted** |
-| Vault TVL | N/A | Public | **Encrypted** (auditors can decrypt) |
-| Pending redemptions | N/A | Public | **Encrypted** |
-| Identity claims | Public (on-chain registry) | N/A | **Verified in TEE** (not exposed) |
-| Regulatory audit | Trivial (everything public) | Trivial | **Selective disclosure** (ACL) |
+| Feature             | ERC-3643 alone              | ERC-4626/7540 alone | + Nox                                   |
+| ------------------- | --------------------------- | ------------------- | --------------------------------------- |
+| Compliance rules    | On-chain, public            | N/A                 | On-chain, **enforced in TEE** (private) |
+| Investor balances   | Public                      | Public              | **Encrypted** (handles)                 |
+| Transfer amounts    | Public                      | Public              | **Encrypted**                           |
+| Vault TVL           | N/A                         | Public              | **Encrypted** (auditors can decrypt)    |
+| Pending redemptions | N/A                         | Public              | **Encrypted**                           |
+| Identity claims     | Public (on-chain registry)  | N/A                 | **Verified in TEE** (not exposed)       |
+| Regulatory audit    | Trivial (everything public) | Trivial             | **Selective disclosure** (ACL)          |
 
 The key trade-off: without Nox, compliance is easy because everything is public — but adoption is blocked because institutions won't expose their data. With Nox, compliance requires selective disclosure — but adoption becomes possible because data is private by default.
 
@@ -351,4 +357,4 @@ The key trade-off: without Nox, compliance is easy because everything is public 
 
 ---
 
-*Back to the [index](./README.md) to review all topics.*
+_Back to the [index](./README.md) to review all topics._
