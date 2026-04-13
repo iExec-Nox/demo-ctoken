@@ -149,6 +149,9 @@ export function useActivityHistory(): UseActivityHistoryResult {
         const getTs = (bn: bigint | null) =>
           bn != null ? formatTimestamp(timestamps.get(bn) ?? 0) : formatTimestamp(0);
 
+        const getRawTs = (bn: bigint | null) =>
+          bn != null ? (timestamps.get(bn) ?? 0) : 0;
+
         // Build entries
         for (const { pair, wrapLogs, unwrapLogs, confFromLogs, confToLogs } of pairResults) {
           for (const log of wrapLogs) {
@@ -159,6 +162,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
               asset: pair.asset,
               amount: formatBalance(log.args.value, pair.decimals),
               timestamp: getTs(log.blockNumber),
+              sortKey: getRawTs(log.blockNumber),
               txHash: log.transactionHash!,
             });
           }
@@ -171,6 +175,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
               asset: pair.asset,
               amount: formatBalance(log.args.cleartextAmount, pair.decimals),
               timestamp: getTs(log.blockNumber),
+              sortKey: getRawTs(log.blockNumber),
               txHash: log.transactionHash!,
             });
           }
@@ -186,6 +191,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
               asset: pair.asset,
               amount: "Encrypted",
               timestamp: getTs(log.blockNumber),
+              sortKey: getRawTs(log.blockNumber),
               txHash: log.transactionHash!,
             });
           }
@@ -201,14 +207,13 @@ export function useActivityHistory(): UseActivityHistoryResult {
             asset: "ACL",
             amount: viewer ? `${viewer.slice(0, 6)}...${viewer.slice(-4)}` : "—",
             timestamp: getTs(log.blockNumber),
+            sortKey: getRawTs(log.blockNumber),
             txHash: log.transactionHash!,
           });
         }
 
         // Sort newest first
-        allEntries.sort((a, b) =>
-          b.timestamp.localeCompare(a.timestamp) || b.id.localeCompare(a.id),
-        );
+        allEntries.sort((a, b) => b.sortKey - a.sortKey || b.id.localeCompare(a.id));
 
         if (!cancelled) {
           setEntries(allEntries);

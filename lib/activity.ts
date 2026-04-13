@@ -6,6 +6,8 @@ export interface ActivityEntry {
   asset: string;
   amount: string;
   timestamp: string;
+  /** Epoch seconds – used for sorting (newest first) */
+  sortKey: number;
   txHash: string;
 }
 
