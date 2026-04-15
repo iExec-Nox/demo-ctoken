@@ -1,8 +1,6 @@
 "use client";
 
-import { useAppKitAccount } from "@reown/appkit/react";
-import { useDisconnect } from "wagmi";
-import { useConnectWallet } from "@/hooks/use-connect-wallet";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,14 +14,16 @@ function formatAddress(address: string) {
 }
 
 export function WalletButton() {
-  const { connect } = useConnectWallet();
-  const { address, isConnected } = useAppKitAccount();
-  const { disconnect } = useDisconnect();
+  const { isConnected, address, smartAccountAddress, type, connect, logout } = useWalletAuth();
+
+  // For SCA: show the smart account address (where tokens live)
+  const displayAddress = type === "sca" ? (smartAccountAddress ?? address) : address;
+
   function handleCopyAddress() {
-    if (address) navigator.clipboard.writeText(address);
+    if (displayAddress) navigator.clipboard.writeText(displayAddress);
   }
 
-  if (isConnected && address) {
+  if (isConnected && displayAddress) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -33,7 +33,7 @@ export function WalletButton() {
           >
             <span aria-hidden="true" className="material-icons text-lg! leading-7">wallet</span>
             <span className="whitespace-nowrap font-mulish text-sm font-bold leading-5">
-              {formatAddress(address)}
+              {formatAddress(displayAddress)}
             </span>
           </Button>
         </DropdownMenuTrigger>
@@ -49,7 +49,7 @@ export function WalletButton() {
             Copy Address
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => disconnect()}
+            onClick={() => logout()}
             className="cursor-pointer gap-2 font-mulish text-xs font-semibold leading-5 text-dropdown-text"
           >
             <span aria-hidden="true" className="material-icons text-[14px]!">logout</span>

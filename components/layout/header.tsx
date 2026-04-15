@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { WalletButton } from "@/components/shared/wallet-button";
@@ -8,7 +8,7 @@ import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { useWalletRedirect } from "@/hooks/use-wallet-redirect";
 
 export function Header() {
-  const { isConnected } = useAppKitAccount();
+  const { isConnected } = useWalletAuth();
   useWalletRedirect({ onConnect: "/dashboard", onDisconnect: "/" });
 
   if (isConnected) {

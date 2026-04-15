@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { useWriteTransaction } from "@/hooks/use-write-transaction";
 import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -34,9 +35,9 @@ interface UseAddViewerResult {
 }
 
 export function useAddViewer(): UseAddViewerResult {
-  const { address } = useAccount();
-  const publicClient = usePublicClient();
-  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
+  const { writeTransaction, waitForReceipt, publicClient } = useWriteTransaction();
 
   const [step, setStep] = useState<AddViewerStep>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -46,12 +47,11 @@ export function useAddViewer(): UseAddViewerResult {
     setStep("idle");
     setError(null);
     setTxEntries([]);
-    resetWriteContract();
-  }, [resetWriteContract]);
+  }, []);
 
   const grant = useCallback(
     async (viewerAddress: string, tokens: TokenConfig[]) => {
-      if (!address) {
+      if (!onChainAddress) {
         setError("Wallet not connected");
         setStep("error");
         return false;
@@ -92,7 +92,7 @@ export function useAddViewer(): UseAddViewerResult {
             address: cTokenAddress,
             abi: confidentialTokenAbi,
             functionName: "confidentialBalanceOf",
-            args: [address],
+            args: [onChainAddress],
           });
 
           if (balanceHandle && balanceHandle !== ZERO_HANDLE) {
@@ -114,16 +114,15 @@ export function useAddViewer(): UseAddViewerResult {
         const entries: { hash: `0x${string}`; symbol: string }[] = [];
 
         for (const { token, handle } of handleEntries) {
-          const tx = await writeContractAsync({
+          const tx = await writeTransaction({
             address: NOX_COMPUTE_ADDRESS,
             abi: noxComputeAbi,
             functionName: "addViewer",
             args: [handle, viewer],
-            ...gasOverrides,
+            gasOverrides,
           });
 
-          // Wait for tx to be mined before sending the next one
-          await publicClient.waitForTransactionReceipt({ hash: tx });
+          await waitForReceipt(tx);
           entries.push({ hash: tx, symbol: token.symbol });
 
           // Cooldown — NoxCompute rate-limits rapid successive calls
@@ -140,7 +139,7 @@ export function useAddViewer(): UseAddViewerResult {
         return false;
       }
     },
-    [address, publicClient, writeContractAsync],
+    [onChainAddress, publicClient, writeTransaction, waitForReceipt],
   );
 
   return { step, error, txEntries, grant, reset };

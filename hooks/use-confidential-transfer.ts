@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { useWriteTransaction } from "@/hooks/use-write-transaction";
 import { parseUnits, isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -27,26 +28,25 @@ interface UseConfidentialTransferResult {
 }
 
 export function useConfidentialTransfer(): UseConfidentialTransferResult {
-  const { address } = useAccount();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
   const { handleClient } = useHandleClient();
   const [step, setStep] = useState<TransferStep>("idle");
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
 
-  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
-  const publicClient = usePublicClient();
+  const { writeTransaction, waitForReceipt, publicClient } = useWriteTransaction();
   const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
     setStep("idle");
     setError(null);
     setTxHash(undefined);
-    resetWriteContract();
-  }, [resetWriteContract]);
+  }, []);
 
   const transfer = useCallback(
     async (token: TokenConfig, amount: string, recipient: string) => {
-      if (!address) {
+      if (!onChainAddress) {
         setError("Wallet not connected");
         setStep("error");
         return false;
@@ -82,8 +82,6 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
       const recipientAddress = recipient as `0x${string}`;
 
       try {
-        const gasOverrides = await estimateGasOverrides(publicClient);
-
         // Step 1: Encrypt the amount via Handle Gateway
         setStep("encrypting");
         setError(null);
@@ -97,18 +95,16 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
         // Step 2: Confidential transfer
         setStep("transferring");
 
-        const transferTx = await writeContractAsync({
+        const transferTx = await writeTransaction({
           address: cTokenAddress,
           abi: confidentialTokenAbi,
           functionName: "confidentialTransfer",
           args: [recipientAddress, handle, handleProof],
-          ...gasOverrides,
+          gasOverrides: await estimateGasOverrides(publicClient),
         });
 
         setTxHash(transferTx);
-
-        // Wait for transfer tx to be mined before marking confirmed
-        await publicClient!.waitForTransactionReceipt({ hash: transferTx });
+        await waitForReceipt(transferTx);
 
         setStep("confirmed");
         pushGtmEvent("cdefi_transfer");
@@ -120,7 +116,7 @@ export function useConfidentialTransfer(): UseConfidentialTransferResult {
         return false;
       }
     },
-    [address, handleClient, writeContractAsync, publicClient, invalidateBalances],
+    [onChainAddress, handleClient, writeTransaction, waitForReceipt, publicClient, invalidateBalances],
   );
 
   return { step, error, txHash, transfer, reset };

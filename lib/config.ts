@@ -24,6 +24,10 @@ export const CONFIG = {
   storage: {
     devModeKey: "nox-dev-mode",
   },
+  alchemy: {
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ?? "",
+    policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID ?? "",
+  },
   walletConnect: {
     projectId:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "demo",
@@ -33,9 +37,16 @@ export const CONFIG = {
   },
 } as const;
 
+if (!CONFIG.alchemy.apiKey) {
+  console.warn(
+    "[alchemy] NEXT_PUBLIC_ALCHEMY_API_KEY is not set — Account Kit will not work. " +
+    "Get an API key at https://dashboard.alchemy.com"
+  );
+}
+
 if (CONFIG.walletConnect.projectId === "demo") {
   console.warn(
-    "[wagmi] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set — WalletConnect will not work. " +
+    "[walletconnect] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set — WalletConnect will not work. " +
     "Get a project ID at https://cloud.reown.com"
   );
 }

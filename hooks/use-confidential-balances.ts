@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAccount, useChainId, useReadContracts } from "wagmi";
+import { useChainId, useReadContracts } from "wagmi";
 import { isAddress } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { confidentialTokens } from "@/lib/tokens";
 import { ZERO_ADDRESS, ZERO_HANDLE } from "@/lib/contracts";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 
 export interface ConfidentialBalance {
   symbol: string;
@@ -21,10 +22,13 @@ export interface ConfidentialBalance {
 }
 
 export function useConfidentialBalances() {
-  const { address, isConnected, status } = useAccount();
+  const { address, smartAccountAddress, isConnected, type } = useWalletAuth();
   const chainId = useChainId();
-  const isReady = isConnected && !!address;
-  const isReconnecting = status === "reconnecting" || status === "connecting";
+
+  // For SCA: cTokens live on the smart account — no fallback to signer.
+  // For EOA: cTokens live on the wallet address.
+  const balanceAddress = type === "sca" ? smartAccountAddress : address;
+  const isReady = isConnected && !!balanceAddress;
 
   // Filter tokens that have a real confidential address (not placeholder "0x...")
   const activeTokens = useMemo(
@@ -37,7 +41,7 @@ export function useConfidentialBalances() {
       address: token.address as `0x${string}`,
       abi: confidentialTokenAbi,
       functionName: "confidentialBalanceOf" as const,
-      args: [address ?? ZERO_ADDRESS],
+      args: [balanceAddress ?? ZERO_ADDRESS],
       chainId,
     })),
     query: { enabled: isReady && activeTokens.length > 0 },
@@ -65,7 +69,7 @@ export function useConfidentialBalances() {
 
   const hasAnyConfidentialBalance = balances.some((b) => b.isInitialized);
 
-  const isLoading = !isReady || isReconnecting || isContractLoading;
+  const isLoading = !isReady || isContractLoading;
 
   return { balances, hasAnyConfidentialBalance, isLoading };
 }

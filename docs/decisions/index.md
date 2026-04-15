@@ -18,5 +18,6 @@
 | 0016 | [Bloquer la fermeture des modales pendant une transaction](./0016-block-modal-close-during-tx.md) | 2026-03-14 | Accepté |
 | 0017 | [Page Delegated View — visualisation des ACL on-chain](./0017-delegated-view-page.md) | 2026-03-16 | Accepté |
 | 0018 | [Refonte modal Faucet avec sections collapsibles](./0018-revamp-faucet-modal-collapsible-sections.md) | 2026-03-25 | Accepté |
+| 0019 | [Migration Reown AppKit → Alchemy Account Kit](./0019-migrate-reown-to-alchemy-account-kit.md) | 2026-03-23 | En cours |
 
 > Les dossiers d'étude et backlogs sont dans [`docs/todo/`](../todo/).

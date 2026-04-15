@@ -1,0 +1,613 @@
+/* Account Kit UI component styles (extracted from @account-kit/react/styles.css)
+   These are imported unlayered to ensure they override Tailwind base styles.
+   The full Account Kit CSS is imported in a layer to prevent its Tailwind v3
+   reset from conflicting with Tailwind v4. */
+
+:root {
+  --akui-active: #94A3B8;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-active: #94A3B8;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-active: #94A3B8;
+}
+
+:root {
+  --akui-static: #CBD5E1;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-static: #374151;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-static: #374151;
+}
+
+:root {
+  --akui-critical: #F87171;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-critical: #DC2626;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-critical: #DC2626;
+}
+
+:root {
+  --akui-btn-primary: #E82594;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-btn-primary: #FF66CC;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-btn-primary: #FF66CC;
+}
+
+:root {
+  --akui-btn-secondary: #E2E8F0;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-btn-secondary: #374151;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-btn-secondary: #374151;
+}
+
+:root {
+  --akui-btn-auth: #FFF;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-btn-auth: argb(255, 255, 255, 0.05);
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-btn-auth: argb(255, 255, 255, 0.05);
+}
+
+:root {
+  --akui-fg-primary: #020617;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-primary: #fff;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-primary: #fff;
+}
+
+:root {
+  --akui-fg-secondary: #475569;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-secondary: #E2E8F0;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-secondary: #E2E8F0;
+}
+
+:root {
+  --akui-fg-tertiary: #94A3B8;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-tertiary: #94A3B8;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-tertiary: #94A3B8;
+}
+
+:root {
+  --akui-fg-invert: #FFF;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-invert: #020617;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-invert: #020617;
+}
+
+:root {
+  --akui-fg-btn-primary: #FFF;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-btn-primary: #FFF;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-btn-primary: #FFF;
+}
+
+:root {
+  --akui-fg-disabled: #CBD5E1;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-disabled: #475569;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-disabled: #475569;
+}
+
+:root {
+  --akui-fg-accent-brand: #E82594;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-accent-brand: #FF66CC;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-accent-brand: #FF66CC;
+}
+
+:root {
+  --akui-fg-critical: #B91C1C;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-critical: #F87171;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-critical: #F87171;
+}
+
+:root {
+  --akui-fg-success: #16A34A;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-fg-success: #86EFAC;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-fg-success: #86EFAC;
+}
+
+:root {
+  --akui-bg-surface-default: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-default: #020617;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-default: #020617;
+}
+
+:root {
+  --akui-bg-surface-subtle: #FBFDFF;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-subtle: #0F172A;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-subtle: #0F172A;
+}
+
+:root {
+  --akui-bg-surface-inset: #EFF4F9;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-inset: #1F2937;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-inset: #1F2937;
+}
+
+:root {
+  --akui-bg-surface-critical: #FEF2F2;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-critical: #FEF2F2;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-critical: #FEF2F2;
+}
+
+:root {
+  --akui-bg-surface-error: #DC2626;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-error: #F87171;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-error: #F87171;
+}
+
+:root {
+  --akui-bg-surface-success: #16A34A;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-success: #86EFAC;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-success: #86EFAC;
+}
+
+:root {
+  --akui-bg-surface-warning: #EA580C;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root:not(.light, .light *) {
+    --akui-bg-surface-warning: #FDBA74;
+  }
+}
+
+:root:is(.dark, .dark *) {
+  --akui-bg-surface-warning: #FDBA74;
+}
+
+:root {
+  --akui-border-radius-base: 8px;
+}
+
+.akui-btn-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.akui-btn-group > .akui-btn:first-child {
+  min-width: 100%;
+  flex-shrink: 0;
+  flex-grow: 1;
+}
+
+.akui-btn-group > .akui-btn:not(:first-child) {
+  flex: 1 1 0%;
+}
+
+.akui-btn-group:has(> :nth-child(4)) > .akui-btn:not(:first-child) > .akui-btn-content {
+  display: none;
+}
+
+.akui-btn {
+  max-height: 40px;
+  display: inline-flex;
+  height: 2.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+
+  .akui-btn {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+.akui-btn {
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition-property: box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  border-radius: calc(var(--akui-border-radius-base) * 1);
+}
+
+.akui-btn:hover {
+  box-shadow: 2.8px 2.8px 8.8px 0px rgba(22, 22, 22, 0.14);
+}
+
+.akui-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.25;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.akui-btn:active {
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.akui-btn-primary {
+  background-color: var(--akui-btn-primary);
+  color: var(--akui-fg-btn-primary);
+}
+
+.akui-btn-secondary {
+  background-color: var(--akui-btn-secondary);
+  color: var(--akui-fg-primary);
+}
+
+.akui-btn-auth {
+  background-color: var(--akui-btn-auth);
+  color: var(--akui-fg-primary);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--akui-static);
+}
+
+.akui-btn-link {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+.akui-btn-link:hover {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+.akui-btn-link:active {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+.akui-btn-link {
+  height: unset;
+  padding: 0px;
+  cursor: pointer;
+  color: var(--akui-fg-accent-brand);
+}
+
+.akui-btn-link:disabled {
+  cursor: not-allowed;
+  opacity: 0.25;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.akui-btn-link:hover {
+  box-shadow: unset;
+}
+
+.akui-btn-link:active {
+  opacity: 0.25;
+}
+
+.akui-input {
+  display: inline-flex;
+  height: 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--akui-static);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--akui-fg-primary);
+  background-color: var(--akui-bg-surface-default);
+}
+
+.akui-input-disabled, .akui-input:disabled, .akui-input[disabled] {
+  pointer-events: none;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--akui-static);
+  background-color: var(--akui-bg-surface-inset);
+}
+
+.akui-input-disabled input, .akui-input:disabled input, .akui-input[disabled] input {
+  cursor: not-allowed;
+  background-color: var(--akui-bg-surface-inset);
+}
+
+.akui-input-disabled input::-moz-placeholder, .akui-input:disabled input::-moz-placeholder, .akui-input[disabled] input::-moz-placeholder {
+  color: var(--akui-fg-disabled);
+}
+
+.akui-input-disabled input::placeholder, .akui-input:disabled input::placeholder, .akui-input[disabled] input::placeholder {
+  color: var(--akui-fg-disabled);
+}
+
+.akui-input-disabled svg > *, .akui-input:disabled svg > *, .akui-input[disabled] svg > * {
+  fill: var(--akui-fg-disabled) !important;
+}
+
+.akui-input svg > * {
+  fill: var(--akui-fg-primary);
+}
+
+.akui-input:focus, .akui-input:focus-visible, .akui-input:focus-within, .akui-input:active {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--akui-active);
+}
+
+.akui-input {
+  border-radius: calc(var(--akui-border-radius-base) * 1);
+}
+
+.akui-input-error, .akui-input[error] {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--akui-critical);
+}
+
+.akui-input input {
+  flex-grow: 1;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background-color: inherit;
+}
+
+.akui-input input:focus, .akui-input input:focus-visible, .akui-input input:focus-within, .akui-input input:active {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.akui-input .akui-input:-moz-placeholder + .match-input > * {
+  fill: var(--akui-fg-disabled);
+}
+
+.akui-input .akui-input:placeholder-shown + .match-input > * {
+  fill: var(--akui-fg-disabled);
+}
+
+.akui-input .akui-input:-moz-placeholder + .match-input {
+  color: var(--akui-fg-disabled);
+}
+
+.akui-input .akui-input:placeholder-shown + .match-input {
+  color: var(--akui-fg-disabled);
+}
+
+.akui-form-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--akui-fg-secondary);
+}
+
+.akui-form-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.akui-form-hint {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+}
+
+.akui-input-error + .akui-form-hint, .akui-input[error] + .akui-form-hint {
+  color: var(--akui-critical);
+}
+
+.akui-modal {
+  border-top-left-radius: calc(var(--akui-border-radius-base) * 2);
+  border-top-right-radius: calc(var(--akui-border-radius-base) * 2);
+}
+
+@media (min-width: 768px) {
+
+  .akui-modal {
+    border-radius: calc(var(--akui-border-radius-base) * 2);
+  }
+}
+
+.akui-modal {
+  background-color: var(--akui-bg-surface-default);
+}
+
+@media (min-width: 768px) {
+
+  .md\:w-\[368px\] {
+    width: 368px;
+  }
+
+  .md\:max-w-sm {
+    max-width: 24rem;
+  }
+
+  .md\:items-center {
+    align-items: center;
+  }
+
+  .md\:radius-2 {
+    border-radius: calc(var(--akui-border-radius-base) * 2);
+  }
+}

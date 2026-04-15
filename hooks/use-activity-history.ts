@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { createTenderlyPublicClient } from "@/lib/smart-account";
 import { erc20Abi } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { noxComputeAbi, NOX_COMPUTE_ADDRESS } from "@/lib/nox-compute-abi";
@@ -60,15 +61,17 @@ export interface UseActivityHistoryResult {
 }
 
 export function useActivityHistory(): UseActivityHistoryResult {
-  const { address } = useAccount();
-  const publicClient = usePublicClient();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
+  // Use Tenderly RPC for getLogs — no rate limits unlike Alchemy free tier
+  const publicClient = useMemo(() => createTenderlyPublicClient(), []);
   const [entries, setEntries] = useState<ActivityEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
 
   useEffect(() => {
-    if (!address || !publicClient) {
+    if (!onChainAddress || !publicClient) {
       setEntries([]);
       setIsLoading(false);
       return;
@@ -78,7 +81,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
 
     async function fetchActivity() {
       try {
-        if (!publicClient || !address) return;
+        if (!publicClient || !onChainAddress) return;
 
         const allBlockNumbers: bigint[] = [];
         const allEntries: ActivityEntry[] = [];
@@ -91,28 +94,28 @@ export function useActivityHistory(): UseActivityHistoryResult {
                 address: pair.underlying,
                 abi: erc20Abi,
                 eventName: "Transfer",
-                args: { from: address, to: pair.cToken },
+                args: { from: onChainAddress, to: pair.cToken },
                 fromBlock: 0n,
               }),
               publicClient.getContractEvents({
                 address: pair.cToken,
                 abi: confidentialTokenAbi,
                 eventName: "UnwrapFinalized",
-                args: { receiver: address },
+                args: { receiver: onChainAddress },
                 fromBlock: 0n,
               }),
               publicClient.getContractEvents({
                 address: pair.cToken,
                 abi: confidentialTokenAbi,
                 eventName: "ConfidentialTransfer",
-                args: { from: address },
+                args: { from: onChainAddress },
                 fromBlock: 0n,
               }),
               publicClient.getContractEvents({
                 address: pair.cToken,
                 abi: confidentialTokenAbi,
                 eventName: "ConfidentialTransfer",
-                args: { to: address },
+                args: { to: onChainAddress },
                 fromBlock: 0n,
               }),
             ]);
@@ -125,7 +128,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
           address: NOX_COMPUTE_ADDRESS as `0x${string}`,
           abi: noxComputeAbi,
           eventName: "ViewerAdded",
-          args: { sender: address },
+          args: { sender: onChainAddress },
           fromBlock: 0n,
         });
 
@@ -237,7 +240,7 @@ export function useActivityHistory(): UseActivityHistoryResult {
       cancelled = true;
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [address, publicClient]);
+  }, [onChainAddress, publicClient]);
 
   return { entries, isLoading, error };
 }

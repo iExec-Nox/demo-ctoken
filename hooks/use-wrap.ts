@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
+import { useWriteTransaction } from "@/hooks/use-write-transaction";
 import { erc20Abi, parseUnits } from "viem";
 import { confidentialTokenAbi } from "@/lib/confidential-token-abi";
 import { estimateGasOverrides } from "@/lib/gas";
@@ -23,14 +24,16 @@ interface UseWrapResult {
 }
 
 export function useWrap(): UseWrapResult {
-  const { address } = useAccount();
+  const { address, smartAccountAddress, type } = useWalletAuth();
+  // For SCA: transactions execute from smart account, so cTokens must go there
+  const onChainAddress = type === "sca" ? smartAccountAddress : address;
+
   const [step, setStep] = useState<WrapStep>("idle");
   const [error, setError] = useState<string | null>(null);
   const [approveTxHash, setApproveTxHash] = useState<`0x${string}` | undefined>();
   const [wrapTxHash, setWrapTxHash] = useState<`0x${string}` | undefined>();
 
-  const { writeContractAsync, reset: resetWriteContract } = useWriteContract();
-  const publicClient = usePublicClient();
+  const { writeTransaction, waitForReceipt, publicClient } = useWriteTransaction();
   const invalidateBalances = useInvalidateBalances();
 
   const reset = useCallback(() => {
@@ -38,12 +41,11 @@ export function useWrap(): UseWrapResult {
     setError(null);
     setApproveTxHash(undefined);
     setWrapTxHash(undefined);
-    resetWriteContract();
-  }, [resetWriteContract]);
+  }, []);
 
   const wrap = useCallback(
     async (token: TokenConfig, amount: string) => {
-      if (!address) {
+      if (!onChainAddress) {
         setError("Wallet not connected");
         setStep("error");
         return false;
@@ -71,38 +73,35 @@ export function useWrap(): UseWrapResult {
         setStep("approving");
         setError(null);
 
-        const approveTx = await writeContractAsync({
+        const gasOverrides = await estimateGasOverrides(publicClient);
+
+        const approveTx = await writeTransaction({
           address: erc20Address,
           abi: erc20Abi,
           functionName: "approve",
           args: [cTokenAddress, parsedAmount],
-          ...(await estimateGasOverrides(publicClient)),
+          gasOverrides,
         });
 
         setApproveTxHash(approveTx);
-
-        // Wait for approve to be mined before calling wrap — the on-chain
-        // allowance must be effective for the wrap to succeed
-        await publicClient!.waitForTransactionReceipt({ hash: approveTx });
+        await waitForReceipt(approveTx);
 
         // Small cooldown — NoxCompute rate-limits rapid successive calls
         await new Promise((r) => setTimeout(r, TEE_COOLDOWN_MS));
 
-        // Step 2: Wrap on cToken contract (re-estimate gas fresh)
+        // Step 2: Wrap on cToken contract
         setStep("wrapping");
 
-        const wrapTx = await writeContractAsync({
+        const wrapTx = await writeTransaction({
           address: cTokenAddress,
           abi: confidentialTokenAbi,
           functionName: "wrap",
-          args: [address, parsedAmount],
-          ...(await estimateGasOverrides(publicClient)),
+          args: [onChainAddress, parsedAmount],
+          gasOverrides: await estimateGasOverrides(publicClient),
         });
 
         setWrapTxHash(wrapTx);
-
-        // Wait for wrap tx to be mined before marking confirmed
-        await publicClient!.waitForTransactionReceipt({ hash: wrapTx });
+        await waitForReceipt(wrapTx);
 
         setStep("confirmed");
         pushGtmEvent("cdefi_wrap");
@@ -114,7 +113,7 @@ export function useWrap(): UseWrapResult {
         return false;
       }
     },
-    [address, writeContractAsync, publicClient, invalidateBalances],
+    [onChainAddress, writeTransaction, waitForReceipt, publicClient, invalidateBalances],
   );
 
   return { step, error, approveTxHash, wrapTxHash, wrap, reset };
